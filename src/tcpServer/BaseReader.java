@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import modules.ErrorModule;
 import modules.TCPServerModule;
 import utility.Query_v12;
 
@@ -56,25 +57,13 @@ public class BaseReader extends Thread {
 				new TCPServerModule(query, output);
 			}
 			else
-			noCaseMatch(output, query.getSourceSid());
+			new ErrorModule(query, output, "No such module found!");
 		}
 		catch(IOException e){
 			
 		}
 		catch(Exception e){
 			
-		}
-	}
-	
-	private void noCaseMatch(DataOutputStream output, String destId){
-		try {
-			if(output!=null){
-				String st= "Invalid request! No such module found!";
-				BaseController.getInstance().sendResponse(st, "error", "string", false, destId, output);
-			}
-		} 
-		catch(Exception e){
-			System.out.println(TAG+"#9 "+e.getMessage());
 		}
 	}
 }

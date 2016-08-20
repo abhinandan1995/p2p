@@ -30,6 +30,16 @@ public class PeersTable{
 		addEntry(i, sid, st, 0);
 	}
 	
+	public PeersEntries getBySystemId(String id){
+		if(peersSystemIds.contains(id)){
+			for(int i=0;i<peersEntries.size();i++){
+				if(peersEntries.get(i).systemId.equals(id))
+					return peersEntries.get(i);
+			}
+		}
+		return null;
+	}
+	
 	public static PeersTable getInstance(){
 		if(peersInstance==null)
 			peersInstance= new PeersTable();

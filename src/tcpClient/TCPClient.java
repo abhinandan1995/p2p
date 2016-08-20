@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import modules.TCPClientModule;
+import utility.Query_v12;
+
 public class TCPClient extends Thread {
 
 	private int serverPort;
@@ -38,14 +41,18 @@ public class TCPClient extends Thread {
 				for(int i = 0; i < nb; i++)
 					digit[i] = input.readByte();
 				String st = new String(digit);
+				
+				Query_v12 query= utility.Utilities.getQueryObject(data);
+
 				System.out.println("Received from server: "+st);
+				
+				if(query.getModule().equals("tcp-server")){
+					new TCPClientModule(query, output);
+				}
 			}
 			else{
 				input=null;
 			}
-
-			//			Utilities.Query q= Utilities.Query.class.cast(Utilities.getObjectFromJson(st, Utilities.Query.class));
-			//			System.out.println("Received: "+ q.payload); 
 		}
 		catch (UnknownHostException e){ 
 			System.out.println("Socket:"+e.getMessage());}
@@ -64,7 +71,6 @@ public class TCPClient extends Thread {
 			}
 			}
 		}
-
 	}
 }
 

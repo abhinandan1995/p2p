@@ -30,6 +30,10 @@ public class BaseServer {
 				}
 				
 			}
+			else if(input.contains("ping-message")){
+				String data= input.substring(12);
+				baseController.sendRequest(new PingQuery("ping-message", null, null, data), "tcp-server", "PingQuery", false, "", utility.Utilities.getIpAddress());
+			}
 			else if(input.contains("ping")){
 				baseController.sendRequest(new PingQuery(input,null,null), "tcp-server", "PingQuery", true, "", utility.Utilities.getIpAddress());
 			}
