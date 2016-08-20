@@ -12,6 +12,8 @@ public class BaseServer {
 		
 		baseController= BaseController.getInstance();
 		baseController.startServer();
+		System.out.println("User ip:" + utility.Utilities.getIpAddress());
+		System.out.println("User id:" + utility.Utilities.getSystemId());
 		
 		String input="";
 		Scanner sc=new Scanner(System.in);
@@ -35,7 +37,8 @@ public class BaseServer {
 				baseController.sendRequest(new PingQuery("ping-message", null, null, data), "tcp-server", "PingQuery", false, "", utility.Utilities.getIpAddress());
 			}
 			else if(input.contains("ping")){
-				baseController.sendRequest(new PingQuery(input,null,null), "tcp-server", "PingQuery", true, "", utility.Utilities.getIpAddress());
+				String data= input.substring(input.indexOf("1"));
+				baseController.sendRequest(new PingQuery(input.substring(0, input.indexOf("1")-1),null,null), "tcp-server", "PingQuery", true, "", data);
 			}
 			else
 			baseController.sendRequest(input, "tcp-server", "string", true, "", utility.Utilities.getIpAddress());

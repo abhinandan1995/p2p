@@ -17,7 +17,7 @@ public class TCPClient extends Thread {
 	private String data;
 	private Socket s= null;
 	boolean response= false;
-	
+
 	public void sendRequestIntoNetwork(int serverPort, String ip, String data, boolean response){
 		this.serverPort= serverPort;
 		this.ip= ip;
@@ -41,11 +41,11 @@ public class TCPClient extends Thread {
 				for(int i = 0; i < nb; i++)
 					digit[i] = input.readByte();
 				String st = new String(digit);
-				
+
 				Query_v12 query= utility.Utilities.getQueryObject(data);
 
 				System.out.println("Received from server: "+st);
-				
+
 				if(query.getModule().equals("tcp-server")){
 					new TCPClientModule(query, output);
 				}
@@ -60,15 +60,15 @@ public class TCPClient extends Thread {
 			System.out.println("EOF:"+e.getMessage()); }
 		catch (IOException e){
 			System.out.println("IO:"+e.getMessage());} 
-		
+
 		finally {
 			if(s!=null){	
 				try {
 					s.close();
 				}
-			catch (IOException e){
-				System.out.println(e.getMessage());
-			}
+				catch (IOException e){
+					System.out.println(e.getMessage());
+				}
 			}
 		}
 	}
