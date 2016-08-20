@@ -42,7 +42,7 @@ public class TCPClient extends Thread {
 					digit[i] = input.readByte();
 				String st = new String(digit);
 
-				Query_v12 query= utility.Utilities.getQueryObject(data);
+				Query_v12 query= utility.Utilities.getQueryObject(st);
 
 				System.out.println("Received from server: "+st);
 

@@ -72,6 +72,7 @@ class PongModule{
 				PeersTable.getInstance().addEntry(pe.ip, pe.systemId, pe.status, pe.time);
 			}
 			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
+			PeersTable.getInstance().echoEntries();
 		}
 		
 		if(pq.action.equals("pong-message")){

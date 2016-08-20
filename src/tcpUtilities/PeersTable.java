@@ -91,5 +91,12 @@ public class PeersTable{
 			}
 		}
 	}
+	
+	public void echoEntries(){
+		for(int i=0;i<peersEntries.size(); i++){
+			PeersEntries pe= peersEntries.get(i);
+			System.out.println(pe.ip+" "+pe.systemId+" "+pe.status);
+		}
+	}
 }
 
