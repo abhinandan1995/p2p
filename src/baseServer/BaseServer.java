@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
+import tcpUtilities.PeersTable;
 
 public class BaseServer {
 
@@ -39,6 +40,9 @@ public class BaseServer {
 			else if(input.contains("ping")){
 				String data= input.substring(input.indexOf("1"));
 				baseController.sendRequest(new PingQuery(input.substring(0, input.indexOf("1")-1),null,null), "tcp-server", "PingQuery", true, "", data);
+			}
+			else if(input.contains("show-peers")){
+				PeersTable.getInstance().echoEntries();
 			}
 			else
 			baseController.sendRequest(input, "tcp-server", "string", true, "", utility.Utilities.getIpAddress());

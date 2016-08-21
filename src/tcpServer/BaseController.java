@@ -68,14 +68,22 @@ public class BaseController {
 	}
 	
 	public void sendRequest(String data, String module, String rtype, boolean response, String destId, String destIp){
-		
-		String requestData= utility.Utilities.makeRequest(getNewQueryId(), data, module, destId, "", "", "", response);
-		new TCPClient().sendRequestIntoNetwork(utility.Utilities.serverPort, destIp, requestData, response);
+		sendRequest(data, module, rtype, response, destId, destIp, 1);
 	}
 	
 	public void sendRequest(Object data, String module, String rtype, boolean response, String destId, String destIp){
+		sendRequest(data, module, rtype, response, destId, destIp, 1);
+	}
+	
+	public void sendRequest(String data, String module, String rtype, boolean response, String destId, String destIp, int hopCount){
 		
-		String requestData= utility.Utilities.makeRequest(getNewQueryId(), data, module, destId, "", "", "", response, rtype);
+		String requestData= utility.Utilities.makeRequest(getNewQueryId(), data, module, destId, null, null, null, response, hopCount);
+		new TCPClient().sendRequestIntoNetwork(utility.Utilities.serverPort, destIp, requestData, response);
+	}
+	
+	public void sendRequest(Object data, String module, String rtype, boolean response, String destId, String destIp, int hopCount){
+		
+		String requestData= utility.Utilities.makeRequest(getNewQueryId(), data, module, destId, null, null, null, response, rtype, hopCount);
 		new TCPClient().sendRequestIntoNetwork(utility.Utilities.serverPort, destIp, requestData, response);
 	}
 	
@@ -83,7 +91,7 @@ public class BaseController {
 		if(output==null)
 			return;
 		try {
-			String responseData= utility.Utilities.makeRequest(data, module, destId, "", "", "", response);
+			String responseData= utility.Utilities.makeRequest(data, module, destId, null, null, null, response);
 			output.writeInt(responseData.length());
 			output.writeBytes(responseData);
 		} catch (IOException e) {
@@ -98,7 +106,7 @@ public class BaseController {
 		if(output==null)
 			return;
 		try {
-			String responseData= utility.Utilities.makeRequest(data, module, destId, "", "", "", response,rtype);
+			String responseData= utility.Utilities.makeRequest(data, module, destId, null, null, null, response,rtype);
 			output.writeInt(responseData.length());
 			output.writeBytes(responseData);
 		} catch (IOException e) {

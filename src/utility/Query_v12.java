@@ -1,6 +1,7 @@
 package utility;
 
 public class Query_v12 {
+	
 	int queryId;
 	String module;
 	String code;
@@ -12,55 +13,17 @@ public class Query_v12 {
 	String destPort;
 	boolean response;
 	String rtype;
+	int hopCount;
 	
 	Query_v12(String m, String p){
-		this(m,p,"");
-	}
-
-	Query_v12(String m, String p, String c){
-		module=m;
-		payload=p;
-		code=c;
-	}
-	
-	Query_v12(String m, String p, String ss, String ds, String si){
-		this(m,p,ss,ds,si,"","","");
-	}
-	
-	Query_v12(String m, String p, String ss, String ds, String si, String sp, String dp){
-		this(m,p,ss,ds,si,"",sp,dp);
-	}
-	
-	Query_v12(String m, String p, String ss, String ds, String si, String sp){
-		this(m,p,ss,ds,si,"",sp,"");
-	}
-
-	Query_v12(String m, String p, String ss, String ds, String si, String c, String sp, String dp){
-		module=m;
-		payload=p;
-		sourceSid=ss;
-		destSid=ds;
-		sourceIp=si;
-		code=c;
-		sourcePort=sp;
-		destPort= dp;
-		response= true;
-	}
-	
-	Query_v12(String m, String p, String ss, String ds, String si, String c, String sp, String dp, boolean r, String rt){
-		module=m;
-		payload=p;
-		sourceSid=ss;
-		destSid=ds;
-		sourceIp=si;
-		code=c;
-		sourcePort=sp;
-		destPort= dp;
-		response= r;
-		rtype= rt;
+		this(utility.Utilities.getRandomNumber(), m, p, null, null, null, null, null, null, false, null);
 	}
 	
 	Query_v12(int id, String m, String p, String ss, String ds, String si, String c, String sp, String dp, boolean r, String rt){
+		this(id, m, p, ss, ds, si, c, sp, dp, r, rt, 10);
+	}
+	
+	Query_v12(int id, String m, String p, String ss, String ds, String si, String c, String sp, String dp, boolean r, String rt, int hc){
 		queryId=id;
 		module=m;
 		payload=p;
@@ -72,6 +35,7 @@ public class Query_v12 {
 		destPort= dp;
 		response= r;
 		rtype= rt;
+		setHopCount(hc);
 	}
 	public String getModule(){
 		return module;
@@ -82,31 +46,63 @@ public class Query_v12 {
 	}
 	
 	public String getCode(){
+		if(code==null)
+			code="";
 		return code;
 	}
 	
 	public String getSourceSid(){
+		if(sourceSid==null)
+			sourceSid="";
 		return sourceSid;
 	}
 	
 	public String getDestSid(){
+		if(destSid==null)
+			destSid="";
 		return destSid;
 	}
 	
 	public String getSourceIp(){
+		if(sourceIp==null)
+			sourceIp="";
 		return sourceIp;
 	}
 	
-	public String getSourcePort(){
-		return sourcePort;
+	public int getSourcePort(){
+		try {
+			return Integer.parseInt(sourcePort);
+		} catch (NumberFormatException e) {
+			System.out.println("Queries: Unable to parse source port. "+e.getMessage());
+		}
+		return 0;
 	}
 	
-	public String getDestPort(){
-		return destPort;
+	public int getDestPort(){
+		try {
+			return Integer.parseInt(destPort);
+		} catch (NumberFormatException e) {
+			System.out.println("Queries: Unable to parse destination port. "+e.getMessage());
+		}
+		return 0;
+	}
+	
+	public int getHopCount(){
+		return hopCount;
 	}
 	
 	public boolean getResponse(){
 		return response;
+	}
+	
+	public int getQueryId(){
+		return queryId;
+	}
+	
+	public String getResponseType(){
+		if(rtype==null)
+			rtype="string";
+		return rtype;
 	}
 	
 	public void setResponse(boolean x){
@@ -121,15 +117,17 @@ public class Query_v12 {
 		queryId=i;
 	}
 	
-	public int getQueryId(){
-		return queryId;
+	public int setRandomId(){
+		return (queryId= utility.Utilities.getRandomNumber());
 	}
 	
-	public String getResponseType(){
-		return rtype;
+	public void setHopCount(int x){
+		if(x>7)
+			x=7;
+		hopCount= x;
 	}
-	
-	public void setRandomId(){
-		queryId= utility.Utilities.getRandomNumber();
+
+	public void decrementHop(){
+		hopCount--;
 	}
 }

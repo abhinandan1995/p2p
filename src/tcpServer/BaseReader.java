@@ -42,7 +42,7 @@ public class BaseReader extends Thread {
 			String data= new String(digit);
 			Query_v12 query= utility.Utilities.getQueryObject(data);
 			
-			if(BaseController.getInstance().isPresent(query.getQueryId()))
+			if(BaseController.getInstance().isPresent(query.getQueryId()) || query.getHopCount()<=0)
 				return;
 			
 			System.out.println ("receive from : " + 

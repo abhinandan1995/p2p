@@ -148,29 +148,32 @@ public class Utilities{
 	}
 	
 	public static String makeRequest(String data, String module, String destId, String code, String sourcePort, String destPort, boolean res){
-		try{
-			return getJsonString(new Query_v12(getRandomNumber(), module, getJsonString(data), getSystemId(), destId, getIpAddress(), code, sourcePort, destPort, res, "string" ));
-		}
-		catch(Exception e){
-			System.out.println(TAG+"#9 "+e.getMessage());
-		}
-		return null;
+		return makeRequest(getRandomNumber(), data, module, destId, code, sourcePort, destPort, res,1);
 	}
 	
 	public static String makeRequest(Object data, String module, String destId, String code, String sourcePort, String destPort, boolean res, String className){
-		try{
-			return getJsonString(new Query_v12(getRandomNumber(), module, getJsonString(data), getSystemId(), destId, getIpAddress(), code, sourcePort, destPort, res, className ));
-		}
-		catch(Exception e){
-			System.out.println(TAG+"#9 "+e.getMessage());
-		}
-		return null;
+		return makeRequest(getRandomNumber(), data, module, destId, code, sourcePort, destPort, res, className,1);
+	}
+	
+	public static String makeRequest(String data, String module, String destId, String code, String sourcePort, String destPort, boolean res, int hopCount){
+		return makeRequest(getRandomNumber(), data, module, destId, code, sourcePort, destPort, res, hopCount);
+	}
+	
+	public static String makeRequest(Object data, String module, String destId, String code, String sourcePort, String destPort, boolean res, String className, int hopCount){
+		return makeRequest(getRandomNumber(), data, module, destId, code, sourcePort, destPort, res, className, hopCount);
+	}
+	
+	public static String makeRequest(int qid, String data, String module, String destId, String code, String sourcePort, String destPort, boolean res){
+		return makeRequest(getRandomNumber(), data, module, destId, code, sourcePort, destPort, res,1);
+	}
+	
+	public static String makeRequest(int qid, Object data, String module, String destId, String code, String sourcePort, String destPort, boolean res, String className){
+		return makeRequest(getRandomNumber(), data, module, destId, code, sourcePort, destPort, res, className,1);
 	}
 
-
-	public static String makeRequest(int qid, String data, String module, String destId, String code, String sourcePort, String destPort, boolean res){
+	public static String makeRequest(int qid, String data, String module, String destId, String code, String sourcePort, String destPort, boolean res, int hopCount){
 		try{
-			return getJsonString(new Query_v12(qid, module, getJsonString(data), getSystemId(), destId, getIpAddress(), code, sourcePort, destPort, res, "string" ));
+			return getJsonString(new Query_v12(qid, module, getJsonString(data), getSystemId(), destId, getIpAddress(), code, sourcePort, destPort, res, "string", hopCount));
 		}
 		catch(Exception e){
 			System.out.println(TAG+"#9 "+e.getMessage());
@@ -178,9 +181,9 @@ public class Utilities{
 		return null;
 	}
 	
-	public static String makeRequest(int qid, Object data, String module, String destId, String code, String sourcePort, String destPort, boolean res, String className){
+	public static String makeRequest(int qid, Object data, String module, String destId, String code, String sourcePort, String destPort, boolean res, String className, int hopCount){
 		try{
-			return getJsonString(new Query_v12(qid, module, getJsonString(data), getSystemId(), destId, getIpAddress(), code, sourcePort, destPort, res, className ));
+			return getJsonString(new Query_v12(qid, module, getJsonString(data), getSystemId(), destId, getIpAddress(), code, sourcePort, destPort, res, className, hopCount));
 		}
 		catch(Exception e){
 			System.out.println(TAG+"#9 "+e.getMessage());
