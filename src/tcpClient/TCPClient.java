@@ -4,9 +4,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import baseServer.BaseNetworkEngine;
 import modules.TCPClientModule;
 import utility.Query_v12;
 
@@ -17,7 +19,8 @@ public class TCPClient extends Thread {
 	private String data;
 	private Socket s= null;
 	boolean response= false;
-
+	private static int requestCount=0;
+	
 	public void sendRequestIntoNetwork(int serverPort, String ip, String data, boolean response){
 		this.serverPort= serverPort;
 		this.ip= ip;
@@ -28,13 +31,20 @@ public class TCPClient extends Thread {
 
 	public void run(){
 
+		if(requestCount++ >= utility.Utilities.maxparallelRequests){
+			System.out.println("System Overload: Too many requests!");
+			return;
+		}
+		
 		try{ 
-			s = new Socket(ip, serverPort); 
+			s = new Socket();
+			s.connect(new InetSocketAddress(ip, serverPort), utility.Utilities.connectionTimeout);
+			
 			DataInputStream input = new DataInputStream( s.getInputStream()); 
 			DataOutputStream output = new DataOutputStream( s.getOutputStream()); 
 			output.writeInt(data.length());
 			output.writeBytes(data);
-
+			
 			if(response){
 				int nb = input.readInt();
 				byte []digit= new byte[nb];
@@ -59,9 +69,15 @@ public class TCPClient extends Thread {
 		catch (EOFException e){
 			System.out.println("EOF:"+e.getMessage()); }
 		catch (IOException e){
-			System.out.println("IO:"+e.getMessage());} 
+			System.out.println("IO:"+e.getMessage());
+			if(e.getMessage().contains("timed out")){
+				BaseNetworkEngine.getInstance().manageNeighboursList(this.ip, true);
+			} 
+			}
 
 		finally {
+			requestCount--;
+			
 			if(s!=null){	
 				try {
 					s.close();

@@ -5,6 +5,7 @@ import java.util.Date;
 
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
+import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
 import utility.Query_v12;
@@ -65,6 +66,7 @@ class PongModule{
 	
 	private void processPongQuery(PingQuery pq){
 		
+		boolean valid = false;
 		if(pq.action.equals("pong")){
 			PeersEntries pe;
 			for(int i=0;i<pq.peers.size();i++){
@@ -72,7 +74,7 @@ class PongModule{
 				PeersTable.getInstance().addEntry(pe.ip, pe.systemId, pe.status, pe.time);
 			}
 			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
-			PeersTable.getInstance().echoEntries();
+			valid= true;
 		}
 		
 		if(pq.action.equals("pong-message")){
@@ -123,8 +125,11 @@ class PongModule{
 				return;
 		}
 			
-		if(output!=null)
-		new ErrorModule(baseQuery, output, "Invalid cases for pong query");
+		if(valid)
+			CallbackRegister.getInstance().notifyCallbacks("tcp-server-"+pq.action, baseQuery);
+		
+		if(!valid && output!=null)
+			new ErrorModule(baseQuery, output, "Invalid cases for pong query");
 	}
 }
 

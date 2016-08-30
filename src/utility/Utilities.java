@@ -22,7 +22,12 @@ public class Utilities{
 	private static String ipAddress="";
 	private static String systemId="";
 	public static int serverPort= 7000;
-
+	public static int neighbourPeersCount= 3;
+	public static int maxSimultaneousRequests= 3;
+	public static int connectionTimeout= 2500;
+	public static int maxHopCount=6;
+	public static int maxparallelRequests= 20;
+	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
 			ipAddress=getLocalIpAddress();

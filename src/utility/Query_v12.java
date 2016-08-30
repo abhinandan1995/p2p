@@ -20,7 +20,7 @@ public class Query_v12 {
 	}
 	
 	Query_v12(int id, String m, String p, String ss, String ds, String si, String c, String sp, String dp, boolean r, String rt){
-		this(id, m, p, ss, ds, si, c, sp, dp, r, rt, 10);
+		this(id, m, p, ss, ds, si, c, sp, dp, r, rt, utility.Utilities.maxHopCount);
 	}
 	
 	Query_v12(int id, String m, String p, String ss, String ds, String si, String c, String sp, String dp, boolean r, String rt, int hc){
@@ -122,8 +122,8 @@ public class Query_v12 {
 	}
 	
 	public void setHopCount(int x){
-		if(x>7)
-			x=7;
+		if(x>utility.Utilities.maxHopCount)
+			x=utility.Utilities.maxHopCount;
 		hopCount= x;
 	}
 

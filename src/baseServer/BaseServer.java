@@ -2,6 +2,7 @@ package baseServer;
 
 import java.util.Scanner;
 
+import modules.InitModule;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.PeersTable;
@@ -18,6 +19,7 @@ public class BaseServer {
 		
 		String input="";
 		Scanner sc=new Scanner(System.in);
+		new InitModule();
 		
 		while(true){
 			input= sc.nextLine();
