@@ -5,6 +5,7 @@ import java.util.Scanner;
 import modules.InitModule;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
+import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersTable;
 
 public class BaseServer {
@@ -14,13 +15,13 @@ public class BaseServer {
 		
 		baseController= BaseController.getInstance();
 		baseController.startServer();
-		System.out.println("User ip:" + utility.Utilities.getIpAddress());
+		System.out.println("User ip:" + utility.Utilities.getIpAddress("172"));
 		System.out.println("User id:" + utility.Utilities.getSystemId());
 		
 		String input="";
 		Scanner sc=new Scanner(System.in);
 		new InitModule();
-		
+		CallbackRegister.getInstance().echoCallbacks();
 		while(true){
 			input= sc.nextLine();
 			if(input.contains("close")){
@@ -31,7 +32,7 @@ public class BaseServer {
 					break;
 				}
 				catch(Exception e){
-					System.out.println("Failed to stop the server"+e.getMessage());
+					System.out.println("Failed to stop the server: "+e.getMessage());
 				}
 				
 			}
@@ -41,7 +42,7 @@ public class BaseServer {
 			}
 			else if(input.contains("ping")){
 				String data= input.substring(input.indexOf("1"));
-				baseController.sendRequest(new PingQuery(input.substring(0, input.indexOf("1")-1),null,null), "tcp-server", "PingQuery", true, "", data);
+				baseController.sendRequest(new PingQuery(input.substring(0, input.indexOf("1")-1),null,null), "tcp-server", "PingQuery", true, utility.Utilities.getSystemId(), data);
 			}
 			else if(input.contains("show-peers")){
 				PeersTable.getInstance().echoEntries();

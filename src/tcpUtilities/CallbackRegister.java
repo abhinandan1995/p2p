@@ -40,6 +40,12 @@ public class CallbackRegister {
 		}
 	}
 	
+	public void echoCallbacks(){
+		for(int i=0;i<callbacks.size();i++){
+			callbackFields cf= callbacks.get(i);
+			System.out.println("a:"+cf.action+"\t"+"c:"+cf.className+"\t"+"f:"+cf.methodName+"\t"+"s:"+cf.singleRun);
+		}
+	}
 }
 
 class callbackFields{

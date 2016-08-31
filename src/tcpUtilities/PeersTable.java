@@ -151,5 +151,10 @@ public class PeersTable{
 		}
 		return false;
 	}
+	
+	public void addEntryAndNeighbour(String ip, String sid, boolean force){
+		addEntry(ip, sid, "connected");
+		addNeighbourPeers(ip, sid, "connected", true);
+	}
 }
 

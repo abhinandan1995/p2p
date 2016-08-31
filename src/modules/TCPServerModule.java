@@ -98,7 +98,7 @@ class PingModule{
 			
 			valid = true;
 			
-			if(utility.Utilities.getSystemId()==baseQuery.getDestSid()){
+			if(utility.Utilities.getSystemId().equals(baseQuery.getDestSid())){
 				if(output==null)
 					BaseController.getInstance().sendRequest(new PingQuery("pong-point","match",null), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), baseQuery.getSourceIp());
 				else 
@@ -131,6 +131,7 @@ class PingModule{
 		if(!valid && output!=null)
 			new ErrorModule(baseQuery, output, "Invalid cases for ping query");
 	}
+	
 }
 
 
