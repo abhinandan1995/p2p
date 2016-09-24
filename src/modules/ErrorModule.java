@@ -9,6 +9,10 @@ public class ErrorModule {
 	Query_v12 baseQuery;
 	DataOutputStream output;
 	
+	public ErrorModule(){
+		
+	}
+	
 	public ErrorModule(Query_v12 q, DataOutputStream o){
 		this(q,o, "Invalid request!");
 	}
@@ -24,5 +28,9 @@ public class ErrorModule {
 			return;
 		BaseController.getInstance().sendResponse(msg, "error", "string", false, baseQuery.getSourceSid(), output);
 		return;
+	}
+	
+	public void echoMessage(String msg){
+		System.out.println(" "+msg+" ");
 	}
 }

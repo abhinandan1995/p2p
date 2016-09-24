@@ -8,9 +8,10 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import baseServer.BaseNetworkEngine;
+import modules.ErrorModule;
 import modules.TCPClientModule;
 import utility.Query_v12;
+import baseServer.BaseNetworkEngine;
 
 public class TCPClient extends Thread {
 
@@ -36,6 +37,9 @@ public class TCPClient extends Thread {
 			return;
 		}
 		
+		if(!utility.Utilities.selfRequest && ip.equals(utility.Utilities.getIpAddress()))
+			return;
+		
 		try{ 
 			s = new Socket();
 			s.connect(new InetSocketAddress(ip, serverPort), utility.Utilities.connectionTimeout);
@@ -53,12 +57,21 @@ public class TCPClient extends Thread {
 				String st = new String(digit);
 
 				Query_v12 query= utility.Utilities.getQueryObject(st);
-
+				
+				if(!query.getResponse())
+					output= null;
+				
 				System.out.println("Received from server: "+st);
 
 				if(query.getModule().equals("tcp-server")){
 					new TCPClientModule(query, output);
 				}
+				else if(query.getModule().equals("error")){
+					new ErrorModule().echoMessage(query.getPayload());
+				}
+				else if(!modules.ModuleLoader.getInstance().moduleLoad("client", query, output))
+					new ErrorModule(query, output, "No such module found!");
+				
 			}
 			else{
 				input=null;

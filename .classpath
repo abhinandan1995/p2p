@@ -7,5 +7,7 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/gson-2.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/jdbi-2.75.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/jdbc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

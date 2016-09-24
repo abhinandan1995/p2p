@@ -42,7 +42,7 @@ public class BaseReader extends Thread {
 			String data= new String(digit);
 			Query_v12 query= utility.Utilities.getQueryObject(data);
 			
-			if(BaseController.getInstance().isPresent(query.getQueryId()) || query.getHopCount()<=0)
+			if(!BaseController.getInstance().allowFurtherProcessing(query))
 				return;
 			
 			System.out.println ("receive from : " + 
@@ -53,11 +53,16 @@ public class BaseReader extends Thread {
 			if(!query.getResponse())
 				output= null;
 			
+			
 			if(query.getModule().equals("tcp-server")){
 				new TCPServerModule(query, output);
 			}
-			else
-			new ErrorModule(query, output, "No such module found!");
+			else if(query.getModule().equals("error")){
+				new ErrorModule().echoMessage(query.getPayload());
+			}
+			else if(!modules.ModuleLoader.getInstance().moduleLoad("server", query, output))
+				new ErrorModule(query, output, "No such module found!");
+		
 		}
 		catch(IOException e){
 			

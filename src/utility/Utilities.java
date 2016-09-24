@@ -27,6 +27,11 @@ public class Utilities{
 	public static int connectionTimeout= 2500;
 	public static int maxHopCount=6;
 	public static int maxparallelRequests= 20;
+	public static boolean selfExplicit= false;
+	public static boolean selfNeighbour= true;
+	public static boolean selfRequest= true;
+	public static String modulesBasePath= "lib/app-modules/jars/";
+	public static String baseIp= "172";
 	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
