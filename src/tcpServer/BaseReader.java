@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import modules.ErrorModule;
 import modules.TCPServerModule;
+import p2pApp.AppServer;
 import utility.Query_v12;
 
 public class BaseReader extends Thread {
@@ -60,8 +61,12 @@ public class BaseReader extends Thread {
 			else if(query.getModule().equals("error")){
 				new ErrorModule().echoMessage(query.getPayload());
 			}
-			else if(!modules.ModuleLoader.getInstance().moduleLoad("server", query, output))
-				new ErrorModule(query, output, "No such module found!");
+			else if(query.getModule().equals("p2p-app")){
+				new AppServer(query, output);
+			}
+			
+//			else if(!modules.ModuleLoader.getInstance().moduleLoad("server", query, output))
+//				new ErrorModule(query, output, "No such module found!");
 		
 		}
 		catch(IOException e){

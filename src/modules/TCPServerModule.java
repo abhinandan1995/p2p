@@ -73,7 +73,7 @@ class PingModule{
 			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected",new Date().getTime());
 			valid = true;
 			if(output!=null)
-			BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getPongList()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+			BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getConnected()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
 		}
 		
 		if(pq.action.equals("ping-stop")){

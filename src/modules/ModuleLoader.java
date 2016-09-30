@@ -32,7 +32,7 @@ public class ModuleLoader {
 	}
 	
 	private void initModules(){
-		moduleList.add(new module("p2p-app", "start.FirstClass"));
+		moduleList.add(new module("p2p-app", "entry.FirstClass"));
 	}
 
 	private void loadJarModules(){

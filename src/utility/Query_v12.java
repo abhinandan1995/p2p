@@ -37,6 +37,7 @@ public class Query_v12 {
 		rtype= rt;
 		setHopCount(hc);
 	}
+	
 	public String getModule(){
 		return module;
 	}

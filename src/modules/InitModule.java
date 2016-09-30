@@ -20,7 +20,7 @@ public class InitModule {
 		
 		initPingPointCallback();
 		initSystemValues();
-		ModuleLoader.getInstance();
+		//ModuleLoader.getInstance();
 	}
 	
 	public void initPingPointCallback(){

@@ -58,15 +58,15 @@ public class BaseNetworkEngine {
 	}
 	
 		
-	public int sendMultipleRequests(Object obj, String module, String rtype, boolean response, String destId, String destIp){
-		return sendMultipleRequests(obj, module, rtype, response, destId, destIp, utility.Utilities.maxHopCount);
+	public int sendMultipleRequests(Object obj, String module, String rtype, boolean response){
+		return sendMultipleRequests(obj, module, rtype, response, utility.Utilities.maxHopCount);
 	}
 	
-	public int sendMultipleRequests(Object obj, String module, String rtype, boolean response, String destId, String destIp, int hopCount){
+	public int sendMultipleRequests(Object obj, String module, String rtype, boolean response, int hopCount){
 		BaseController bControl= BaseController.getInstance();
 		int qId= bControl.getNewQueryId();
 		for(int i=0; i<peersTable.getNeighbourPeers().size() && i<utility.Utilities.maxSimultaneousRequests; i++){
-			bControl.sendRequest(qId, obj, module, rtype, response, destId, destIp, hopCount);
+			bControl.sendRequest(qId, obj, module, rtype, response, peersTable.getNeighbourPeers().get(i).systemId, peersTable.getNeighbourPeers().get(i).ip, hopCount);
 		}
 		return qId;
 	}
@@ -97,10 +97,11 @@ public class BaseNetworkEngine {
 	public void manageNeighboursList(String action, Object obj){
 		try{
 			if(action.equals("tcp-server-pong")){
-				Query_v12 query= Query_v12.class.cast(obj);
+				Query_v12 query= (Query_v12)obj;
 				PeersTable pt= peersTable;
 				
 				pt.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", true);
+				manageNeighboursList();
 			}
 			
 			if(action.equals("tcp-server-ping")){

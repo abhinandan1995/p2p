@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import modules.InitModule;
+import p2pApp.SearchQuery;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.PeersTable;
@@ -32,12 +33,12 @@ public class BaseServer {
 			System.out.println(l.get(i).get("filename"));
 		}
 		
-		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk6", "connected");
-		PeersTable.getInstance().addEntry("192.168.1.102", "kdsjfk1", "connected");
-		PeersTable.getInstance().addEntry("172.31.65.44", "kdsjfk2", "connected");
-		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk3", "connected");
-		PeersTable.getInstance().addEntry("192.168.1.102", "kdsjfk4", "connected");
-		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk5", "connected");
+//		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk6", "connected");
+//		PeersTable.getInstance().addEntry("192.168.1.102", "kdsjfk1", "connected");
+//		PeersTable.getInstance().addEntry("172.31.65.44", "kdsjfk2", "connected");
+//		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk3", "connected");
+//		PeersTable.getInstance().addEntry("192.168.1.102", "kdsjfk4", "connected");
+//		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk5", "connected");
 		
 		BaseNetworkEngine.getInstance().connectToNetwork();
 		
@@ -57,7 +58,7 @@ public class BaseServer {
 			}
 			else if(input.contains("ping-message-all")){
 				String data= input.substring(17);
-				BaseNetworkEngine.getInstance().sendMultipleRequests(new PingQuery("ping-message-all", null, null, data), "tcp-server", "PingQuery", false, "", utility.Utilities.getIpAddress());
+				BaseNetworkEngine.getInstance().sendMultipleRequests(new PingQuery("ping-message-all", null, null, data), "tcp-server", "PingQuery", false);
 			}
 			else if(input.contains("ping-message")){
 				String data= input.substring(12);
@@ -74,7 +75,9 @@ public class BaseServer {
 				PeersTable.getInstance().echoNeighbours();
 			}
 			else if(input.contains("query")){
-				baseController.sendRequest(input, "p2p-app", "string", true, "", utility.Utilities.getIpAddress());
+				
+				BaseNetworkEngine.getInstance().sendMultipleRequests(new SearchQuery(12, "search", input.substring(6, input.length()), null), "p2p-app", "SearchQuery", false);
+				//baseController.sendRequest(input.substring(6, input.length()), "p2p-app", "string", false, "", utility.Utilities.getIpAddress());
 			}
 			else
 			baseController.sendRequest(input, "tcp-server", "string", true, "", utility.Utilities.getIpAddress());
