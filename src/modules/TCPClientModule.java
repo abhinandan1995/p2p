@@ -29,10 +29,8 @@ public class TCPClientModule {
 		if(type.equals("string")){
 			echoString();
 		}
-		else{
-			if(type.contains("PingQuery")){
+		else if(type.equals("PingQuery")){
 				new PongModule(baseQuery, output);
-			}
 		}
 	}
 	

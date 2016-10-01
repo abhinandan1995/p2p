@@ -16,6 +16,8 @@ public class BaseReader extends Thread {
 	DataOutputStream output; 
 	Socket clientSocket; 
 	final private String TAG= "Base Reader";
+	private static int serverRequestCount=0;
+	
 	public BaseReader (Socket aClientSocket) { 
 		
 		try { 
@@ -32,7 +34,16 @@ public class BaseReader extends Thread {
 		}
 	}
 	
+	public static int getRequestCount(){
+		return serverRequestCount;
+	}
+	
 	public void run(){
+		
+		if(serverRequestCount++ >= utility.Utilities.maxParallelServerRequests){
+			new ErrorModule("System Overload: Too many requests to the Server!");
+			return;
+		}
 		
 		try{
 			int readLen= input.readInt();
@@ -46,34 +57,42 @@ public class BaseReader extends Thread {
 			if(!BaseController.getInstance().allowFurtherProcessing(query))
 				return;
 			
-			System.out.println ("receive from : " + 
+			System.out.println ("Received from Client : " + 
 					clientSocket.getInetAddress() + ":" +
-					clientSocket.getPort() + " Data - " + data);
+					clientSocket.getPort() + "\n" + data);
 			
 			
 			if(!query.getResponse())
 				output= null;
 			
+			switch(query.getModule()){
 			
-			if(query.getModule().equals("tcp-server")){
+			case "tcp-server":
 				new TCPServerModule(query, output);
-			}
-			else if(query.getModule().equals("error")){
-				new ErrorModule().echoMessage(query.getPayload());
-			}
-			else if(query.getModule().equals("p2p-app")){
+				break;
+				
+			case "error":
+				new ErrorModule(query.getPayload());
+				break;
+				
+			case "p2p-app":
 				new AppServer(query, output);
+				break;
+				
+				default:
+					new ErrorModule(query, output, "No such module found!");
+					break;
 			}
-			
-//			else if(!modules.ModuleLoader.getInstance().moduleLoad("server", query, output))
-//				new ErrorModule(query, output, "No such module found!");
-		
 		}
+			
 		catch(IOException e){
 			
 		}
 		catch(Exception e){
 			
+		}
+		finally{
+			serverRequestCount--;
 		}
 	}
 }

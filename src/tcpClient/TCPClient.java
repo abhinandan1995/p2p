@@ -27,19 +27,28 @@ public class TCPClient extends Thread {
 		this.ip= ip;
 		this.data= data;
 		this.response= response;
-		this.start();
+		validateRequest();
 	}
 
-	public void run(){
-
-		if(requestCount++ >= utility.Utilities.maxparallelRequests){
-			System.out.println("System Overload: Too many requests!");
+	public static int getRequestCount(){
+		return requestCount;
+	}
+	
+	private void validateRequest(){
+		
+		if(requestCount++ >= utility.Utilities.maxParallelClientRequests){
+			new ErrorModule("System Overload: Too many requests being made!");
 			return;
 		}
 		
 		if(!utility.Utilities.selfRequest && ip.equals(utility.Utilities.getIpAddress()))
 			return;
 		
+		this.start();
+	}
+	
+	public void run(){
+
 		try{ 
 			s = new Socket();
 			s.connect(new InetSocketAddress(ip, serverPort), utility.Utilities.connectionTimeout);
@@ -50,6 +59,7 @@ public class TCPClient extends Thread {
 			output.writeBytes(data);
 			
 			if(response){
+				
 				int nb = input.readInt();
 				byte []digit= new byte[nb];
 				for(int i = 0; i < nb; i++)
@@ -61,17 +71,21 @@ public class TCPClient extends Thread {
 				if(!query.getResponse())
 					output= null;
 				
-				System.out.println("Received from server: "+st);
+				System.out.println("Received from Server ("+ip+":"+serverPort+")\n"+st);
 
-				if(query.getModule().equals("tcp-server")){
-					new TCPClientModule(query, output);
-				}
-				else if(query.getModule().equals("error")){
-					new ErrorModule().echoMessage(query.getPayload());
-				}
-				else if(!modules.ModuleLoader.getInstance().moduleLoad("client", query, output))
-					new ErrorModule(query, output, "No such module found!");
+				switch(query.getModule()){
 				
+					case "tcp-server": 
+						new TCPClientModule(query, output);
+						break;
+						
+					case "error":
+						new ErrorModule(query.getPayload());
+						break;
+						
+						default:
+							new ErrorModule(query, output, "No such module found!");
+				}
 			}
 			else{
 				input=null;
@@ -79,14 +93,16 @@ public class TCPClient extends Thread {
 		}
 		catch (UnknownHostException e){ 
 			System.out.println("Socket:"+e.getMessage());}
+		
 		catch (EOFException e){
 			System.out.println("EOF:"+e.getMessage()); }
+		
 		catch (IOException e){
 			System.out.println("IO:"+e.getMessage());
 			if(e.getMessage().contains("timed out")){
 				BaseNetworkEngine.getInstance().manageNeighboursList(this.ip, true);
 			} 
-			}
+		}
 
 		finally {
 			requestCount--;

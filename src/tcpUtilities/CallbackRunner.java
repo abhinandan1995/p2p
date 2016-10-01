@@ -2,7 +2,7 @@ package tcpUtilities;
 
 import java.lang.reflect.Method;
 
-public class CallbackRunner implements Runnable {
+public class CallbackRunner extends Thread {
 
 	String className;
 	String methodName;
@@ -16,7 +16,8 @@ public class CallbackRunner implements Runnable {
 		this.methodName= methodName;
 		this.queryObject= qobj;
 		this.baseObject= bobj;
-		new Thread(this).start();
+		
+		this.start();
 	}
 	
 	public void run(){

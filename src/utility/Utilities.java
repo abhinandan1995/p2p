@@ -26,7 +26,8 @@ public class Utilities{
 	public static int maxSimultaneousRequests= 3;
 	public static int connectionTimeout= 2500;
 	public static int maxHopCount=6;
-	public static int maxparallelRequests= 20;
+	public static int maxParallelClientRequests= 20;
+	public static int maxParallelServerRequests= 50;
 	public static boolean selfExplicit= false;
 	public static boolean selfNeighbour= true;
 	public static boolean selfRequest= true;

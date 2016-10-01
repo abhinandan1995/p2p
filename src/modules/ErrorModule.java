@@ -10,7 +10,11 @@ public class ErrorModule {
 	DataOutputStream output;
 	
 	public ErrorModule(){
-		
+		this("Unable to process the request. An error occured!");
+	}
+	
+	public ErrorModule(String msg){
+		echoMessage(msg);
 	}
 	
 	public ErrorModule(Query_v12 q, DataOutputStream o){
@@ -30,7 +34,7 @@ public class ErrorModule {
 		return;
 	}
 	
-	public void echoMessage(String msg){
+	private void echoMessage(String msg){
 		System.out.println(" "+msg+" ");
 	}
 }

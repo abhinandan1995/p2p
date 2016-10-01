@@ -59,17 +59,16 @@ public class TCPServer implements Runnable {
 		return false;
 	}
 
-	public void getServerInfo(){
+	public String getServerInfo(){
 
+		String data="n/a";
 		try{
-			System.out.println("Start data");
-			System.out.println("User ip:" + utility.Utilities.getIpAddress());
-			System.out.println("User id:" + utility.Utilities.getSystemId());
-			System.out.println("End data");
+			data="Ip: "+utility.Utilities.getIpAddress()+"\nId: "+utility.Utilities.getSystemId();
 		}
 		catch(Exception e){
 			System.out.println(TAG+"#5: "+e.getMessage());
 		}
+		return data;
 	}
 	
 	public int getPort(){
