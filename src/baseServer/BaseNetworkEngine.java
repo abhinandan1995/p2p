@@ -31,17 +31,23 @@ public class BaseNetworkEngine {
 		List<PeersEntries> pe= pt.getConnected();
 			
 		for(int i=0;i< pe.size() && pt.getNeighbourPeers().size()<=utility.Utilities.neighbourPeersCount; i++){
-			if(!pt.isNeighbourPresent(pe.get(i).systemId)){
-				
+			if(!pt.isNeighbourPresentByIp(pe.get(i).ip)){
 				pt.addNeighbourPeers(pe.get(i).ip, pe.get(i).systemId, "unknown", false);
-				
-				double random= Math.random();
-				System.out.println("Started: "+random);
-				
 				BaseController.getInstance().sendRequest(new PingQuery("ping",null,null), "tcp-server", "PingQuery", true, "", pe.get(i).ip);
-				
-				System.out.println("Ended: "+ random);
-				
+			}
+		}
+	}
+	
+	public void manageNeighboursList(List<PeersEntries> pe){
+		
+		if(pe.size()<1)
+			manageNeighboursList();
+		
+		PeersTable pt= peersTable;
+		for(int i=0;i< pe.size() && pt.getNeighbourPeers().size()<=utility.Utilities.neighbourPeersCount; i++){
+			if(!pt.isNeighbourPresentByIp(pe.get(i).ip)){
+				pt.addNeighbourPeers(pe.get(i).ip, pe.get(i).systemId, "unknown", false);
+				BaseController.getInstance().sendRequest(new PingQuery("ping",null,null), "tcp-server", "PingQuery", true, "", pe.get(i).ip);
 			}
 		}
 	}
@@ -98,18 +104,13 @@ public class BaseNetworkEngine {
 		try{
 			if(action.equals("tcp-server-pong")){
 				Query_v12 query= (Query_v12)obj;
-				PeersTable pt= peersTable;
-				
-				pt.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", true);
-				manageNeighboursList();
+				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", true);
+				manageNeighboursList(((PingQuery)utility.Utilities.getObjectFromJson(query.getPayload(), PingQuery.class)).peers);
 			}
 			
 			if(action.equals("tcp-server-ping")){
 				Query_v12 query= Query_v12.class.cast(obj);
-				PeersTable pt= peersTable;
-				
-				pt.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", false);
-
+				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", false);
 			}
 		}
 		catch(Exception e){
@@ -117,5 +118,9 @@ public class BaseNetworkEngine {
 		}
 	}
 
+	public void TimedOutHandler(String action, Object obj){
+		String ip= obj.toString();
+		BaseNetworkEngine.getInstance().manageNeighboursList(ip, true);
+	}
 
 }

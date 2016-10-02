@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
 import utility.MySqlHandler;
 import utility.Query_v12;
@@ -32,7 +33,7 @@ public class AppServer {
 				
 				searchQuery= (SearchQuery) utility.Utilities.getObjectFromJson(query.getPayload(), SearchQuery.class);
 				if(searchQuery.mode.equals("search")){
-					searchDatabase(searchQuery.key);
+					searchDatabase(searchQuery.data);
 				}
 				if(searchQuery.mode.equals("results")){
 					echoResults(searchQuery.results);

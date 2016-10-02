@@ -24,16 +24,18 @@ public class InitModule {
 	}
 	
 	private void initPingPongCallbacks(){
-		callbackRegis.registerForCallback("tcp-server-pong", "tcpUtilities.PeersTable", "echoEntries", false, peersTable);
+//		callbackRegis.registerForCallback("tcp-server-pong", "tcpUtilities.PeersTable", "echoEntries", false, peersTable);
 		callbackRegis.registerForCallback("tcp-server-pong", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
 		callbackRegis.registerForCallback("tcp-server-ping", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
-		callbackRegis.registerForCallback("tcp-server-pong-point", "modules.TCPServerModule", "", false, this);			
+//		callbackRegis.registerForCallback("tcp-server-pong-point", "modules.TCPServerModule", "", false, this);		
+		callbackRegis.registerForCallback("ServerException-TimedOut", "baseServer.BaseNetworkEngine", "TimedOutHandler", false, networkEngine);
 	}
 	
 	private void initSystemValues(){
 		System.out.println("\nInitialising System variables... \n");
 		System.out.println("User-Ip: " + utility.Utilities.getIpAddress(utility.Utilities.baseIp));
-		System.out.println("User-Id: " + utility.Utilities.getSystemId());	
+		System.out.println("User-Id: " + utility.Utilities.getSystemId());
+		System.out.println("\n");
 	}
 	
 }

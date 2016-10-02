@@ -1,15 +1,14 @@
 package modules;
 
 import java.io.DataOutputStream;
-import java.util.Date;
 
-import baseServer.BaseNetworkEngine;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
 import utility.Query_v12;
+import baseServer.BaseNetworkEngine;
 
 public class TCPServerModule {
 
@@ -70,17 +69,27 @@ class PingModule{
 		boolean valid= false;
 		
 		if(pq.action.equals("ping")){
-			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected",new Date().getTime());
+			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
 			valid = true;
 			if(output!=null)
-			BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getConnected()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+				BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getConnected()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+		}
+		
+		if(pq.action.equals("ping-force")){
+			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
+			PeersTable.getInstance().addNeighbourPeers(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected", false);
+			
+			if(output!=null)
+				BaseController.getInstance().sendResponse(new PingQuery("pong-force","valid",PeersTable.getInstance().getConnected()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+			return;
 		}
 		
 		if(pq.action.equals("ping-stop")){
-			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "disconnected",new Date().getTime());
+			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "disconnected");
+			BaseNetworkEngine.getInstance().manageNeighboursList(baseQuery.getSourceIp(), true);
 			valid = true;
 			if(output!=null)
-			BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getAll()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+				BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getAll()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
 		}
 		
 		if(pq.action.equals("ping-updates")){
@@ -89,9 +98,10 @@ class PingModule{
 				pe= pq.peers.get(i);
 				PeersTable.getInstance().addEntry(pe.ip, pe.systemId, pe.status, pe.time);
 			}
-			valid = true;
+			
 			if(output!=null)
-			BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getAll()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+				BaseController.getInstance().sendResponse(new PingQuery("pong","valid",PeersTable.getInstance().getAll()), "tcp-server", "PingQuery", false, baseQuery.getSourceSid(), output);
+			return;
 		}
 		
 		if(pq.action.equals("ping-point")){
@@ -115,18 +125,19 @@ class PingModule{
 		if(pq.action.equals("pong-point")){
 			valid = true;
 			if(pq.result.equals("match")){
-				PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected",new Date().getTime());
-				PeersTable.getInstance().addNeighbourPeers(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected", true);
+				PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
 			}
 		}
 		
 		if(pq.action.equals("ping-message")){
 			System.out.println(pq.getExtraData());
+			return;
 		}
 		
 		if(pq.action.equals("ping-message-all")){
 			System.out.println(pq.getExtraData());
 			BaseNetworkEngine.getInstance().forwardRequests(baseQuery);
+			return;
 		}
 		
 		if(valid)

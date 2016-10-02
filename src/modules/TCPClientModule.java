@@ -74,6 +74,16 @@ class PongModule{
 			valid= true;
 		}
 		
+		if(pq.action.equals("pong-force")){
+			PeersEntries pe;
+			for(int i=0;i<pq.peers.size();i++){
+				pe= pq.peers.get(i);
+				PeersTable.getInstance().addEntry(pe.ip, pe.systemId, pe.status, pe.time);
+			}
+			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
+			PeersTable.getInstance().addNeighbourPeers(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected", true);
+		}
+		
 		if(pq.action.equals("pong-message")){
 			System.out.println(pq.getExtraData());
 			return;

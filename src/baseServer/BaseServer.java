@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import modules.InitModule;
-import p2pApp.SearchQuery;
+import p2pApp.p2pQueries.SearchQuery;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.PeersTable;
@@ -22,8 +22,6 @@ public class BaseServer {
 		String input="";
 		Scanner sc=new Scanner(System.in);
 		new InitModule();
-		System.out.println(MySqlHandler.getInstance().getDatabase());
-		
 		List<Map<String, Object>> l;
 //		ArrayList<String[]> as= new ArrayList<String[]>();
 //		as.add(new String[]{"another love song"});
@@ -34,11 +32,14 @@ public class BaseServer {
 		}
 		
 //		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk6", "connected");
-//		PeersTable.getInstance().addEntry("192.168.1.102", "kdsjfk1", "connected");
-//		PeersTable.getInstance().addEntry("172.31.65.44", "kdsjfk2", "connected");
-//		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk3", "connected");
-//		PeersTable.getInstance().addEntry("192.168.1.102", "kdsjfk4", "connected");
-//		PeersTable.getInstance().addEntry("172.31.65.43", "kdsjfk5", "connected");
+//		PeersTable.getInstance().addEntry("192.168.1.102","kdsjfk6", "connected");
+//		PeersTable.getInstance().addEntry("172.31.78.7", "kdsjfk2", "connected");
+//		PeersTable.getInstance().addEntry("172.31.78.7", "kdsjfk3", "connected");
+//		PeersTable.getInstance().addEntry("192.168.1.102","kdsjfk3", "connected");
+//		PeersTable.getInstance().addEntry("172.31.78.7", "kdsjfk5", "connected");
+//		PeersTable.getInstance().addEntry("172.31.78.8", "kdsjfk5", "connected");
+//		PeersTable.getInstance().addEntry("172.31.78.9", "kdsjfk5", "connected");
+//		PeersTable.getInstance().addEntry("172.31.78.6", "kdsjfk5", "connected");
 		
 		BaseNetworkEngine.getInstance().connectToNetwork();
 		
@@ -66,7 +67,7 @@ public class BaseServer {
 			}
 			else if(input.contains("ping")){
 				String data= input.substring(input.indexOf("1"));
-				baseController.sendRequest(new PingQuery(input.substring(0, input.indexOf("1")-1),null,null), "tcp-server", "PingQuery", true, utility.Utilities.getSystemId(), data);
+				baseController.sendRequest(new PingQuery(input.substring(0, input.indexOf("1")-1),null,null), "tcp-server", "PingQuery", true, "", data);
 			}
 			else if(input.contains("show-peers")){
 				PeersTable.getInstance().echoEntries();

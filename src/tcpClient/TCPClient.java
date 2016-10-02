@@ -10,8 +10,8 @@ import java.net.UnknownHostException;
 
 import modules.ErrorModule;
 import modules.TCPClientModule;
+import tcpUtilities.CallbackRegister;
 import utility.Query_v12;
-import baseServer.BaseNetworkEngine;
 
 public class TCPClient extends Thread {
 
@@ -100,7 +100,7 @@ public class TCPClient extends Thread {
 		catch (IOException e){
 			System.out.println("IO:"+e.getMessage());
 			if(e.getMessage().contains("timed out")){
-				BaseNetworkEngine.getInstance().manageNeighboursList(this.ip, true);
+				CallbackRegister.getInstance().notifyCallbacks("ServerException-TimedOut", new String(this.ip));
 			} 
 		}
 

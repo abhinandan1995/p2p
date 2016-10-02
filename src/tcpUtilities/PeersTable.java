@@ -23,16 +23,22 @@ public class PeersTable{
 	
 	public synchronized void addEntry(String i, String sid, String st, long t){
 		if(peersSystemIds.contains(sid)){
-			updateEntry(i, sid, st, t);
+			
+			if(t<0)
+				updateEntry(i, sid, st);
+			else
+				updateEntry(i, sid, st, t);
 			return;
 		}
 		
 		peersSystemIds.add(sid);
+		if(t<0)
+			t=new Date().getTime();
 		peersEntries.add(new PeersEntries(i, sid, st, t));
 	}
 	
 	public void addEntry(String i, String sid, String st){
-		addEntry(i, sid, st, new Date().getTime());
+		addEntry(i, sid, st, -1);
 	}
 	
 	public PeersEntries getBySystemId(String id){
@@ -144,6 +150,9 @@ public class PeersTable{
 	
 	public void addNeighbourPeers(String i, String sid, String st, long t, boolean force){
 		
+		if(isNeighbourPresent(sid))
+			return;
+		
 		if(!utility.Utilities.selfNeighbour){
 			if(utility.Utilities.getIpAddress().equals(i) || utility.Utilities.getSystemId().equals(sid))
 				return;
@@ -174,13 +183,18 @@ public class PeersTable{
 		return false;
 	}
 	
+	public boolean isNeighbourPresentByIp(String ip){
+		for(int i=0;i<neighbourPeers.size();i++){
+			if(neighbourPeers.get(i).ip.equals(ip))
+				return true;
+		}
+		return false;
+	}
+	
 	public void updateNeighbourPeer(String ip, String sid, String st, boolean force){
 		for(int i=0;i<neighbourPeers.size();i++){
-			if(neighbourPeers.get(i).ip.equals(ip)){
+			if(neighbourPeers.get(i).ip.equals(ip) || neighbourPeers.get(i).systemId.equals(sid)){
 				neighbourPeers.remove(i);
-				
-				if(!isNeighbourPresent(sid))
-					addNeighbourPeers(ip, sid, st, force);
 			}
 		}
 		if(!isNeighbourPresent(sid))
