@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import baseServer.BaseNetworkEngine;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
 import utility.MySqlHandler;
@@ -33,6 +34,7 @@ public class AppServer {
 				
 				searchQuery= (SearchQuery) utility.Utilities.getObjectFromJson(query.getPayload(), SearchQuery.class);
 				if(searchQuery.mode.equals("search")){
+					BaseNetworkEngine.getInstance().forwardRequests(query);
 					searchDatabase(searchQuery.data);
 				}
 				if(searchQuery.mode.equals("results")){
@@ -40,6 +42,7 @@ public class AppServer {
 				}
 			}
 		}
+		
 	}
 
 	public void searchDatabase(String key){
