@@ -41,5 +41,9 @@ public class SearchResults {
 	public String getUserid(){
 		return userid;
 	}
+	
+	public String getFileSize(){
+		return filesize;
+	}
 }
 

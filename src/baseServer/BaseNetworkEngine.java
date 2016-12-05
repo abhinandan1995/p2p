@@ -89,13 +89,14 @@ public class BaseNetworkEngine {
 		}
 	}
 	
-	public void connectToNetwork(){
+	public boolean connectToNetwork(){
 		
 		if(peersTable.getConnected().size()==0){
 			System.out.println("No peers found. Please ping an active user to connect!");
-			return;
+			return false;
 		}
 		manageNeighboursList();
+		return true;
 	}
 	
 	//Callback Functions

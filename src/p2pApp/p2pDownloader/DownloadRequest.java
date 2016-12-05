@@ -1,14 +1,16 @@
 package p2pApp.p2pDownloader;
 
+import static utility.Utilities.outputFolder;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import static utility.Utilities.outputFolder;
 
 import p2pApp.p2pQueries.DownloadQuery;
+import utility.PercentKeeper;
 
 
 public class DownloadRequest extends Thread {
@@ -17,7 +19,7 @@ public class DownloadRequest extends Thread {
 	String userIp;
 	String userId;
 	String filename;
-	
+	PercentKeeper pk;
 	public DownloadRequest(String fileId, String userIp){
 		this(fileId, userIp, null, null);
 	}
@@ -32,6 +34,15 @@ public class DownloadRequest extends Thread {
 		this.userId= userId;
 		this.filename= filename;
 		
+		this.start();
+	}
+	
+	public DownloadRequest(String fileId, String userIp, String filename, String userId, PercentKeeper pk){
+		this.fileId= fileId;
+		this.userIp= userIp;
+		this.userId= userId;
+		this.filename= filename;
+		this.pk= pk;
 		this.start();
 	}
 	
@@ -57,7 +68,7 @@ public class DownloadRequest extends Thread {
 		    boolean result = false;
 
 		    try{
-		        theDir.mkdir();
+		        theDir.mkdirs();
 		        result = true;
 		    } 
 		    catch(SecurityException se){
@@ -85,7 +96,19 @@ public class DownloadRequest extends Thread {
             
             System.out.println("Downloading file: "+filename);
                 
-                FileOutputStream fos = new FileOutputStream(utility.Utilities.outputFolder+filename);
+//            java.awt.EventQueue.invokeLater(new Runnable() {
+//                public void run() {
+//                    ProgressDialog dialog = new ProgressDialog(new javax.swing.JFrame(), true, filename);
+//                    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+//                        @Override
+//                        public void windowClosing(java.awt.event.WindowEvent e) {
+//                          //  System.exit(0);
+//                        }
+//                    });
+//                    dialog.setVisible(true);
+//                }
+//            });
+                FileOutputStream fos = new FileOutputStream(utility.Utilities.outputFolder+filename.replace("?", ""));
                 while (size > 0 && (n = input.read(buf, 0, (int)Math.min(buf.length, size))) != -1)
                 		{
                 		  fos.write(buf,0,n);
@@ -94,12 +117,14 @@ public class DownloadRequest extends Thread {
                 		  counter++;
                 		  if(((int)(counter*percent*100))%5==0){
                 			  System.out.println("Downloading done..."+ (int)((double)(startSize-size)/(double)startSize*100));
+                			  pk.setVal((int)((double)(startSize-size)/(double)startSize*100));
                 		  }
                 		  
 //                		  if(((int)(counter*percent*100))>60){
 //                			  break;
 //                		  }
                 		}
+                pk.setVal(100);
                 		fos.close();
                 		System.out.println("Download completed");
 

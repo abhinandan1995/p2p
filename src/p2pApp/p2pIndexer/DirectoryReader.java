@@ -17,7 +17,7 @@ public class DirectoryReader {
 //      System.out.println("[FILE] " + aFile.getName());
 //      System.out.println("[PATH] " + aFile.getPath().replace("\\", "/"));
 //      
-      values = new String[]{String.valueOf(FileID++),aFile.getName().replace("'", "''"),aFile.getPath().replace("\\", "/").replace("'", "''"),"null",String.valueOf(aFile.length())};
+      values = new String[]{String.valueOf(FileID++),aFile.getName().replace("'", "''").replace("_", " "),aFile.getPath().replace("\\", "/").replace("'", "''"),"null",String.valueOf(aFile.length())};
       handler.insertSingle(TblName, columns, values);
     }
     else if (aFile.isDirectory()) {

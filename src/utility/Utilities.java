@@ -1,10 +1,13 @@
 package utility;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -13,8 +16,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
-
-import p2pApp.SearchResults;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -39,6 +40,7 @@ public class Utilities{
 	public static String outputFolder= "D:/p2p/Downloads/";
 	public static int activeSearchId= 0;
 	public static int bufferSize= 16384;
+	public static String[] inputFolders;
 	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
@@ -302,4 +304,61 @@ public class Utilities{
 	public static int getRandomNumber(){
 		return ThreadLocalRandom.current().nextInt(1000000,1000000000);
 	}
+	
+	public static String humanReadableByteCount(long bytes, boolean si) {
+	    int unit = si ? 1000 : 1024;
+	    if (bytes < unit) return bytes + " B";
+	    int exp = (int) (Math.log(bytes) / Math.log(unit));
+	    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "");
+	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
+	
+	public static void writeToFile(String path, ArrayList<String> al){
+		
+		try{
+			
+		FileWriter fw= new FileWriter(path);
+		for(int i=0;i<al.size();i++){
+			fw.write(al.get(i));
+		}
+		fw.close();
+		}
+		catch(Exception e){
+			System.out.println("FileWrite Exception #1 " + e.getMessage());
+		}
+		
+	}
+	
+	public static void writeToFile(String path, String data, boolean append){
+		
+		try{
+			
+		FileWriter fw= new FileWriter(path, append);
+		fw.write(data+"\n");
+		fw.close();
+		}
+		catch(Exception e){
+			System.out.println("FileWrite Exception #2 " + e.getMessage());
+		}
+		
+	}
+	
+	public static String readFromIpFile(String path){
+	
+	    String s="";
+		
+		 try{  
+			    FileInputStream fin=new FileInputStream(path);  
+			    int i=0;  
+			    while((i=fin.read())!=-1){  
+			     s=s+(char)i; 
+			    }  
+			    fin.close();  
+			  }
+		 catch(Exception e){
+				  System.out.println("FileRead Exception #1 "+e.getMessage());
+		 }
+		 return s;
+	}  
+	
 }

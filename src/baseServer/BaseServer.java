@@ -22,9 +22,11 @@ public class BaseServer {
 		baseController= BaseController.getInstance();
 		baseController.startServer();
 		
+		new InitModule();
+		
+		//new PingSeqModule("172.31");
 		String input="";
 		Scanner sc=new Scanner(System.in);
-		new InitModule();
 		List<Map<String, Object>> l;
 //		ArrayList<String[]> as= new ArrayList<String[]>();
 //		as.add(new String[]{"another love song"});
@@ -79,7 +81,6 @@ public class BaseServer {
 				PeersTable.getInstance().echoNeighbours();
 			}
 			else if(input.contains("query")){
-				
 				BaseNetworkEngine.getInstance().sendMultipleRequests(new SearchQuery(SearchTable.getInstance().getNewSearchId(), "search", input.substring(6, input.length()), null), "p2p-app", "SearchQuery", false);
 				//baseController.sendRequest(input.substring(6, input.length()), "p2p-app", "string", false, "", utility.Utilities.getIpAddress());
 			}

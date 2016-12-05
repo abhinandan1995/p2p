@@ -24,7 +24,7 @@ public class SearchTable {
 		
 		for(int i=0;i<sr.size();i++){
 			SearchResults temp= sr.get(i);
-			searchResults.add( new SearchResults(ip, id, temp.fileid, temp.filename, temp.hash, temp.filesize));
+			searchResults.add( new SearchResults(ip, temp.userid, temp.fileid, temp.filename, temp.hash, temp.filesize));
 		}
 		
 	}

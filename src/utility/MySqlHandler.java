@@ -39,7 +39,7 @@ public class MySqlHandler {
 	public MysqlDataSource getProperties() throws Exception{
 		Properties props = new Properties();
         FileInputStream fis = null;
-        fis = new FileInputStream("src/resources/db-ms.properties");
+        fis = new FileInputStream("data/db-ms.properties");
         props.load(fis);
 		return getProperties(props.getProperty("mysql.database"));
 	}
@@ -49,7 +49,7 @@ public class MySqlHandler {
         FileInputStream fis = null;
         MysqlDataSource ds = null;
 
-        fis = new FileInputStream("src/resources/db-ms.properties");
+        fis = new FileInputStream("data/db-ms.properties");
         props.load(fis);
         
         ds = new MysqlConnectionPoolDataSource();

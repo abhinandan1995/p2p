@@ -10,6 +10,7 @@ import p2pApp.p2pIndexer.DirectoryReader;
 import p2pApp.p2pQueries.DownloadQuery;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
+import ui.UISearch;
 import utility.MySqlHandler;
 import utility.Query_v12;
 import baseServer.BaseNetworkEngine;
@@ -40,8 +41,9 @@ public class AppServer {
 					searchDatabase(searchQuery);
 				}
 				if(searchQuery.mode.equals("results")){
-					SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(), query.getSourceSid());	
+					SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(),"");
 					echoResults(SearchTable.getInstance().getSearchTable());
+					UISearch.updateTable(SearchTable.getInstance().getSearchTable());
 				}
 			}
 			
@@ -67,7 +69,7 @@ public class AppServer {
 		
 		ArrayList<SearchResults> al= new ArrayList<SearchResults>();
 		for(int i=0;i<l.size();i++){
-			al.add(new SearchResults(l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString()));
+			al.add(new SearchResults("","Abhinandan",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString() ));
 		}
 		SearchQuery data=new SearchQuery(searchQuery.searchId, "results", "", al); 
 		sendResults(data);
@@ -85,7 +87,7 @@ public class AppServer {
 	
 	private void echoResults(ArrayList<SearchResults> al){
 		for(int i=0; i<al.size();i++){
-			System.out.println(i+" "+al.get(i).ip+" "+ al.get(i).filename+ " "+al.get(i).filesize );
+			System.out.println(i+" "+al.get(i).ip+" "+ al.get(i).filename+ " "+al.get(i).filesize +" "+al.get(i).userid );
 		}
 	}
 
