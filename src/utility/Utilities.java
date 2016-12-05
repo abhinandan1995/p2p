@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -12,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
+
+import p2pApp.SearchResults;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,6 +36,8 @@ public class Utilities{
 	public static boolean selfRequest= true;
 	public static String modulesBasePath= "lib/app-modules/jars/";
 	public static String baseIp= "172";
+	public static String outputFolder= "e:/appDownloads/";
+	public static int activeSearchId= 0;
 	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){

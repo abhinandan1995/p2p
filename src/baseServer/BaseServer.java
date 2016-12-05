@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 import modules.InitModule;
+import p2pApp.SearchResults;
+import p2pApp.SearchTable;
+import p2pApp.p2pDownloader.DownloadRequest;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
@@ -77,8 +80,18 @@ public class BaseServer {
 			}
 			else if(input.contains("query")){
 				
-				BaseNetworkEngine.getInstance().sendMultipleRequests(new SearchQuery(12, "search", input.substring(6, input.length()), null), "p2p-app", "SearchQuery", false);
+				BaseNetworkEngine.getInstance().sendMultipleRequests(new SearchQuery(SearchTable.getInstance().getNewSearchId(), "search", input.substring(6, input.length()), null), "p2p-app", "SearchQuery", false);
 				//baseController.sendRequest(input.substring(6, input.length()), "p2p-app", "string", false, "", utility.Utilities.getIpAddress());
+			}
+			else if(input.contains("download")){
+				String []arr= input.split(" ");
+				new DownloadRequest(arr[2],arr[1],arr[3]);
+			}
+			else if(input.contains("getfile")){
+				String []arr= input.split(" ");
+				int index= Integer.parseInt(arr[1]);
+				SearchResults sr= SearchTable.getInstance().getFromSearchTable(index);
+				new DownloadRequest(sr.getFileId(), sr.getIp(), sr.getFilename(), sr.getUserid());
 			}
 			else
 			baseController.sendRequest(input, "tcp-server", "string", true, "", utility.Utilities.getIpAddress());

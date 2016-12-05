@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import baseServer.BaseNetworkEngine;
+import p2pApp.p2pDownloader.DownloadResponse;
+import p2pApp.p2pIndexer.DirectoryReader;
+import p2pApp.p2pQueries.DownloadQuery;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
 import utility.MySqlHandler;
 import utility.Query_v12;
-
+import baseServer.BaseNetworkEngine;
 public class AppServer {
 
 	Query_v12 query;
@@ -27,7 +29,7 @@ public class AppServer {
 	private void processRequest(){
 	
 		if(query.getResponseType().equals("string")){
-			searchDatabase(query.getPayload());
+		//	searchDatabase(query.getPayload());
 		}
 		else{
 			if(query.getResponseType().equals("SearchQuery")){
@@ -35,28 +37,39 @@ public class AppServer {
 				searchQuery= (SearchQuery) utility.Utilities.getObjectFromJson(query.getPayload(), SearchQuery.class);
 				if(searchQuery.mode.equals("search")){
 					BaseNetworkEngine.getInstance().forwardRequests(query);
-					searchDatabase(searchQuery.data);
+					searchDatabase(searchQuery);
 				}
 				if(searchQuery.mode.equals("results")){
-					echoResults(searchQuery.results);
+					SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(), query.getSourceSid());	
+					echoResults(SearchTable.getInstance().getSearchTable());
 				}
+			}
+			
+			if(query.getResponseType().equals("DownloadQuery")){
+				DownloadQuery dq= (DownloadQuery)utility.Utilities.getObjectFromJson(query.getPayload(), DownloadQuery.class);
+				String path= DirectoryReader.getFilePath(dq.key);
+				new DownloadResponse(path, output);
 			}
 		}
 		
 	}
 
-	public void searchDatabase(String key){
+	public void searchDatabase(SearchQuery searchQuery){
 		List<Map<String, Object>> l;
 		//ArrayList<String[]> as= new ArrayList<String[]>();
 		//as.add(new String[]{"another love song"});
 		//MySqlHandler.getInstance().insertMultiple("testquery", new String[]{"filename"}, as);
 		
-		l=MySqlHandler.getInstance().fetchQuery("SELECT filename, match(filename) against ('"+key+"' in natural language mode) as relevance from testquery WHERE match(filename) against ('"+key+"' in natural language mode)");
-		ArrayList<String> al= new ArrayList<String>();
+		String key= searchQuery.data;
+		
+		String TblName = "DirReader";
+		l=MySqlHandler.getInstance().fetchQuery("SELECT FileID, FileName, Hash, FileSize, match(FileName) against ('"+key+"' in natural language mode) as relevance from "+ TblName+" WHERE match(FileName) against ('"+key+"' in natural language mode)");
+		
+		ArrayList<SearchResults> al= new ArrayList<SearchResults>();
 		for(int i=0;i<l.size();i++){
-			al.add(l.get(i).get("filename").toString());
+			al.add(new SearchResults(l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString()));
 		}
-		SearchQuery data=new SearchQuery(123, "results", "", al); 
+		SearchQuery data=new SearchQuery(searchQuery.searchId, "results", "", al); 
 		sendResults(data);
 	}
 	
@@ -70,9 +83,9 @@ public class AppServer {
 		}
 	}
 	
-	private void echoResults(ArrayList<String> al){
+	private void echoResults(ArrayList<SearchResults> al){
 		for(int i=0; i<al.size();i++){
-			System.out.println(al.get(i));
+			System.out.println(i+" "+al.get(i).ip+" "+ al.get(i).filename+ " "+al.get(i).filesize );
 		}
 	}
 

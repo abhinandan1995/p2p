@@ -1,5 +1,7 @@
 package modules;
 
+import java.util.ArrayList;
+
 import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersTable;
 import utility.MySqlHandler;
@@ -36,6 +38,12 @@ public class InitModule {
 		System.out.println("User-Ip: " + utility.Utilities.getIpAddress(utility.Utilities.baseIp));
 		System.out.println("User-Id: " + utility.Utilities.getSystemId());
 		System.out.println("\n");
+		
+		System.out.println("Loading databases... \n");
+		ArrayList<String> names= new ArrayList<String>();
+		names.add("e:/movies");
+		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, false);
+		System.out.println("\nFinished loading. \n");
 	}
 	
 }

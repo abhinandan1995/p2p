@@ -1,10 +1,15 @@
 package p2pApp.p2pDownloader;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 
-public class DownloadRequest {
+import p2pApp.p2pQueries.DownloadQuery;
+
+
+public class DownloadRequest extends Thread {
 
 	String fileId;
 	String userIp;
@@ -24,12 +29,63 @@ public class DownloadRequest {
 		this.userIp= userIp;
 		this.userId= userId;
 		this.filename= filename;
+		
+		this.start();
 	}
 	
-	private void startDownload(){
+	public void run(){
 		
-		
+		Socket clientSocket = null;
+
+        try {
+            clientSocket = new Socket( userIp, utility.Utilities.serverPort);
+            startDownload(clientSocket);
+            
+        } catch (Exception e) {
+            
+        }
 	}
 	
-	
+	private void startDownload(Socket clientSocket) throws Exception{	
+		
+		String data= utility.Utilities.makeRequest(new DownloadQuery("fileId",fileId), "p2p-app", userId, null, ""+clientSocket.getPort(), ""+utility.Utilities.serverPort, true, "DownloadQuery");
+		
+		DataInputStream input = new DataInputStream( clientSocket.getInputStream()); 
+		DataOutputStream output = new DataOutputStream( clientSocket.getOutputStream()); 
+		
+		output.writeInt(data.length());
+		output.writeBytes(data);
+		
+		try {
+            long size= input.readLong();
+            int n = 0;
+            byte[]buf = new byte[4092];
+            double percent= (4092/(double)size);
+            int counter=0;
+            
+            System.out.println("Downloading file: "+filename);
+                
+                FileOutputStream fos = new FileOutputStream(utility.Utilities.outputFolder+filename);
+                while (size > 0 && (n = input.read(buf, 0, (int)Math.min(buf.length, size))) != -1)
+                		{
+                		  fos.write(buf,0,n);
+                		  fos.flush();
+                		  size -= n;
+                		  counter++;
+                		  if(((int)(counter*percent*100))%10==0){
+                			  System.out.println("Downloading done..."+(int)(counter*percent*100));
+                		  }
+                		  
+                		  if(((int)(counter*percent*100))>60){
+                			  break;
+                		  }
+                		}
+                		fos.close();
+                		System.out.println("Download completed");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+	}	
 }
