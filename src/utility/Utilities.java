@@ -35,9 +35,10 @@ public class Utilities{
 	public static boolean selfNeighbour= true;
 	public static boolean selfRequest= true;
 	public static String modulesBasePath= "lib/app-modules/jars/";
-	public static String baseIp= "172";
+	public static String baseIp= "192";
 	public static String outputFolder= "e:/appDownloads/";
 	public static int activeSearchId= 0;
+	public static int bufferSize= 16384;
 	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){

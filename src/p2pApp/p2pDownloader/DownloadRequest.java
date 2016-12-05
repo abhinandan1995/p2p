@@ -59,8 +59,8 @@ public class DownloadRequest extends Thread {
 		try {
             long size= input.readLong();
             int n = 0;
-            byte[]buf = new byte[4092];
-            double percent= (4092/(double)size);
+            byte[]buf = new byte[utility.Utilities.bufferSize];
+            double percent= (utility.Utilities.bufferSize/(double)size);
             int counter=0;
             
             System.out.println("Downloading file: "+filename);
@@ -76,9 +76,9 @@ public class DownloadRequest extends Thread {
                 			  System.out.println("Downloading done..."+(int)(counter*percent*100));
                 		  }
                 		  
-                		  if(((int)(counter*percent*100))>60){
-                			  break;
-                		  }
+//                		  if(((int)(counter*percent*100))>60){
+//                			  break;
+//                		  }
                 		}
                 		fos.close();
                 		System.out.println("Download completed");

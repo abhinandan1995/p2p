@@ -35,7 +35,7 @@ public class DownloadResponse {
 		
 		System.out.println("Sending file: "+filepath);
 		int n = 0;
-	    byte[]buf = new byte[4092];
+	    byte[]buf = new byte[utility.Utilities.bufferSize];
 	    
 	    output.writeLong(myFile.length());
 		output.flush();
