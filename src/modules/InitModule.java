@@ -41,8 +41,8 @@ public class InitModule {
 		
 		System.out.println("Loading databases... \n");
 		ArrayList<String> names= new ArrayList<String>();
-		names.add("e:/movies");
-		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, false);
+		names.add("F:/");
+		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
 		System.out.println("\nFinished loading. \n");
 	}
 	
