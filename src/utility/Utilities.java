@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -210,7 +209,7 @@ public class Utilities{
 		return null;
 	}
 	
-	public static String makeRequest(List list, String type){
+	public static String makeRequest(List<?> list, String type){
 		try{
 			return getJsonString(new Query_v12(type, getJsonString(list)));
 		}
@@ -229,7 +228,7 @@ public class Utilities{
 		return gson.toJson(obj);
 	}
 
-	public static Object getObjectFromJson(String jsonString, Class toClass){  
+	public static Object getObjectFromJson(String jsonString, Class<?> toClass){  
 		try {
 			return new Gson().fromJson(jsonString, toClass);
 		} catch (Exception e) {
@@ -360,5 +359,9 @@ public class Utilities{
 		 }
 		 return s;
 	}  
+	
+	public static String parseInvalidFilenames(String filename){
+		return filename.replace("?", "");
+	}
 	
 }

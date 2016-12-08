@@ -2,37 +2,40 @@ package ui;
 
 import java.awt.event.WindowEvent;
 
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import p2pApp.SearchResults;
 import utility.PercentKeeper;
 
 public class ProgressDialog extends javax.swing.JDialog implements Runnable{
 
 	static final long serialVersionUID= 2;
-    public ProgressDialog(java.awt.Frame parent, boolean modal, SearchResults sr) {
-        super(parent, modal);
-        initComponents(sr.getFilename());
-    }
+	JScrollPane jp;
+	String filename;
     
+//	public ProgressDialog(java.awt.Frame parent, boolean modal, SearchResults sr) {
+//        super(parent, modal);
+//        initComponents(sr.getFilename());
+//    }
+//    
     public ProgressDialog(java.awt.Frame parent, boolean modal, String filename) {
-        super(parent, modal);
-        initComponents(filename);
+        this(parent, modal, filename, null);
     }
 
     public ProgressDialog(java.awt.Frame parent, boolean modal, String filename, PercentKeeper pk) {
         super(parent, modal);
-        initComponents(filename);
         this.pk= pk;
-        
+        this.filename= filename;
         new Thread(this).start();
     }
     
     public void run(){
+    	initComponents();
     	this.setVisible(true);
+//    	jp.requestFocus();
     }
     
-    private void initComponents(String filename) {
+    private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
         jProgressBar1 = new javax.swing.JProgressBar();

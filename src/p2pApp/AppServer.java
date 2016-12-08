@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import p2pApp.p2pDownloader.DownloadResponse;
-import p2pApp.p2pIndexer.DirectoryReader;
+import p2pApp.p2pIndexer.TableHandler;
 import p2pApp.p2pQueries.DownloadQuery;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
@@ -30,7 +30,7 @@ public class AppServer {
 	private void processRequest(){
 	
 		if(query.getResponseType().equals("string")){
-		//	searchDatabase(query.getPayload());
+	
 		}
 		else{
 			if(query.getResponseType().equals("SearchQuery")){
@@ -41,7 +41,7 @@ public class AppServer {
 					searchDatabase(searchQuery);
 				}
 				if(searchQuery.mode.equals("results")){
-					SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(),"");
+					SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(),query.getSourceSid());
 					echoResults(SearchTable.getInstance().getSearchTable());
 					UISearch.updateTable(SearchTable.getInstance().getSearchTable());
 				}
@@ -49,7 +49,7 @@ public class AppServer {
 			
 			if(query.getResponseType().equals("DownloadQuery")){
 				DownloadQuery dq= (DownloadQuery)utility.Utilities.getObjectFromJson(query.getPayload(), DownloadQuery.class);
-				String path= DirectoryReader.getFilePath(dq.key);
+				String path= TableHandler.getFilePath(dq.key);
 				new DownloadResponse(path, output);
 			}
 		}
@@ -69,7 +69,7 @@ public class AppServer {
 		
 		ArrayList<SearchResults> al= new ArrayList<SearchResults>();
 		for(int i=0;i<l.size();i++){
-			al.add(new SearchResults("","Abhinandan",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString() ));
+			al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString() ));
 		}
 		SearchQuery data=new SearchQuery(searchQuery.searchId, "results", "", al); 
 		sendResults(data);

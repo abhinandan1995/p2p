@@ -53,7 +53,7 @@ public class MySqlHandler {
         props.load(fis);
         
         ds = new MysqlConnectionPoolDataSource();
-        String url= props.getProperty("mysql.url")+":"+props.getProperty("mysql.port")+"/"+dbName;
+        String url= props.getProperty("mysql.url")+":"+props.getProperty("mysql.port")+"/"+dbName+"?"+props.getProperty("mysql.unicode");
         ds.setURL(url);
         ds.setUser(props.getProperty("mysql.username"));
         
@@ -203,6 +203,23 @@ public class MySqlHandler {
 		
         catch(Exception e){
         	System.out.println("Database Exception #5: "+e.getMessage());
+        }
+        finally {
+            if (handle != null) {
+                handle.close();
+            }
+        }
+	}
+	
+	public void updateTable(String tblName, String setVariable, String setValue, String whereVar, String whereVal){
+		
+		Handle handle= null;
+		try {
+            handle = dbi.open();
+            handle.execute("UPDATE "+tblName+" SET "+setVariable+" = "+ "'"+ setValue+ "'" +" WHERE "+whereVar+ "= "+ "'"+ whereVal +"'");
+        } 
+        catch(Exception e){
+        	System.out.println("Database Exception #3: "+e.getMessage());
         }
         finally {
             if (handle != null) {

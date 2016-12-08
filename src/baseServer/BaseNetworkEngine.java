@@ -7,6 +7,7 @@ import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
+import ui.UISearch;
 import utility.Query_v12;
 
 public class BaseNetworkEngine {
@@ -104,14 +105,17 @@ public class BaseNetworkEngine {
 	public void manageNeighboursList(String action, Object obj){
 		try{
 			if(action.equals("tcp-server-pong")){
+				UISearch.enableSearchButon(true);
 				Query_v12 query= (Query_v12)obj;
 				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", true);
+				persistActivePeers(((PingQuery)utility.Utilities.getObjectFromJson(query.getPayload(), PingQuery.class)).peers, query.getSourceIp(), query.getSourceSid());
 				manageNeighboursList(((PingQuery)utility.Utilities.getObjectFromJson(query.getPayload(), PingQuery.class)).peers);
 			}
 			
 			if(action.equals("tcp-server-ping")){
 				Query_v12 query= Query_v12.class.cast(obj);
 				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", false);
+				persistActivePeers(null, query.getSourceIp(), query.getSourceSid());
 			}
 		}
 		catch(Exception e){
@@ -122,6 +126,16 @@ public class BaseNetworkEngine {
 	public void TimedOutHandler(String action, Object obj){
 		String ip= obj.toString();
 		BaseNetworkEngine.getInstance().manageNeighboursList(ip, true);
+	}
+	
+	private void persistActivePeers(List<PeersEntries> pe, String ip, String sid){
+		if(pe!=null){
+			for(int i=0;i<pe.size();i++){
+				utility.Utilities.writeToFile("data/ips.dat", pe.get(i).ip + " "+ pe.get(i).systemId, true);
+			}
+		}
+		if(ip!=null)
+		utility.Utilities.writeToFile("data/ips.dat", ip+ " "+ sid, true);
 	}
 
 }

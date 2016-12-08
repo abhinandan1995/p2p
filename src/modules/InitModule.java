@@ -29,7 +29,6 @@ public class InitModule {
 		
 		initSystemValues();
 		initPeersTable();
-		//ModuleLoader.getInstance();
 	}
 	
 	private void initPingPongCallbacks(){
@@ -50,11 +49,10 @@ public class InitModule {
 		
 		ArrayList<String> names= new ArrayList<String>();
 		for(int i=0;i<utility.Utilities.inputFolders.length;i++){
-			
 			names.add(utility.Utilities.inputFolders[i].trim());
 		}
 		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
-		System.out.println("\nFinished loading. \n");
+		System.out.println("Finished loading databases. \n");
 	}
 	
 	private void initPeersTable(){

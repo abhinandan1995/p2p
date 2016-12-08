@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import p2pApp.p2pIndexer.DirectoryReader;
 import p2pApp.p2pQueries.DownloadQuery;
 import utility.PercentKeeper;
 
@@ -108,7 +109,8 @@ public class DownloadRequest extends Thread {
 //                    dialog.setVisible(true);
 //                }
 //            });
-                FileOutputStream fos = new FileOutputStream(utility.Utilities.outputFolder+filename.replace("?", ""));
+                FileOutputStream fos = new FileOutputStream(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(filename));
+                
                 while (size > 0 && (n = input.read(buf, 0, (int)Math.min(buf.length, size))) != -1)
                 		{
                 		  fos.write(buf,0,n);
@@ -127,6 +129,7 @@ public class DownloadRequest extends Thread {
                 pk.setVal(100);
                 		fos.close();
                 		System.out.println("Download completed");
+                		DirectoryReader.updateTableOnDownload(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(filename));
 
         } catch (IOException e) {
             e.printStackTrace();

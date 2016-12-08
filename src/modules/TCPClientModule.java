@@ -69,10 +69,8 @@ class PongModule{
 			for(int i=0;i<pq.peers.size();i++){
 				pe= pq.peers.get(i);
 				PeersTable.getInstance().addEntry(pe.ip, pe.systemId, pe.status, pe.time);
-				utility.Utilities.writeToFile("data/ips.dat", pe.ip + " "+ pe.systemId, true);
 			}
 			PeersTable.getInstance().addEntry(baseQuery.getSourceIp(), baseQuery.getSourceSid(), "connected");
-			utility.Utilities.writeToFile("data/ips.dat", baseQuery.getSourceIp()+ " "+ baseQuery.getSourceSid(), true);
 			valid= true;
 		}
 		
