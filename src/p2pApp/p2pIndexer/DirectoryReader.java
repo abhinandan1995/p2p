@@ -75,19 +75,16 @@ public class DirectoryReader {
 
 	private static void getFilesOnStart(){
 		List<Map<String, Object>> l;
-
 		try{
 			l= TableHandler.getFilesFromTable();
 			fileList= new HashMap<String, Object>();
 			for(int i=0;i<l.size();i++){
 				fileList.put(l.get(i).get("Path").toString(), l.get(i));	
 			}
-
 		}
 		catch(Exception e){
 			System.out.println("Directory Read #2 "+e.getMessage());  
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -134,7 +131,7 @@ public class DirectoryReader {
 				while(itr.hasNext()){
 					String s= itr.next();
 					HashMap<String, Object> o= (HashMap<String, Object>)fileList.get(s);
-					values = new String[]{String.valueOf(TableHandler.FileID++),o.get("FileName").toString(), o.get("Path").toString(), o.get("Hash").toString(), o.get("FileSize").toString(), o.get("Type").toString(), "0"};
+					values = new String[]{String.valueOf(TableHandler.FileID++),o.get("FileName").toString().replace("'", "''"), o.get("Path").toString().replace("'", "''"), o.get("Hash").toString(), o.get("FileSize").toString(), o.get("Type").toString(), "0"};
 					files.add(values);
 				}
 			}

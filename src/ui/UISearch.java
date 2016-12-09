@@ -238,7 +238,6 @@ public class UISearch extends javax.swing.JFrame {
 			java.util.logging.Logger.getLogger(UISearch.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 		}
 
-
 		Thread t= new Thread(){
 			public void run(){
 				UISearch ui = new UISearch();
