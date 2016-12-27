@@ -4,7 +4,7 @@ import java.io.DataOutputStream;
 import java.util.ArrayList;
 
 import baseServer.BaseNetworkEngine;
-import p2pApp.p2pDownloader.DownloadResponse;
+import p2pApp.p2pDownloader.UploadThread;
 import p2pApp.p2pIndexer.TableHandler;
 import p2pApp.p2pQueries.DownloadQuery;
 import p2pApp.p2pQueries.SearchQuery;
@@ -43,7 +43,8 @@ public class AppServer {
 		if(query.getResponseType().equals("DownloadQuery")){
 			DownloadQuery dq= (DownloadQuery)utility.Utilities.getObjectFromJson(query.getPayload(), DownloadQuery.class);
 			String path= TableHandler.getFilePath(dq.key);
-			new DownloadResponse(path, output);
+			//new DownloadResponse(path, output);
+			new UploadThread(path, output, dq.part, dq.segMode);
 		}
 	}
 

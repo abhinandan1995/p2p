@@ -38,7 +38,7 @@ public class Utilities{
 	public static String baseIp= "172";
 	public static String outputFolder= "D:/p2p/Downloads/";
 	public static int activeSearchId= 0;
-	public static int bufferSize= 16384;
+	public static int bufferSize= 8000;
 	public static int maxDownloadThreadCount= 4;
 	public static String[] inputFolders;
 	

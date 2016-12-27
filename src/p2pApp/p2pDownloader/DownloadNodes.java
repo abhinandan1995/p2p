@@ -36,6 +36,17 @@ public class DownloadNodes {
 			partsDone[part]=2;
 			partsCompleted++;
 		}
+		if(partsCompleted>=totalParts){
+			try{
+				
+			
+			fos.getChannel().close();
+			fos.close();
+			}
+			catch(Exception e){
+				System.out.println("From download nodes "+e.getMessage());
+			}
+		}
 	}
 
 	public int getRemainingPart(){
@@ -46,16 +57,19 @@ public class DownloadNodes {
 		return -1;
 	}
 
-	public void downloadFile(){
+	public boolean downloadFile(){
 		try{
 			if(fos==null)
 				fos = new FileOutputStream(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(searchResults.getFilename()));
 			int pt= getRemainingPart();
+			if(pt<0)
+				return true;
 			partsDone[pt]= 1;
 			new DownloadThread(searchResults.getIp(), searchResults.getFileId(), searchResults.getUserid(), pt, segMode, searchResults.getFilename(), fos.getChannel(), this);
 		}
 		catch(Exception e){
 			System.out.println("Download node #1 "+e.getMessage());
 		}
+		return false;
 	}
 }

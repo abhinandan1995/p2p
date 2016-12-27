@@ -17,7 +17,7 @@ public class SegmentationModes {
 	private void initValues(){
 		switch(name){
 		case "short":
-			size= 20*1000*1000;
+			size= 24*1000*1000;
 			break;
 		case "medium":
 			size= 80*1000*1000;
@@ -29,6 +29,7 @@ public class SegmentationModes {
 	}
 	
 	private void setupValues(long totalSize){
+		
 		if(totalSize < 1000*1000*1000){
 			name= "short";
 		}
@@ -38,6 +39,7 @@ public class SegmentationModes {
 		else {
 			name= "long";
 		}
+		initValues();
 	}
 	
 	public String getName(){

@@ -20,16 +20,17 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import baseServer.BaseNetworkEngine;
 import modules.InitModule;
 import p2pApp.SearchResults;
 import p2pApp.SearchTable;
+import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pDownloader.DownloadRequest;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.PeersTable;
 import utility.PercentKeeper;
-import baseServer.BaseNetworkEngine;
 
 
 public class UISearch extends javax.swing.JFrame {
@@ -439,8 +440,8 @@ class ButtonEditor extends DefaultCellEditor {
 		//        });
 
 
-		new DownloadRequest(sr.getFileId(), sr.getIp(), sr.getFilename(), sr.getUserid(), pk);
-
+		//new DownloadRequest(sr.getFileId(), sr.getIp(), sr.getFilename(), sr.getUserid(), pk);
+		DownloadEngine.getInstance().addDownload(sr);
 	}
 	@Override
 	public Object getCellEditorValue() {

@@ -32,6 +32,7 @@ public class DownloadThread extends Thread{
 		this.start();
 	}
 
+	@Override
 	public void run(){
 		Socket clientSocket = null;
 
@@ -61,20 +62,20 @@ public class DownloadThread extends Thread{
 		int n=0;
 		byte[]buf = new byte[utility.Utilities.bufferSize];
 		//  FileOutputStream fos = new FileOutputStream(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(filename));
-
+		fos.position(part*(new SegmentationModes(segMode)).getSize());
 		while (size > 0 && (n = input.read(buf, 0, (int)Math.min(buf.length, size))) != -1){
 
 			ByteBuffer bf= ByteBuffer.wrap(buf);
-			bf.flip();
 			
-			fos.position(part*(new SegmentationModes(segMode)).getSize());
 			while(bf.hasRemaining()){
 				fos.write(bf);
 			}
 			//fos.flush();
-			fos.force(true);
 			size -= n;
 		}
+		fos.force(true);
+		node.addPartsDone(part);
+		
 	}
 }
 

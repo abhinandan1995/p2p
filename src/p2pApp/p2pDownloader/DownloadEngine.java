@@ -22,18 +22,21 @@ public class DownloadEngine {
 		return downloadEngine;
 	}
 	
-	public static void addDownload(SearchResults sr){
+	public void addDownload(SearchResults sr){
 		downloadList.add(0, new DownloadNodes(sr));
 		startDownloading();
 	}
 	
-	private static void startDownloading(){
+	private void startDownloading(){
 		while(true){
 			if(downloadList.isEmpty())
 				break;	
 			
 			try{
 				makeDirectory();
+				if(downloadList.get(0).downloadFile()){
+					downloadList.remove(0);
+				}
 			}
 			catch(Exception e){
 				

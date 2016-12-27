@@ -52,16 +52,29 @@ public class UploadThread {
 		int n = 0;
 		byte[]buf = new byte[utility.Utilities.bufferSize];
 		ByteBuffer bb= ByteBuffer.allocate(utility.Utilities.bufferSize);
+		long returnLength= getFileSize(myFile);
+		output.writeLong(returnLength);
 		
-		output.writeLong(getFileSize(myFile));
 		output.flush();
 
 		FileInputStream fis = new FileInputStream(myFile);
 		FileChannel fc= fis.getChannel();
-		while((n =fc.read(bb)) != -1){
-			bb.get(buf);
+		long sum=0;
+		fc.position(part*partSize);
+		bb.clear();
+		while((n =fc.read(bb)) != -1 && sum<=returnLength){
+			
+			try{
+				bb.flip();
+				bb.get(buf,0, bb.capacity());
+			}
+			catch(Exception e){
+				System.out.println("inner exception to Upload thread "+e.getMessage());
+			}
 			output.write(buf,0,n);
 			output.flush();
+			sum= sum+n;
+			bb.clear();
 		}
 		fc.close();
 		fis.close();
