@@ -39,6 +39,7 @@ public class Utilities{
 	public static String outputFolder= "D:/p2p/Downloads/";
 	public static int activeSearchId= 0;
 	public static int bufferSize= 16384;
+	public static int maxDownloadThreadCount= 4;
 	public static String[] inputFolders;
 	
 	public static String getIpAddress(){
@@ -361,7 +362,7 @@ public class Utilities{
 	}  
 	
 	public static String parseInvalidFilenames(String filename){
-		return filename.replace("?", "");
+		return filename.replace("?", "").trim();
 	}
 	
 }
