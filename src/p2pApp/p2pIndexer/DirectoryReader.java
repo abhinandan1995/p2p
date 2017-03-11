@@ -14,27 +14,32 @@ public class DirectoryReader {
 	private static List<String[]> files= null;
 	private static HashMap<String, Object> fileList= null;
 
-	static void getFiles (File aFile) throws Exception {	
-		
+	static long getFiles (File aFile) throws Exception {	
+		long sum=0;
 		if(aFile.isFile()){
 			
 			values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " ").replace("?",""), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "1", "1"};
 			files.add(values);
+			return aFile.length();
 		}
 		else if (aFile.isDirectory()) {
 
-			values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "2", "1"};
-			files.add(values);
-
+			
 			File[] listOfFiles = aFile.listFiles();
 			if(listOfFiles!=null) {
 				for (int i = 0; i < listOfFiles.length; i++)
-					getFiles(listOfFiles[i]);
+					sum = sum+ getFiles(listOfFiles[i]);
+				
+				values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", ""+sum, "2", "1"};
+				files.add(values);
+				
+				return sum;
 			} 
 			else {
 				System.out.println("Directory Read #3 - Access Denied");
 			}
 		}
+		return 0;
 	}
 
 	public static void DR_init(ArrayList<String> names){

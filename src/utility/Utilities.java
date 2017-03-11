@@ -27,8 +27,8 @@ public class Utilities{
 	public static int serverPort= 7000;
 	public static int neighbourPeersCount= 3;
 	public static int maxSimultaneousRequests= 3;
-	public static int connectionTimeout= 2500;
-	public static int maxHopCount=6;
+	public static int connectionTimeout= 3000;
+	public static int maxHopCount=7;
 	public static int maxParallelClientRequests= 20;
 	public static int maxParallelServerRequests= 50;
 	public static boolean selfExplicit= false;
@@ -40,8 +40,10 @@ public class Utilities{
 	public static int activeSearchId= 0;
 	public static int bufferSize= 8000;
 	public static int maxDownloadThreadCount= 4;
+	public static int maxParallelDownloads= 3;
 	public static String[] inputFolders;
-	
+	public static int resultSetSize= 2;
+	public static String searchCol= "Path";
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
 			ipAddress=getLocalIpAddress();

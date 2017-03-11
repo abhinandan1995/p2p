@@ -79,7 +79,11 @@ public class BaseNetworkEngine {
 	}
 	
 	public void forwardRequests(Query_v12 query){
-		query.decrementHop();
+		forwardRequests(query, false);
+	}
+	
+	public void forwardRequests(Query_v12 query, boolean found){
+		query.decrementHop(found);
 		query.setResponse(false);
 		if(query.getHopCount()<=0){
 			return;

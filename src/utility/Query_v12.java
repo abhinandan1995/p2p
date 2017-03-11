@@ -129,6 +129,13 @@ public class Query_v12 {
 	}
 
 	public void decrementHop(){
-		hopCount--;
+		decrementHop(false);
+	}
+	
+	public void decrementHop(boolean found){
+		if(found)
+			hopCount= hopCount / 3;
+		else
+			hopCount--;
 	}
 }

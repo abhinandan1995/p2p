@@ -2,6 +2,7 @@ package p2pApp.p2pDownloader;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -18,8 +19,10 @@ public class DownloadThread extends Thread{
 	String filename;
 	FileChannel fos;
 	DownloadNodes node;
+	static int DownloadThreadsCount=0;
 	
 	public DownloadThread(String userIp, String fileId, String userId, int part, String segMode, String filename, FileChannel fos, DownloadNodes node){
+		
 		this.userIp= userIp;
 		this.fileId= fileId;
 		this.userId= userId;
@@ -35,13 +38,22 @@ public class DownloadThread extends Thread{
 	@Override
 	public void run(){
 		Socket clientSocket = null;
-
+		DownloadThreadsCount++;
+		
 		try {
-			clientSocket = new Socket( userIp, utility.Utilities.serverPort);
+			clientSocket = new Socket();
+			clientSocket.connect(new InetSocketAddress(userIp, utility.Utilities.serverPort),
+					utility.Utilities.connectionTimeout);
 			startDownload(clientSocket);
 		}
 		catch(Exception e){
-			System.out.println("Download Thread #1 "+ e.getMessage());
+			System.out.println("Download Thread #1 "+e.getMessage()+ " : "+filename+":"+part);
+			if(e.getMessage().contains("timed out")){
+				node.removeIp(userIp, part);
+			}
+		}
+		finally{
+			DownloadThreadsCount--;
 		}
 	}
 
@@ -58,6 +70,7 @@ public class DownloadThread extends Thread{
 
 	private void readInputStream(DataInputStream input) throws Exception{
 
+		System.out.println("Downloading file: "+ filename + " : "+ part);
 		long size= input.readLong();
 		int n=0;
 		byte[]buf = new byte[utility.Utilities.bufferSize];
@@ -65,7 +78,7 @@ public class DownloadThread extends Thread{
 		fos.position(part*(new SegmentationModes(segMode)).getSize());
 		while (size > 0 && (n = input.read(buf, 0, (int)Math.min(buf.length, size))) != -1){
 
-			ByteBuffer bf= ByteBuffer.wrap(buf);
+			ByteBuffer bf= ByteBuffer.wrap(buf,0, n);
 			
 			while(bf.hasRemaining()){
 				fos.write(bf);
@@ -74,8 +87,8 @@ public class DownloadThread extends Thread{
 			size -= n;
 		}
 		fos.force(true);
-		node.addPartsDone(part);
-		
+		node.addPartsDone(userIp, part);
+		System.out.println("Downloaded file done: "+ filename + " : "+ part);
 	}
 }
 

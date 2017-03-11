@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 
 import modules.ErrorModule;
 import modules.TCPClientModule;
+import p2pApp.AppServer;
 import tcpUtilities.CallbackRegister;
 import utility.Query_v12;
 
@@ -82,7 +83,10 @@ public class TCPClient extends Thread {
 					case "error":
 						new ErrorModule(query.getPayload());
 						break;
-						
+					
+					case "p2p-app":
+						new AppServer(query, output);
+						break;
 						default:
 							new ErrorModule(query, output, "No such module found!");
 				}

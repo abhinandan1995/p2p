@@ -26,6 +26,7 @@ import p2pApp.SearchResults;
 import p2pApp.SearchTable;
 import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pDownloader.DownloadRequest;
+import p2pApp.p2pQueries.GetDirQuery;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpQueries.PingQuery;
 import tcpServer.BaseController;
@@ -441,7 +442,11 @@ class ButtonEditor extends DefaultCellEditor {
 
 
 		//new DownloadRequest(sr.getFileId(), sr.getIp(), sr.getFilename(), sr.getUserid(), pk);
+		if(sr.getType().equals("1"))
 		DownloadEngine.getInstance().addDownload(sr);
+		if(sr.getType().equals("2")){
+			GetDirQuery.getDirQuery(sr);
+		}
 	}
 	@Override
 	public Object getCellEditorValue() {

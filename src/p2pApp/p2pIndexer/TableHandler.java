@@ -11,7 +11,7 @@ public class TableHandler {
 	private static MySqlHandler handler = MySqlHandler.getInstance();
 	public static String TblName = "DirReader";
 	private static String[] columns = new String[]{"FileID","FileName","Path","Hash","FileSize", "Type", "Valid"};
-	private static String[] data = new String[]{"FileID int not null","FileName varchar(255) not null","Path varchar(255) CHARACTER SET utf8 COLLATE utf8_spanish_ci not null","Hash char(40) null","FileSize char(20)", "type char(1) not null default '1'", "valid char(1) not null default '1'", "primary key(FileID)", "FULLTEXT(FileName)", "Unique key (Path)", "key(valid)"};
+	private static String[] data = new String[]{"FileID int not null","FileName varchar(255) not null","Path varchar(255) CHARACTER SET utf8 COLLATE utf8_spanish_ci not null","Hash char(40) null","FileSize char(20)", "Type char(1) not null default '1'", "Valid char(1) not null default '1'", "primary key(FileID)", "FULLTEXT("+utility.Utilities.searchCol+")", "Unique key (Path)", "key(valid)", "key(hash)"};
 	
 	public static void createTable(boolean force){
 		handler.createTable(TblName, data, null, force);
@@ -39,5 +39,12 @@ public class TableHandler {
 	
 	public static void fillTable(String[] values){
 		handler.insertSingle(TblName, columns, values);
+	}
+	
+	public static List<Map<String, Object>> getFilesFromDir(String fileId){
+		String query = "SELECT Path from "+ TblName + " WHERE FileID = "+ fileId;
+		String path = (String)(handler.fetchQuery(query)).get(0).get("Path");
+		return MySqlHandler.getInstance().fetchQuery(
+				"SELECT * from "+TblName + " WHERE Path like '"+path+"/%' && Valid= '1'");
 	}
 }

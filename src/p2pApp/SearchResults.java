@@ -11,15 +11,15 @@ public class SearchResults {
 	String userid;
 	String fileid;
 	String path;
-	ArrayList<String> altIps;
+	String type;
+	ArrayList<AlternateIps> altIps;
 	
 	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize){
-		this.ip= ip;
-		this.fileid= fileid;
-		this.filename= filename;
-		this.hash= hash;
-		this.filesize= filesize;
-		this.userid= userid;
+		this(ip, userid, fileid, filename, hash, filesize, "1");
+	}
+	
+	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, String type){
+		this(ip, userid, fileid, filename, hash, filesize, new ArrayList<AlternateIps>(), type);
 	}
 	
 	public SearchResults(String fileid, String filename, String hash, String filesize){
@@ -29,7 +29,7 @@ public class SearchResults {
 		this.filesize= filesize;
 	}
 	
-	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, ArrayList<String> altIps){
+	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, ArrayList<AlternateIps> altIps, String type){
 		this.ip= ip;
 		this.fileid= fileid;
 		this.filename= filename;
@@ -37,6 +37,7 @@ public class SearchResults {
 		this.filesize= filesize;
 		this.userid= userid;
 		this.altIps= altIps;
+		this.type= type;
 	}
 	
 	public String getFileId(){
@@ -59,14 +60,22 @@ public class SearchResults {
 		return filesize;
 	}
 	
-	public void addAlternateIps(String ip){
+	public void addAlternateIps(String ip, String key, String filename, String filesize, String userid){
 		if(altIps==null)
-			altIps= new ArrayList<String>();
-		altIps.add(ip);
+			altIps= new ArrayList<AlternateIps>();
+		altIps.add(new AlternateIps(ip, key, filename, filesize, userid));
 	}
 	
-	public ArrayList<String> getAlternateIps(){
+	public ArrayList<AlternateIps> getAlternateIps(){
 		return altIps;
+	}
+	
+	public String getType(){
+		return type;
+	}
+	
+	public void setFilename(String name){
+		filename= name;
 	}
 }
 

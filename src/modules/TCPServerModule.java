@@ -37,7 +37,6 @@ public class TCPServerModule {
 			}
 		}
 	}
-	
 	private void echoString(){
 		BaseController.getInstance().sendResponse(baseQuery.getPayload(), baseQuery.getModule(), "string", false, baseQuery.getSourceSid(), output);
 	}

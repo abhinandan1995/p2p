@@ -47,12 +47,12 @@ public class UploadThread {
 
 	public void send(File myFile) throws Exception{
 
-		System.out.println("Sending file: "+filepath+" :"+part);
-		
-		int n = 0;
-		byte[]buf = new byte[utility.Utilities.bufferSize];
-		ByteBuffer bb= ByteBuffer.allocate(utility.Utilities.bufferSize);
 		long returnLength= getFileSize(myFile);
+		System.out.println("Sending file: "+filepath+" :"+part+ " size= "+returnLength + " total= "+ myFile.length());
+		
+		long n = 0;
+		byte[]buf = new byte[utility.Utilities.bufferSize];
+		ByteBuffer bb= ByteBuffer.wrap(buf);
 		output.writeLong(returnLength);
 		
 		output.flush();
@@ -66,12 +66,12 @@ public class UploadThread {
 			
 			try{
 				bb.flip();
-				bb.get(buf,0, bb.capacity());
 			}
 			catch(Exception e){
 				System.out.println("inner exception to Upload thread "+e.getMessage());
+				
 			}
-			output.write(buf,0,n);
+			output.write(buf,0, (int)(n <= (returnLength- sum) ? n : (returnLength- sum)));
 			output.flush();
 			sum= sum+n;
 			bb.clear();
@@ -79,7 +79,7 @@ public class UploadThread {
 		fc.close();
 		fis.close();
 		output.close();
-		System.out.println("File sending completed :"+part);
+		System.out.println("File sending completed :"+filepath+" : "+part);
 	}
 
 	private long getFileSize(File myFile){

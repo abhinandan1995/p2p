@@ -10,6 +10,7 @@ import utility.MySqlHandler;
 public class SearchDatabase {
 
 	SearchQuery searchQuery;
+	int size=0;
 	
 	public SearchDatabase(SearchQuery sq){
 		this.searchQuery= sq;
@@ -33,12 +34,17 @@ public class SearchDatabase {
 		List<Map<String, Object>> l;
 		String key= searchQuery.data.replace("'", "''");	
 		String TblName = "DirReader";
-		l=MySqlHandler.getInstance().fetchQuery("SELECT FileID, FileName, Hash, FileSize, Type, match(FileName) against ('"+key+"' in natural language mode) as relevance from "+ TblName+" WHERE Valid= '1' && match(FileName) against ('"+key+"' in natural language mode)");
+		l=MySqlHandler.getInstance().fetchQuery("SELECT FileID, FileName, Hash, FileSize, Type, match("+utility.Utilities.searchCol+") against ('"+key+"' in natural language mode) as relevance from "+ TblName+" WHERE Valid= '1' && match("+utility.Utilities.searchCol+") against ('"+key+"' in natural language mode)");
 		
 		ArrayList<SearchResults> al= new ArrayList<SearchResults>();
 		for(int i=0;i<l.size();i++){
-			al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString() ));
+			al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString() ));
 		}
+		size= al.size();
 		searchQuery=new SearchQuery(searchQuery.searchId, "results", "", al); 
+	}
+	
+	public int getSize(){
+		return size;
 	}
 }
