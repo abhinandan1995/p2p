@@ -165,7 +165,6 @@ public class FileDownloadController implements Initializable {
 		}
 		}
 		catch(Exception e){
-			
 		}
 	}
 	

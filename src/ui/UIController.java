@@ -456,6 +456,8 @@ public class UIController implements Initializable{
 			Stage dialog = new Stage();
 		    dialog.setTitle("Downloading: "+sr.getFilename());
 		    dialog.initOwner(anchorPane.getScene().getWindow());
+		    dialog.setY(400+ 40*Math.random());
+		    dialog.setY(200+ 20*Math.random());
 		    
 		    FXMLLoader loader = new FXMLLoader(getClass().getResource("download_file.fxml"));
 		    Parent root = (Parent)loader.load();
