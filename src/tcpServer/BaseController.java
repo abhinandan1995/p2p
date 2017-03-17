@@ -41,6 +41,7 @@ public class BaseController {
 
 	public void stopServer() throws IOException{
 		server.stop();
+		System.exit(0);
 	}
 	
 	public int getServerPort(){

@@ -53,11 +53,19 @@ public class SearchTable {
 	}
 	
 	public SearchResults getFromSearchTable(int index){
+		if(index< searchResults.size())
 		return searchResults.get(index);
+		return null;
 	}
 	
 	synchronized private void addNew(SearchResults sr){
-		if(sr.hash!= null && existingHashes.containsKey(sr.hash)){
+		
+		if(sr.hash.equals("null")){
+			searchResults.add(sr);
+			return;
+		}
+		
+		if(existingHashes.containsKey(sr.hash)){
 			searchResults.get(existingHashes.get(sr.hash)).addAlternateIps(sr.ip, sr.fileid, sr.filename, sr.filesize, sr.userid);
 			return;
 		}

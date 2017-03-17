@@ -13,7 +13,7 @@ import p2pApp.p2pQueries.DownloadQuery;
 import p2pApp.p2pQueries.GetDirQuery;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
-import ui.UISearch;
+import tcpUtilities.CallbackRegister;
 import utility.Query_v12;
 public class AppServer {
 
@@ -41,7 +41,9 @@ public class AppServer {
 			if(searchQuery.mode.equals("results")){
 				SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(), searchQuery.searchId);
 				echoResults(SearchTable.getInstance().getSearchTable());
-				UISearch.updateTable(SearchTable.getInstance().getSearchTable());
+				//UISearch.updateTable(SearchTable.getInstance().getSearchTable());
+				//UIController.addResults(SearchTable.getInstance().getSearchTable());
+				CallbackRegister.getInstance().notifyCallbacks("p2p-app-results", query);
 			}
 		}
 

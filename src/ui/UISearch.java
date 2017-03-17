@@ -320,9 +320,7 @@ public class UISearch extends javax.swing.JFrame {
 			}
 			else
 				baseController.sendRequest(input, "tcp-server", "string", true, "", utility.Utilities.getIpAddress());
-
 		}
-
 	}
 
 

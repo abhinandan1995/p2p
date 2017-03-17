@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public class AppUi extends Application{
 
 	public static void main(String []args){
-		launch(args);
+		launch(args);	
 	}
 	
 	@Override
@@ -27,5 +27,8 @@ public class AppUi extends Application{
 		catch(Exception e){
 			System.out.println(e.getMessage());
 		}
+		
 	}
+	
+	
 }

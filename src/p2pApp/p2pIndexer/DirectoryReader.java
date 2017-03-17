@@ -8,37 +8,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import p2pApp.p2pDownloader.DownloadEngine;
+
 public class DirectoryReader {
 
 	private static String[] values = null;
 	private static List<String[]> files= null;
 	private static HashMap<String, Object> fileList= null;
-
-	static long getFiles (File aFile) throws Exception {	
+	private static DownloadEngine de= DownloadEngine.getInstance();
+	
+	static long getFiles (File aFile, int depth) throws Exception {	
 		long sum=0;
 		if(aFile.isFile()){
 			
-			values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " ").replace("?",""), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "1", "1"};
+			if(depth>=0 && !de.isPresentInPaused(aFile)){
+			values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "1", "1"};
 			files.add(values);
+			}
 			return aFile.length();
 		}
 		else if (aFile.isDirectory()) {
 
 			
-			File[] listOfFiles = aFile.listFiles();
+				File[] listOfFiles = aFile.listFiles();
 			if(listOfFiles!=null) {
 				for (int i = 0; i < listOfFiles.length; i++)
-					sum = sum+ getFiles(listOfFiles[i]);
+					sum = sum+ getFiles(listOfFiles[i], depth-1);
 				
+				if(depth>=0){
 				values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", ""+sum, "2", "1"};
 				files.add(values);
-				
+				}
+			}
 				return sum;
 			} 
 			else {
 				System.out.println("Directory Read #3 - Access Denied");
 			}
-		}
+		
 		return 0;
 	}
 
@@ -54,8 +61,20 @@ public class DirectoryReader {
 			files= new ArrayList<String[]>();
 			for(int i=0;i<names.size();i++)
 			{
-				aFile= new File(names.get(i));  
-				getFiles(aFile);
+				try{
+				
+				int index= names.get(i).indexOf("::");
+				int val= 128;
+				if(index==-1)
+					index= names.get(i).length();
+				else
+					val= Integer.parseInt(names.get(i).substring(index+2));
+				aFile= new File(names.get(i).substring(0, index));  
+				getFiles(aFile, val);
+				}
+				catch(Exception e){
+					
+				}
 			}
 
 			getFilesOnStart();

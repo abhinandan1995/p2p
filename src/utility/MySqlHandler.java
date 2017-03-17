@@ -1,6 +1,10 @@
 package utility;
 
 import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +21,13 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 public class MySqlHandler {
 
 	private static MySqlHandler mysqlHandler;
-	private String dbName="";
+	private String dbName="p2p_app";
 	private MysqlDataSource dataSource;
 	private DBI dbi;
 	
 	private MySqlHandler(){
 		try{
-			loadDatabase(null);
+			loadDatabase(dbName);
 		}
 		catch(Exception e){
 			System.out.println("Database Exception #1:"+ e.getMessage());
@@ -35,15 +39,7 @@ public class MySqlHandler {
 			mysqlHandler= new MySqlHandler();
 		return mysqlHandler;
 	}
-	
-	public MysqlDataSource getProperties() throws Exception{
-		Properties props = new Properties();
-        FileInputStream fis = null;
-        fis = new FileInputStream("data/db-ms.properties");
-        props.load(fis);
-		return getProperties(props.getProperty("mysql.database"));
-	}
-	
+		
 	public MysqlDataSource getProperties(String dbName) throws Exception{
 		Properties props = new Properties();
         FileInputStream fis = null;
@@ -53,17 +49,21 @@ public class MySqlHandler {
         props.load(fis);
         
         ds = new MysqlConnectionPoolDataSource();
-        String url= props.getProperty("mysql.url")+":"+props.getProperty("mysql.port")+"/"+dbName+"?"+props.getProperty("mysql.unicode");
-        ds.setURL(url);
-        ds.setUser(props.getProperty("mysql.username"));
-        
+
         String pass=props.getProperty("mysql.password");
         if(pass==null)
         	pass="";
+
+        String url= props.getProperty("mysql.url")+":"+props.getProperty("mysql.port")+"/";
+        
+        createDatabase(url, 
+        		props.getProperty("mysql.username"), pass,
+        		dbName);
+        
+        ds.setURL(url+dbName+"?"+props.getProperty("mysql.unicode"));
+        ds.setUser(props.getProperty("mysql.username"));
         ds.setPassword(pass);
 
-        this.dbName= dbName;
-        
         return ds;
 	}
 	
@@ -72,19 +72,38 @@ public class MySqlHandler {
 	}
 	
 	public void loadDatabase(String dbName) throws Exception{
-		if(this.dbName.equals(dbName)){
-			return;
-		}
 		
-		if(dbName==null)
-			dataSource= getProperties();
-		else
-			dataSource= getProperties(dbName);
-		
+		dataSource= getProperties(dbName);
 		Class.forName("com.mysql.jdbc.Driver");
     	dbi = new DBI(dataSource);
 	}
 	
+	private void createDatabase(String url, String user, String pass, String dbName){
+		Connection connection = null;
+		Statement statement = null;
+	    try {
+	        Class.forName("com.mysql.jdbc.Driver");
+	        connection = DriverManager.getConnection(url,
+	                user, pass);
+	        statement = connection.createStatement();
+	        String sql = "CREATE DATABASE "+dbName;
+	        statement.executeUpdate(sql);
+	        connection.close();
+	        
+	    } catch (SQLException sqlException) {
+	        if (sqlException.getErrorCode() == 1007) {
+	            
+	        } 
+	        else if(sqlException.getErrorCode()== 1044 || sqlException.getErrorCode()== 1045){
+	        	System.out.println("Database Exception #4: Check for database permissions. "+sqlException.getMessage());
+	        }
+	        else {
+	            System.out.println("Database Exception #4: Check for database connectivity. "+sqlException.getMessage());
+	        }
+	    } catch (ClassNotFoundException e) {
+	        
+	    }
+	}
 	public List<Map<String, Object>> fetchQuery(String sql){
 		
 		Handle handle = null;
@@ -227,5 +246,14 @@ public class MySqlHandler {
             }
         }
 	}
+	
+	public void TestDatabase() throws Exception{
+		Handle handle= null;
+		
+			handle= dbi.open();
+			handle.execute("USE "+dbName);
+		handle.close();
+	}
+
 	
 }

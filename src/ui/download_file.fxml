@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="160.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.FileDownloadController">
+  <children>
+    <AnchorPane fx:id="anchorPane" VBox.vgrow="ALWAYS">
+         <children>
+            <ImageView fx:id="image" fitHeight="61.0" fitWidth="73.0" layoutX="16.0" layoutY="29.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="title" alignment="TOP_CENTER" layoutX="108.0" layoutY="21.0" prefHeight="54.0" prefWidth="377.0" text="Cristiano ronaldo the story of a legentd. what he did was asehedsf sdfk sdkfjkdjsfj" textFill="#1e241a" wrapText="true">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ProgressBar fx:id="progressBar" layoutX="108.0" layoutY="81.0" prefHeight="18.0" prefWidth="348.0" progress="0.0" />
+            <Button fx:id="pauseButton" defaultButton="true" layoutX="187.0" layoutY="119.0" mnemonicParsing="false" onAction="#controlAction" prefHeight="32.0" prefWidth="110.0" text="Pause" />
+            <Button fx:id="closeButton" cancelButton="true" layoutX="420.0" layoutY="124.0" mnemonicParsing="false" onAction="#stopAction" prefHeight="25.0" prefWidth="65.0" text="Stop" />
+            <Label fx:id="speedLabel" layoutX="18.0" layoutY="93.0" prefHeight="42.0" prefWidth="80.0" textFill="#2bc317">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Button fx:id="openExplorer" graphicTextGap="2.0" layoutX="303.0" layoutY="119.0" mnemonicParsing="false" onAction="#openInExplorer" prefHeight="32.0" prefWidth="110.0" text="Open file location" visible="false" />
+         </children>
+    </AnchorPane>
+  </children>
+</VBox>

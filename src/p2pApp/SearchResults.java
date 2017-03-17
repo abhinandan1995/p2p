@@ -38,6 +38,8 @@ public class SearchResults {
 		this.userid= userid;
 		this.altIps= altIps;
 		this.type= type;
+		
+		//this.altIps.add(new AlternateIps("193.12.1.14","34","something", "89"));
 	}
 	
 	public String getFileId(){
@@ -76,6 +78,10 @@ public class SearchResults {
 	
 	public void setFilename(String name){
 		filename= name;
+	}
+	
+	public String getHash(){
+		return hash;
 	}
 }
 

@@ -2,8 +2,10 @@ package utility;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -307,6 +309,10 @@ public class Utilities{
 		return ThreadLocalRandom.current().nextInt(1000000,1000000000);
 	}
 	
+	public static String humanReadableByteCount(String bytes, boolean si) {
+		return humanReadableByteCount( Long.parseLong(bytes), si);
+	}
+	
 	public static String humanReadableByteCount(long bytes, boolean si) {
 	    int unit = si ? 1000 : 1024;
 	    if (bytes < unit) return bytes + " B";
@@ -345,6 +351,21 @@ public class Utilities{
 		
 	}
 	
+	public static void writeObjectToFile(String path, Object obj){
+		
+		try{
+			
+		FileOutputStream fos= new FileOutputStream(path);
+		ObjectOutputStream oos= new ObjectOutputStream(fos);
+		oos.writeObject(obj);
+		oos.close();
+		fos.close();
+		}
+		catch(Exception e){
+			System.out.println("FileWriteToObject Exception #3 " + e.getMessage());
+		}
+		
+	}
 	public static String readFromIpFile(String path){
 	
 	    String s="";

@@ -10,21 +10,52 @@ import p2pApp.SearchResults;
 public class DownloadEngine {
 	
 	private static DownloadEngine downloadEngine;
-	static ArrayList<DownloadNodes> downloadList;
+	ArrayList<DownloadNodes> downloadList;
+	ArrayList<DownloadNodes> pausedList;
 	
 	private DownloadEngine(){
 		downloadList= new ArrayList<DownloadNodes>();
+		pausedList= new ArrayList<DownloadNodes>();
 	}
 	
+	public void AddPausedDownloads(ArrayList<DownloadNodes> dn){
+		pausedList.addAll(dn);
+	}
+	
+	public boolean isPresentInPaused(File file){
+		for(int i=0; i < pausedList.size(); i++){
+			if(pausedList.get(i).getSearchResults().getFilename().equals(file.getName())){
+				return true;
+			}
+		}
+		return false;
+	}
 	public static DownloadEngine getInstance(){
 		if(downloadEngine==null)
 			downloadEngine = new DownloadEngine();
 		return downloadEngine;
 	}
 	
-	public void addDownload(SearchResults sr){
-		downloadList.add(new DownloadNodes(sr));
+	public DownloadNodes addDownload(SearchResults sr){
+		DownloadNodes dn=null;
+		
+		for(int i=0;i<pausedList.size();i++){
+			SearchResults temp= pausedList.get(i).getSearchResults();
+			if(temp.getHash().equals(sr.getHash())){
+				if(temp.getIp().equals(sr.getIp())){
+					dn= pausedList.get(i);
+					dn.isPaused= false;
+				}
+				pausedList.remove(i);
+				break;
+			}
+		}
+		
+		if(dn==null)
+			dn= new DownloadNodes(sr);
+		downloadList.add(dn);
 		startDownloading();
+		return dn;
 	}
 	
 	public void batchAdd(String base, ArrayList<SearchResults> al){
@@ -56,7 +87,43 @@ public class DownloadEngine {
 		startDownloading();
 	}
 	
+	public void pauseDownloadOfFile(DownloadNodes node){
+		for(int i=0;i<downloadList.size();i++){
+			if(downloadList.get(i)==node){
+				pausedList.add(node);
+				downloadList.remove(i);
+				utility.Utilities.writeToFile(
+						"data/partials/"+node.getSearchResults().getHash()+".txt",
+						utility.Utilities.getJsonString(new SaveDownloadNodes(node)), false);
+				break;
+			}
+		}
+	}
+	
+	public void resumeDownloadOfFile(DownloadNodes node){
+		for(int i=0;i<pausedList.size();i++){
+			if(pausedList.get(i)==node){
+				pausedList.remove(i);
+				downloadList.add(node);
+				startDownloading();
+				break;
+			}
+		}
+	}
+	
+	public boolean stopDownloadOfFile(DownloadNodes node){
+		for(int i=0;i<downloadList.size();i++){
+			if(downloadList.get(i)==node){
+				downloadList.remove(i);
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void startDownloading(){
+		
+		System.out.println("**Threads: "+DownloadThread.DownloadThreadsCount);
 			if(downloadList.isEmpty())
 				return;	
 			int count=0;

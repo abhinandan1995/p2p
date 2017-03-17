@@ -1,21 +1,30 @@
 package modules;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import baseServer.BaseNetworkEngine;
+import p2pApp.SearchTable;
+import p2pApp.p2pDownloader.DownloadEngine;
+import p2pApp.p2pDownloader.DownloadNodes;
+import p2pApp.p2pDownloader.SaveDownloadNodes;
+import tcpServer.BaseController;
 import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
 import utility.MySqlHandler;
-import baseServer.BaseNetworkEngine;
 
 public class InitModule {
 
 	PeersTable peersTable;
 	CallbackRegister callbackRegis;
 	BaseNetworkEngine networkEngine;
+	boolean shutDown= false;
 	
 	public InitModule(){
 		
@@ -23,12 +32,16 @@ public class InitModule {
 		callbackRegis= CallbackRegister.getInstance();
 		networkEngine= BaseNetworkEngine.getInstance();
 		MySqlHandler.getInstance();
+		SearchTable.getInstance();
 		
 		initPingPongCallbacks();
 		initUserValues();
+		getPausedDownloads();
 		
 		initSystemValues();
 		initPeersTable();
+		
+		
 	}
 	
 	private void initPingPongCallbacks(){
@@ -40,10 +53,33 @@ public class InitModule {
 	}
 	
 	private void initSystemValues(){
+		
+		if(shutDown){
+			return;
+		}
+		
+		String ip;
 		System.out.println("\nInitialising System variables... \n");
-		System.out.println("User-Ip: " + utility.Utilities.getIpAddress(utility.Utilities.baseIp));
+		System.out.println("User-Ip: " + (ip= utility.Utilities.getIpAddress(utility.Utilities.baseIp)));
 		System.out.println("User-Id: " + utility.Utilities.getSystemId());
 		System.out.println("\n");
+		
+		if(ip==null){
+			System.out.println("\n *** Unable to find a network connection. Shutting down. *** ");
+			stopServer();
+		}
+		
+		if(shutDown)
+			return;
+		
+		try{
+			MySqlHandler.getInstance().TestDatabase();
+		}
+		catch(Exception e){
+			System.out.println("Can't connect to database. : "+e.getMessage());
+			stopServer();
+			return;
+		}
 		
 		System.out.println("Loading databases... \n");
 		
@@ -51,11 +87,17 @@ public class InitModule {
 		for(int i=0;i<utility.Utilities.inputFolders.length;i++){
 			names.add(utility.Utilities.inputFolders[i].trim());
 		}
+		names.add(utility.Utilities.outputFolder.trim());
+		
 		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
 		System.out.println("Finished loading databases. \n");
 	}
 	
 	private void initPeersTable(){
+		
+		if(shutDown)
+			return;
+		
 		String s= utility.Utilities.readFromIpFile("data/ips.dat");
 		try{
 			
@@ -91,8 +133,44 @@ public class InitModule {
 		}
 		catch(Exception e){
 			System.out.println("Exception: Config file not found!");
+			stopServer();
 		}
-
+	}
+	
+	private void stopServer(){
+		try{
+			shutDown= true;
+			BaseController.getInstance().stopServer();
+		}
+		catch(Exception e){
+			System.out.println("Init Module: Can't stop server. "+e.getMessage());
+		}
+		
+	}
+	
+	private void getPausedDownloads(){
+		
+		ArrayList<DownloadNodes> an= new ArrayList<DownloadNodes>();
+		File aFile= new File("data/partials");
+		File[] listOfFiles = aFile.listFiles();
+		if(listOfFiles!=null) {
+			for (int i = 0; i < listOfFiles.length; i++){
+				try{
+					String content= new String(Files.readAllBytes(Paths.get(listOfFiles[i].getAbsolutePath())));
+					//listOfFiles[i].delete();
+					DownloadNodes dn=new DownloadNodes((SaveDownloadNodes)utility.Utilities.getObjectFromJson(content, SaveDownloadNodes.class)); 
+					if(new File(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(dn.getSearchResults().getFilename())).exists())
+						an.add(dn);
+					else
+						listOfFiles[i].delete();
+				}
+				catch(Exception e){
+					listOfFiles[i].delete();
+					System.out.println("Error while loading paused downloads: "+e.getMessage());
+				}
+			}
+			DownloadEngine.getInstance().AddPausedDownloads(an);
+		}
 	}
 	
 }

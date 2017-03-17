@@ -7,7 +7,6 @@ import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
-import ui.UISearch;
 import utility.Query_v12;
 
 public class BaseNetworkEngine {
@@ -24,8 +23,7 @@ public class BaseNetworkEngine {
 			baseEngineInstance= new BaseNetworkEngine();
 		return baseEngineInstance;
 	}
-
-
+	
 	public void manageNeighboursList(){
 		
 		PeersTable pt= peersTable;
@@ -109,7 +107,7 @@ public class BaseNetworkEngine {
 	public void manageNeighboursList(String action, Object obj){
 		try{
 			if(action.equals("tcp-server-pong")){
-				UISearch.enableSearchButon(true);
+				//UISearch.enableSearchButon(true);
 				Query_v12 query= (Query_v12)obj;
 				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", true);
 				persistActivePeers(((PingQuery)utility.Utilities.getObjectFromJson(query.getPayload(), PingQuery.class)).peers, query.getSourceIp(), query.getSourceSid());

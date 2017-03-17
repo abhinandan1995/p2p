@@ -23,9 +23,9 @@ public class DownloadResponse {
         try {
         	send(myFile);
         } catch (FileNotFoundException ex) {
-            System.out.println("Downloading File #1: "+ex.getMessage());
+            System.out.println("Download Response #1: "+ex.getMessage());
         }catch(Exception e){
-        	System.out.println("Downloading file #2: "+e.getMessage());
+        	System.out.println("Download Response #2: "+e.getMessage());
         }
         
         

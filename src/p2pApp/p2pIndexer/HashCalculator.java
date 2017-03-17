@@ -13,6 +13,7 @@ public class HashCalculator {
 	private static HashCalculator hashCalc;
 	private ArrayList<String> fileList;
 	private static int selectedVal= 0;
+	private int count = 0;
 	private boolean running1= false, running2= false;
 	private HashCalculator(){
 		fileList= new ArrayList<String>();
@@ -41,7 +42,7 @@ public class HashCalculator {
 				public void run(){
 					running1= true;
 					while(true){
-						
+		
 						String path= getFilePath();
 						if(path!=null && path!=""){
 							String h= null;
@@ -92,11 +93,13 @@ public class HashCalculator {
 	private synchronized String getFilePath(){
 		
 		if(fileList.size()>0){
-		
+			count++;
 			String path= fileList.get(0);
 			fileList.remove(0);
 			return path;
 		}
+		System.out.println("File hashing Completed. Total files hashed: "+ count);
+		count=0;
 		return null;
 	}
 	

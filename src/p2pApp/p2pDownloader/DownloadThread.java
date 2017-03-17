@@ -20,6 +20,7 @@ public class DownloadThread extends Thread{
 	FileChannel fos;
 	DownloadNodes node;
 	static int DownloadThreadsCount=0;
+	int delay= 0;
 	
 	public DownloadThread(String userIp, String fileId, String userId, int part, String segMode, String filename, FileChannel fos, DownloadNodes node){
 		
@@ -34,13 +35,36 @@ public class DownloadThread extends Thread{
 		
 		this.start();
 	}
+	
+	public DownloadThread(String userIp, String fileId, String userId, int part, String segMode, String filename, FileChannel fos, DownloadNodes node, int delay){
+		
+		this.userIp= userIp;
+		this.fileId= fileId;
+		this.userId= userId;
+		this.part= part;
+		this.segMode= segMode;
+		this.filename= filename;
+		this.fos= fos;
+		this.node= node;
+		this.delay= delay;
+		
+		this.start();
+	}
 
+	public int getDelay(){
+		return delay;
+	}
+	
 	@Override
 	public void run(){
 		Socket clientSocket = null;
 		DownloadThreadsCount++;
 		
 		try {
+			
+			if(delay>0){
+				Thread.sleep(delay);
+			}
 			clientSocket = new Socket();
 			clientSocket.connect(new InetSocketAddress(userIp, utility.Utilities.serverPort),
 					utility.Utilities.connectionTimeout);
@@ -78,6 +102,12 @@ public class DownloadThread extends Thread{
 		fos.position(part*(new SegmentationModes(segMode)).getSize());
 		while (size > 0 && (n = input.read(buf, 0, (int)Math.min(buf.length, size))) != -1){
 
+			if(node.isPaused){
+				input.close();
+				node.setPartStatus(part, (byte)0);
+				return;
+			}
+			
 			ByteBuffer bf= ByteBuffer.wrap(buf,0, n);
 			
 			while(bf.hasRemaining()){
@@ -85,6 +115,7 @@ public class DownloadThread extends Thread{
 			}
 			//fos.flush();
 			size -= n;
+			node.percentKeeper.addDone(n);
 		}
 		fos.force(true);
 		node.addPartsDone(userIp, part);

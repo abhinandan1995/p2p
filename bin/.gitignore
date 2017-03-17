@@ -1,6 +1,7 @@
-/utility/
-/p2pApp/
-/baseServer/
-/modules/
 /ui/
-/tcpClient/
+/baseServer/
+/p2pApp/
+/utility/
+/modules/
+/main/
+/settings.fxml
