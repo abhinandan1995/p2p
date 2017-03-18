@@ -443,7 +443,7 @@ class ButtonEditor extends DefaultCellEditor {
 		if(sr.getType().equals("1"))
 		DownloadEngine.getInstance().addDownload(sr);
 		if(sr.getType().equals("2")){
-			GetDirQuery.getDirQuery(sr);
+			GetDirQuery.sendDirQuery(sr);
 		}
 	}
 	@Override

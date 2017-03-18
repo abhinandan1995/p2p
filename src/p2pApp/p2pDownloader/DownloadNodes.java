@@ -180,7 +180,7 @@ public class DownloadNodes {
 			fos.close();
 			isComplete= true;
 			CallbackRegister.getInstance().notifyCallbacks(
-					"p2p-app-download-file-"+searchResults.getFileId(), searchResults);
+					"p2p-app-download-file-"+searchResults.getIp()+"-"+searchResults.getFileId(), searchResults);
 			
 			DirectoryReader.updateTableOnDownload(
 					utility.Utilities.outputFolder + 

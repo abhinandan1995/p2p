@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class AppUi extends Application{
@@ -22,6 +23,7 @@ public class AppUi extends Application{
 
 			primaryStage.setTitle("p2p application");
 			primaryStage.setScene(scene);
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("img/File.png")));
 			primaryStage.show();
 		}
 		catch(Exception e){

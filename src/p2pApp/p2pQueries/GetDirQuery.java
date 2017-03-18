@@ -14,6 +14,7 @@ public class GetDirQuery {
 	public String type;
 	public String name;
 	public ArrayList<SearchResults> files;
+	public String ip;
 	
 	public GetDirQuery(String action, String mode, String key, String name){
 		this.action= action;
@@ -23,6 +24,16 @@ public class GetDirQuery {
 		this.key= key;
 		this.name= name;
 	}
+	
+	public GetDirQuery(String action, String mode, String key, String name, String ip){
+		this.action= action;
+		getDirId= utility.Utilities.getRandomNumber();
+		type= "2";
+		this.mode= mode;
+		this.key= key;
+		this.name= name;
+		this.ip= ip;
+	}
 
 	public GetDirQuery(int id, String action, String name, ArrayList<SearchResults> files){
 		this.getDirId= id;
@@ -31,8 +42,25 @@ public class GetDirQuery {
 		this.files= files;
 	}
 	
-	public static void getDirQuery(SearchResults sr){
+	public GetDirQuery(SearchResults sr){
+		this("search", "fileId", sr.getFileId(), sr.getFilename(), sr.getIp());
+	}
+	
+	public static void sendDirQuery(SearchResults sr){
 		BaseController.getInstance().sendRequest(
 				new GetDirQuery("search", "fileId", sr.getFileId(), sr.getFilename()), "p2p-app", "GetDirQuery", true, "", sr.getIp(), 1);
+	}
+	
+	public static void sendDirQuery(GetDirQuery gdq){
+		BaseController.getInstance().sendRequest(
+				gdq, "p2p-app", "GetDirQuery", true, "", gdq.getIp(), 1);
+	}
+	
+	public int getDirId(){
+		return getDirId;
+	}
+	
+	public String getIp(){
+		return ip;
 	}
 }

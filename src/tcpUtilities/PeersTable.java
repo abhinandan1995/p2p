@@ -144,6 +144,14 @@ public class PeersTable{
 		return neighbourPeers;
 	}
 	
+	public List<String> getNeighbourIps(){
+		List<String> ips= new ArrayList<String>();
+		for(int i=0;i<neighbourPeers.size();i++){
+			ips.add(neighbourPeers.get(i).ip+" :: "+ neighbourPeers.get(i).systemId);
+		}
+		return ips;
+	}
+	
 	public void addNeighbourPeers(String ip, String sid, String st, boolean force){
 		addNeighbourPeers(ip, sid, st, new Date().getTime(), force);
 	}
@@ -166,6 +174,8 @@ public class PeersTable{
 				neighbourPeers.add(new PeersEntries(i, sid, st, t));
 			}
 		}
+		
+		CallbackRegister.getInstance().notifyCallbacks("tcp-server-neighbours", null);
 	}
 	
 	public void remNeighbourPeerByIp(String ip){
@@ -173,6 +183,7 @@ public class PeersTable{
 			if(neighbourPeers.get(i).ip.equals(ip))
 				neighbourPeers.remove(i);
 		}
+		CallbackRegister.getInstance().notifyCallbacks("tcp-server-neighbours", null);
 	}
 	
 	public boolean isNeighbourPresent(String sid){
@@ -199,6 +210,8 @@ public class PeersTable{
 		}
 		if(!isNeighbourPresent(sid))
 			addNeighbourPeers(ip, sid, st, force);
+		else
+			CallbackRegister.getInstance().notifyCallbacks("tcp-server-neighbours", null);
 	}
 	
 	public void addEntryAndNeighbour(String ip, String sid, boolean force){

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.DirDownloadController">
+  <children>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+         <children>
+            <ListView fx:id="listView" layoutX="22.0" layoutY="177.0" prefHeight="206.0" prefWidth="597.0" />
+            <ImageView fx:id="image" fitHeight="87.0" fitWidth="96.0" layoutX="14.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="dirname" layoutX="130.0" layoutY="16.0" prefHeight="56.0" prefWidth="433.0" text="Name of the directory being downloaded.">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <ProgressBar fx:id="progressBar" layoutX="130.0" layoutY="83.0" prefHeight="18.0" prefWidth="433.0" progress="0.0" />
+            <Label fx:id="dirsize" alignment="CENTER" layoutX="570.0" layoutY="20.0" prefHeight="49.0" prefWidth="54.0" text="40.8 GB" />
+            <Label fx:id="progressLabel" alignment="CENTER" layoutX="576.0" layoutY="83.0" prefHeight="18.0" prefWidth="43.0" text="67%" />
+            <Button defaultButton="true" layoutX="168.0" layoutY="117.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="117.0" text="Open Location" />
+            <Button layoutX="297.0" layoutY="117.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="110.0" text="Pause" />
+            <Button cancelButton="true" layoutX="420.0" layoutY="117.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="110.0" text="Stop" />
+            <Label fx:id="speedLabel" alignment="CENTER" layoutX="13.0" layoutY="117.0" prefHeight="36.0" prefWidth="89.0" text="Speed Mbps">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Separator layoutX="10.0" layoutY="162.0" prefHeight="6.0" prefWidth="615.0" />
+         </children>
+    </AnchorPane>
+  </children>
+</VBox>

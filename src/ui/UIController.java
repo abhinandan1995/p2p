@@ -1,5 +1,8 @@
 package ui;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -25,12 +28,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -64,16 +70,45 @@ public class UIController implements Initializable{
     @FXML private Button settings;
     @FXML private AnchorPane anchorPane;
     @FXML private Label totalResults;
+	@FXML private TextArea consoleArea;
+	@FXML private TextField textIp;
+	@FXML private ListView<String> peersList;
 	
+	private PrintStream ps ;
     private final ObservableList<Records> records =
 	        FXCollections.observableArrayList();   
+	private final ObservableList<String> peers= 
+			FXCollections.observableArrayList();
 	
     @FXML protected void openPreferences(ActionEvent ae){
     	showPreferencesDialog();
     }
 	
     @FXML protected void initServer(ActionEvent ae){
-    	startServer();
+    	
+    	if(startServer.getText().equals("Stop")){
+    		totalResults.setText("Server Offline");
+    		try{
+    		BaseController.getInstance().stopServer();
+    		startServer.setText("Start");
+    		}
+    		catch(Exception e){
+    			
+    		}
+    	}
+    	else{
+	    	totalResults.setText("Server Online");
+	    	startServer();
+    	}
+    }
+    
+    @FXML protected void pingIp(ActionEvent ae){
+    	String text= textIp.getText();
+    	textIp.setText("");
+    	if(utility.Utilities.validateIp(text))
+    		BaseController.getInstance().sendRequest(new PingQuery(), "tcp-server", "PingQuery", true, "", text);
+    	else
+    		System.out.println("\n** Error while pinging. Enter valid ip address!");
     }
     
 	@FXML protected void handleClickOnSearch(ActionEvent ae){
@@ -103,6 +138,16 @@ public class UIController implements Initializable{
         // initialize your logic here: all @FXML variables will have been injected
 		
 		//totalResults.setText("hello");
+		ps = new PrintStream(new Console(consoleArea)) ;
+		System.setOut(ps);
+        System.setErr(ps);
+        System.out.println("System status area");
+        
+        peersList.setItems(peers);
+        
+        peersList.setTooltip(new Tooltip("Shows the list of peers with which you are connected"));
+        consoleArea.setTooltip(new Tooltip("Shows the status of the system"));
+        
 		Source.setCellValueFactory(new PropertyValueFactory<Records, String>("Source"));
 		Filename.setCellValueFactory(new PropertyValueFactory<Records, String>("Filename"));
 		Filesize.setCellValueFactory(new PropertyValueFactory<Records, String>("Filesize"));
@@ -328,7 +373,8 @@ public class UIController implements Initializable{
 	        		showFileDownloadDialog(sr);
 	        	}
 	        	if(sr.getType().equals("2")){
-	        			GetDirQuery.getDirQuery(sr);
+	        			//GetDirQuery.getDirQuery(sr);
+	        		showDirDownloadDialog(sr);
 	        	}
 	        	
 	          table.getSelectionModel().select(getTableRow().getIndex());
@@ -417,6 +463,7 @@ public class UIController implements Initializable{
 				BaseController.getInstance().startServer();
 				new InitModule();
 				CallbackRegister.getInstance().registerForCallback("p2p-app-results", "ui.UIController", "handleResults", false, UIController.this);
+				CallbackRegister.getInstance().registerForCallback("tcp-server-neighbours", "ui.UIController", "modifyPeersList", false, UIController.this);
 				//returns true if peers table has some entries (some possibility for connections).
 				//returns false if peers table is empty.
 				BaseNetworkEngine.getInstance().connectToNetwork();
@@ -436,6 +483,7 @@ public class UIController implements Initializable{
 			
 			Stage dialog = new Stage();
 		    dialog.setTitle("Preferences");
+			dialog.getIcons().add(new Image(getClass().getResourceAsStream("img/File.png")));
 		    dialog.initOwner(anchorPane.getScene().getWindow());
 		    FXMLLoader loader = new FXMLLoader(getClass().getResource("settings.fxml"));
 		    Parent root = (Parent)loader.load();
@@ -458,6 +506,7 @@ public class UIController implements Initializable{
 		    dialog.initOwner(anchorPane.getScene().getWindow());
 		    dialog.setY(400+ 40*Math.random());
 		    dialog.setY(200+ 20*Math.random());
+		    dialog.getIcons().add(new Image(getClass().getResourceAsStream("img/File.png")));
 		    
 		    FXMLLoader loader = new FXMLLoader(getClass().getResource("download_file.fxml"));
 		    Parent root = (Parent)loader.load();
@@ -470,18 +519,81 @@ public class UIController implements Initializable{
 			
 			controller.setDownloadNode(DownloadEngine.getInstance().addDownload(sr));
 			CallbackRegister.getInstance().registerForCallback(
-					"p2p-app-download-file-"+sr.getFileId(), "ui.FileDownloadController", "completeDownload", true, controller);
+					"p2p-app-download-file-"+sr.getIp()+"-"+sr.getFileId(), "ui.FileDownloadController", "completeDownload", true, controller);
 			}
 	
 			catch(Exception e){
 				System.out.println("Unable to open the file download: "+e.getMessage());
 			}
 	}
+	
+	private void showDirDownloadDialog(SearchResults sr){
+		try{
+				
+				Stage dialog = new Stage();
+			    dialog.setTitle("Downloading: "+sr.getFilename());
+			    dialog.initOwner(anchorPane.getScene().getWindow());
+//			    dialog.setY(400+ 40*Math.random());
+//			    dialog.setY(200+ 20*Math.random());
+			    dialog.getIcons().add(new Image(getClass().getResourceAsStream("img/File.png")));
+			    
+			    FXMLLoader loader = new FXMLLoader(getClass().getResource("download_dir.fxml"));
+			    Parent root = (Parent)loader.load();
+				DirDownloadController controller = (DirDownloadController)loader.getController();
+				controller.setupStage(dialog);
+//				controller.setTitle(sr);
+				Scene scene = new Scene(root);
+				dialog.setScene(scene);
+				dialog.show();
+				
+//				controller.setDownloadNode(DownloadEngine.getInstance().addDownload(sr));
+				GetDirQuery.sendDirQuery(sr);
+				CallbackRegister.getInstance().registerForCallback(
+						"p2p-app-dir-listfiles", "ui.DirDownloadController", "fileList", true, controller);
+				}
+		
+				catch(Exception e){
+					System.out.println("Unable to open the file download: "+e.getMessage());
+				}
+		}
+	
+	public class Console extends OutputStream {
+        private TextArea console;
+
+        public Console(TextArea console) {
+            this.console = console;
+        }
+
+        public void appendText(final String valueOf) {
+            Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					console.appendText(valueOf);
+				}
+			});
+        }
+
+        public void write(int b) throws IOException {
+            appendText(String.valueOf((char)b));
+        }
+    }
 	// Callback functions
 	
 	public void handleResults(String action, Object obj){
 		if(action.equals("p2p-app-results")){
 			addResults(SearchTable.getInstance().getSearchTable());
+		}
+	}
+	
+	public synchronized void modifyPeersList(String action, Object obj){
+		if(action.equals("tcp-server-neighbours")){
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					peers.clear();
+					peers.addAll(PeersTable.getInstance().getNeighbourIps());
+				}
+			});
 		}
 	}
 

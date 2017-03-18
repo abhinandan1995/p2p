@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import baseServer.BaseNetworkEngine;
-import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pDownloader.UploadThread;
 import p2pApp.p2pIndexer.TableHandler;
 import p2pApp.p2pQueries.DownloadQuery;
@@ -64,7 +63,8 @@ public class AppServer {
 				}
 			}
 			if(gdq.action.equals("results")){
-				DownloadEngine.getInstance().batchAdd(gdq.name, gdq.files);
+				//DownloadEngine.getInstance().batchAdd(gdq.name, gdq.files);
+				CallbackRegister.getInstance().notifyCallbacks("p2p-app-dir-listfiles", gdq);
 			}
 		}
 	}
