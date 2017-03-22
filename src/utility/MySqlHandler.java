@@ -15,6 +15,7 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Query;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
@@ -151,7 +152,10 @@ public class MySqlHandler {
             handle.execute("INSERT into "+tblName+" ( "+ cms+")" +"VALUES " +"( "+vs+")");
         } 
         catch(Exception e){
-        	System.out.println("Database Exception #3: "+e.getMessage());
+        	if(e instanceof MySQLIntegrityConstraintViolationException){
+			}
+			else
+				System.out.println("Database Exception #4: "+e.getMessage());
         }
         finally {
             if (handle != null) {
@@ -191,7 +195,10 @@ public class MySqlHandler {
 			batch.execute();
 		}
 		catch(Exception e){
-			System.out.println("Database Exception #4: "+e.getMessage());
+			if(e instanceof MySQLIntegrityConstraintViolationException){
+			}
+			else
+				System.out.println("Database Exception #4: "+e.getMessage());
 		}
 		finally {
             if (handle != null) {
@@ -238,7 +245,10 @@ public class MySqlHandler {
             handle.execute("UPDATE "+tblName+" SET "+setVariable+" = "+ "'"+ setValue+ "'" +" WHERE "+whereVar+ "= "+ "'"+ whereVal +"'");
         } 
         catch(Exception e){
-        	System.out.println("Database Exception #3: "+e.getMessage());
+        	if(e instanceof MySQLIntegrityConstraintViolationException){
+			}
+			else
+				System.out.println("Database Exception #4: "+e.getMessage());
         }
         finally {
             if (handle != null) {

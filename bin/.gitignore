@@ -1,8 +1,4 @@
-/ui/
-/baseServer/
-/p2pApp/
 /utility/
-/modules/
-/main/
-/settings.fxml
-/tcpUtilities/
+/baseServer/
+/ui/
+/tcpServer/

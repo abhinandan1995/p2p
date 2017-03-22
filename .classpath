@@ -9,6 +9,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/gson-2.2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdbc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdbi-2.75.jar"/>
-	<classpathentry kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/lucene-core-3.2.0.jar"/>
+	<classpathentry kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/lucene-analyzers-common-6.4.2.jar"/>
+	<classpathentry kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/lucene-core-6.4.2.jar"/>
+	<classpathentry kind="lib" path="E:/Compilers/eclipse/projects/p2p-v2/lib/lucene-queryparser-6.4.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

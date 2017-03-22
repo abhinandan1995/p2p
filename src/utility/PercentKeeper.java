@@ -41,6 +41,10 @@ public class PercentKeeper {
 		sizeDone= size;
 	}
 	
+	public long getSizeDone(){
+		return sizeDone;
+	}
+	
 	public void addDone(long size){
 		try{
 		tempSize= tempSize + size;

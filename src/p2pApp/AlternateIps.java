@@ -47,4 +47,8 @@ public class AlternateIps {
 	public String getUserid(){
 		return userid;
 	}
+	
+	public void addNew(AlternateIps ip){
+		
+	}
 }

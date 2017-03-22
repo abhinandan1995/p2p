@@ -5,34 +5,43 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.DirDownloadController">
+<VBox prefHeight="432.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.DirDownloadController">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
          <children>
-            <ListView fx:id="listView" layoutX="22.0" layoutY="177.0" prefHeight="206.0" prefWidth="597.0" />
-            <ImageView fx:id="image" fitHeight="87.0" fitWidth="96.0" layoutX="14.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" />
+            <ListView fx:id="listView" layoutX="22.0" layoutY="212.0" prefHeight="206.0" prefWidth="597.0" />
+            <ImageView fitHeight="100.0" fitWidth="85.0" layoutX="15.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@img/img_dir.png" />
+               </image></ImageView>
             <Label fx:id="dirname" layoutX="130.0" layoutY="16.0" prefHeight="56.0" prefWidth="433.0" text="Name of the directory being downloaded.">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
             <ProgressBar fx:id="progressBar" layoutX="130.0" layoutY="83.0" prefHeight="18.0" prefWidth="433.0" progress="0.0" />
-            <Label fx:id="dirsize" alignment="CENTER" layoutX="570.0" layoutY="20.0" prefHeight="49.0" prefWidth="54.0" text="40.8 GB" />
-            <Label fx:id="progressLabel" alignment="CENTER" layoutX="576.0" layoutY="83.0" prefHeight="18.0" prefWidth="43.0" text="67%" />
-            <Button defaultButton="true" layoutX="168.0" layoutY="117.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="117.0" text="Open Location" />
-            <Button layoutX="297.0" layoutY="117.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="110.0" text="Pause" />
-            <Button cancelButton="true" layoutX="420.0" layoutY="117.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="110.0" text="Stop" />
+            <Label fx:id="dirsize" alignment="CENTER" layoutX="570.0" layoutY="20.0" prefHeight="49.0" prefWidth="54.0" text="Size" />
+            <Label fx:id="progressLabel" alignment="CENTER" layoutX="576.0" layoutY="83.0" prefHeight="18.0" prefWidth="43.0" />
+            <Button fx:id="openButton" defaultButton="true" layoutX="168.0" layoutY="117.0" mnemonicParsing="false" onAction="#onOpenPressed" prefHeight="36.0" prefWidth="117.0" text="Open Location" />
+            <Button fx:id="pauseButton" layoutX="297.0" layoutY="117.0" mnemonicParsing="false" onAction="#onPausePressed" prefHeight="36.0" prefWidth="110.0" text="Pause" />
+            <Button fx:id="stopButton" cancelButton="true" layoutX="420.0" layoutY="117.0" mnemonicParsing="false" onAction="#onStopPressed" prefHeight="36.0" prefWidth="110.0" text="Stop" />
             <Label fx:id="speedLabel" alignment="CENTER" layoutX="13.0" layoutY="117.0" prefHeight="36.0" prefWidth="89.0" text="Speed Mbps">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
             <Separator layoutX="10.0" layoutY="162.0" prefHeight="6.0" prefWidth="615.0" />
+            <Label fx:id="filesCount" alignment="CENTER" layoutX="202.0" layoutY="175.0" prefHeight="30.0" prefWidth="218.0" style="-fx-background-color: #7bab4c;" text="Getting list of files..." textFill="#0f1e39">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
          </children>
     </AnchorPane>
   </children>

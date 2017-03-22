@@ -46,6 +46,8 @@ public class Utilities{
 	public static String[] inputFolders;
 	public static int resultSetSize= 2;
 	public static String searchCol= "Path";
+	public static boolean debugMode= false;
+	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
 			ipAddress=getLocalIpAddress();

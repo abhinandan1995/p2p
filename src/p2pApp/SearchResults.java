@@ -65,7 +65,7 @@ public class SearchResults {
 	public void addAlternateIps(String ip, String key, String filename, String filesize, String userid){
 		if(altIps==null)
 			altIps= new ArrayList<AlternateIps>();
-		altIps.add(new AlternateIps(ip, key, filename, filesize, userid));
+		addNewAltIp(new AlternateIps(ip, key, filename, filesize, userid));
 	}
 	
 	public ArrayList<AlternateIps> getAlternateIps(){
@@ -82,6 +82,17 @@ public class SearchResults {
 	
 	public String getHash(){
 		return hash;
+	}
+	
+	public void addNewAltIp(AlternateIps ip){
+		if(ip.getIp().equals(ip)){
+			return;
+		}
+		for(int i=0;i<altIps.size();i++){
+			if(ip.getIp().equals(altIps.get(i).getIp()))
+				return;
+		}
+		altIps.add(ip);
 	}
 }
 

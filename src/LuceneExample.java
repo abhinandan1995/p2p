@@ -1,25 +1,26 @@
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriter.MaxFieldLength;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.SimpleFSDirectory;
-import org.apache.lucene.util.Version;
 
 import utility.MySqlHandler;
 
@@ -36,19 +37,24 @@ public class LuceneExample {
 	  List<Map<String, Object>> l;
 		
    MySqlHandler handler = MySqlHandler.getInstance();
-  l= handler.fetchQuery("Select * from testQuery");
+  l= handler.fetchQuery("Select * from dirreader");
    //Lucene Section
-   Directory directory = new SimpleFSDirectory(INDEX_DIRECTORY);
-   Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
-   IndexWriter iWriter = new IndexWriter(directory, analyzer, true,MaxFieldLength.UNLIMITED);
-   
+  Directory dir = FSDirectory.open(Paths.get("indexPath"));
+  Analyzer analyzer = new StandardAnalyzer();
+  IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+  iwc.setOpenMode(OpenMode.CREATE);
+  IndexWriter writer = new IndexWriter(dir, iwc);
    //Looping through resultset and adding to index file
    int count = 0;
    while(true) {
     Document doc = new Document();
-    doc.add(new Field("filename", l.get(count).get("filename").toString(), Field.Store.YES, Field.Index.ANALYZED_NO_NORMS));
-    //Adding doc to iWriter
-    iWriter.addDocument(doc);
+  //  doc.add(new Field("filename", l.get(count).get("filename").toString(), Field.Store.YES, Field.Index.ANALYZED_NO_NORMS));
+    Field pathField = new StringField("filename", l.get(count).get("filename").toString(), Field.Store.YES);
+    System.out.println(l.get(count).get("filename").toString());
+    doc.add(pathField);
+    Field path= new TextField("path", l.get(count).get("Path").toString(), Field.Store.YES);
+    doc.add(path);
+    writer.addDocument(doc);
     count++;
     if(count>=l.size())
     	break;
@@ -57,9 +63,8 @@ public class LuceneExample {
    System.out.println(count+" record indexed");
    
    //Closing iWriter
-   iWriter.optimize(); 
-   iWriter.commit();
-   iWriter.close();
+   //writer.commit();
+   writer.close();
    
    //Closing JDBC connection
    
@@ -76,12 +81,12 @@ public class LuceneExample {
   try {
    
    //Searching
-   IndexReader reader = IndexReader.open(FSDirectory.open(INDEX_DIRECTORY), true);
-   IndexSearcher searcher = new IndexSearcher(reader);
-   Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+	  IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get("indexPath")));
+	   IndexSearcher searcher = new IndexSearcher(reader);
+	      Analyzer analyzer = new StandardAnalyzer();
    //MultiFieldQueryParser is used to search multiple fields
-   String files= "filename";
-   QueryParser mqp = new QueryParser(Version.LUCENE_30, files , analyzer);
+   String files= "path";
+   QueryParser mqp = new QueryParser(files , analyzer);
    
  //  Term term = new Term("filename",keyword);
 //   //create the term query object
@@ -90,16 +95,15 @@ public class LuceneExample {
    
    System.out.println("query >> " + query);
    
-   TopDocs hits = searcher.search(query, 100); // run the query
+   ScoreDoc[] hits = searcher.search(query, 100).scoreDocs; // run the query
    
-   System.out.println("Results found >> " + hits.totalHits);
+   System.out.println("Results found >> " +hits.length);
    
-   for (int i = 0; i < hits.totalHits; i++) {
-    Document doc = searcher.doc(hits.scoreDocs[i].doc);//get the next  document
+   for (int i = 0; i < hits.length && i<100; i++) {
+    Document doc = searcher.doc(hits[i].doc);//get the next  document
     System.out.println(doc.get("filename"));
    }
    
-   searcher.close();
   } catch (Exception e) {
    e.printStackTrace();
   }
@@ -118,12 +122,18 @@ public class LuceneExample {
   obj.createIndex();
   
   //searching keyword
-  obj.search("ruchi");
-  obj.search("sarchi");
-obj.search("love song");
-obj.search("haryl potter");
+  Scanner in= new Scanner(System.in);
+  
+  while(true){
+  String str= in.nextLine();
+  obj.search(str);
+  if(in.equals("close"))
+	  break;
+  }
+  
+  in.close();
   //using wild card serach
-  //obj.search("*ruchi");
+  //obj.search("abhi");
 
 
 //  //using logical operator

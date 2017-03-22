@@ -24,7 +24,8 @@ public class DownloadEngine {
 	
 	public boolean isPresentInPaused(File file){
 		for(int i=0; i < pausedList.size(); i++){
-			if(pausedList.get(i).getSearchResults().getFilename().equals(file.getName())){
+			if(pausedList.get(i).getSearchResults().getFilename().equals(file.getName())&&
+					file.getAbsolutePath().contains(utility.Utilities.outputFolder)){
 				return true;
 			}
 		}
@@ -34,6 +35,25 @@ public class DownloadEngine {
 		if(downloadEngine==null)
 			downloadEngine = new DownloadEngine();
 		return downloadEngine;
+	}
+	
+	public void addDownload(DownloadNodes node, boolean start){
+		
+		for(int i=0;i<pausedList.size();i++){
+			SearchResults temp= pausedList.get(i).getSearchResults();
+			if(temp.getHash().equals(node.getSearchResults().getHash())){
+				if(temp.getIp().equals(node.getSearchResults().getIp())){
+					node= pausedList.get(i);
+					node.isPaused= false;
+				}
+				pausedList.remove(i);
+				break;
+			}
+		}
+		
+		downloadList.add(node);
+		if(start)
+		startDownloading();
 	}
 	
 	public DownloadNodes addDownload(SearchResults sr){
@@ -56,6 +76,38 @@ public class DownloadEngine {
 		downloadList.add(dn);
 		startDownloading();
 		return dn;
+	}
+	
+	public ArrayList<DownloadNodes> addMultiple(String base, ArrayList<SearchResults> al, boolean start){
+		ArrayList<DownloadNodes> nodes= new ArrayList<DownloadNodes>();
+		try{
+			makeDirectory(base);
+		}
+		catch(Exception e){
+			System.out.println("Download Engine #3 "+ e.getMessage());
+			return nodes;
+		}
+		
+		for(int i=0;i<al.size();i++){
+			SearchResults sr= al.get(i);
+			
+			if(sr.getType().equals("2")){
+				try{
+					makeDirectory(sr.getFilename());
+				}
+				catch(Exception e){
+					System.out.println("Download Engine #2 "+ e.getMessage());
+				}
+				continue;
+			}
+			if(sr.getType().equals("1")){
+				nodes.add(new DownloadNodes(sr));
+			}
+		}
+		downloadList.addAll(nodes);
+		if(start)
+		startDownloading();
+		return nodes;
 	}
 	
 	public void batchAdd(String base, ArrayList<SearchResults> al){

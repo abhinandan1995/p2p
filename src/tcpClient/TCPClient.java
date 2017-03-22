@@ -72,6 +72,7 @@ public class TCPClient extends Thread {
 				if(!query.getResponse())
 					output= null;
 				
+				if(utility.Utilities.debugMode)
 				System.out.println("Received from Server ("+ip+":"+serverPort+")\n"+st);
 
 				switch(query.getModule()){

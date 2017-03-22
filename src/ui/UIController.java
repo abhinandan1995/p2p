@@ -547,6 +547,8 @@ public class UIController implements Initializable{
 				dialog.show();
 				
 //				controller.setDownloadNode(DownloadEngine.getInstance().addDownload(sr));
+				controller.setDetails(sr.getFilename(), sr.getFileSize());
+				
 				GetDirQuery.sendDirQuery(sr);
 				CallbackRegister.getInstance().registerForCallback(
 						"p2p-app-dir-listfiles", "ui.DirDownloadController", "fileList", true, controller);

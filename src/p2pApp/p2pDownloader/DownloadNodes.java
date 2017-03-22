@@ -27,7 +27,7 @@ public class DownloadNodes {
 	int activeSeeds=1;
 	public boolean isComplete= false;
 	PercentKeeper percentKeeper;
-	public boolean isPaused= false;
+	public boolean isPaused= false, isStopped= false;
 	int delayCount= 10;
 	
 	public DownloadNodes(SearchResults sr){
@@ -70,6 +70,9 @@ public class DownloadNodes {
 	}
 	
 	public void resumeDownload(){
+		if(!isPaused)
+			return;
+		
 		isPaused= false;
 		delayCount = 5;
 		activeSeeds= 1;
@@ -77,23 +80,35 @@ public class DownloadNodes {
 	}
 	
 	public void pauseDownload(){
+		if(isPaused)
+			return;
+		
 		isPaused= true;
+		if(!isComplete)
 		DownloadEngine.getInstance().pauseDownloadOfFile(this);
 		activeIps.clear();
 	}
 	
 	public void stopDownload(){
+		if(isComplete)
+			return;
+		
 		isPaused= true;
+		isStopped= true;
 		
 		try{
 			if(DownloadEngine.getInstance().stopDownloadOfFile(this)){
+				if(fos!=null){
 					fos.getChannel().close();
-				fos.close();
+					fos.close();
+				}
 				new File(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(searchResults.getFilename())).delete();
 			}
 			else{
-				fos.getChannel().close();
-				fos.close();
+				if(fos!=null){
+					fos.getChannel().close();
+					fos.close();
+				}
 			}
 			fos= null;
 		}
@@ -108,7 +123,14 @@ public class DownloadNodes {
 	}
 	
 	public int getPercent(){
+		if(isComplete)
+			return 100;
 		return percentKeeper.getPercent();
+		//return 45;
+	}
+	
+	public long getSizeDone(){
+		return percentKeeper.getSizeDone();
 	}
 	
 	public double getSpeed(){
