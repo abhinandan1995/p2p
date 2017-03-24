@@ -1,4 +1,3 @@
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +13,11 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
@@ -27,7 +28,7 @@ import utility.MySqlHandler;
 
 public class LuceneExample {
  
- public static final File INDEX_DIRECTORY = new File("IndexDirectory");
+ public static final String INDEX_DIRECTORY = "LuceneIndex";
  
  public void createIndex() {
   
@@ -39,7 +40,7 @@ public class LuceneExample {
    MySqlHandler handler = MySqlHandler.getInstance();
   l= handler.fetchQuery("Select * from dirreader");
    //Lucene Section
-  Directory dir = FSDirectory.open(Paths.get("indexPath"));
+  Directory dir = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
   Analyzer analyzer = new StandardAnalyzer();
   IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
   iwc.setOpenMode(OpenMode.CREATE);
@@ -81,7 +82,7 @@ public class LuceneExample {
   try {
    
    //Searching
-	  IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get("indexPath")));
+	  IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(INDEX_DIRECTORY)));
 	   IndexSearcher searcher = new IndexSearcher(reader);
 	      Analyzer analyzer = new StandardAnalyzer();
    //MultiFieldQueryParser is used to search multiple fields
@@ -101,8 +102,16 @@ public class LuceneExample {
    
    for (int i = 0; i < hits.length && i<100; i++) {
     Document doc = searcher.doc(hits[i].doc);//get the next  document
-    System.out.println(doc.get("filename"));
+    System.out.println(doc.get("path") + hits[i].score);
    }
+   
+   PrefixQuery pq= new PrefixQuery(new Term("path", "f:/animes/hyouka"));
+	System.out.println(pq.toString());
+	hits = searcher.search(pq, 100).scoreDocs; // run the query
+	for (int i = 0; i < hits.length && i<100; i++) {
+	    Document doc = searcher.doc(hits[i].doc);//get the next  document
+	    System.out.println(doc.get("path") + hits[i].score);
+	   }
    
   } catch (Exception e) {
    e.printStackTrace();

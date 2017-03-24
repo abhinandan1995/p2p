@@ -1,6 +1,7 @@
 package p2pApp.p2pIndexer;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,44 +9,62 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.store.FSDirectory;
+
 import p2pApp.p2pDownloader.DownloadEngine;
+import tcpUtilities.CallbackRegister;
+import utility.LuceneHandler;
 
 public class DirectoryReader {
 
 	private static String[] values = null;
 	private static List<String[]> files= null;
+	private static List<String[]> remFiles= null;
 	private static HashMap<String, Object> fileList= null;
 	private static DownloadEngine de= DownloadEngine.getInstance();
-	
+	private static DirectoryReader directoryReader;
+	public static String type= "MySQL";
+
+	public static DirectoryReader getInstance(){
+		if(directoryReader==null)
+			directoryReader= new DirectoryReader();
+		return directoryReader;
+	}
+
 	static long getFiles (File aFile, int depth) throws Exception {	
 		long sum=0;
 		if(aFile.isFile()){
-			
 			if(depth>=0 && !de.isPresentInPaused(aFile)){
-			values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "1", "1"};
-			files.add(values);
+				values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "1", "1"};
+				files.add(values);
 			}
 			return aFile.length();
 		}
 		else if (aFile.isDirectory()) {
-
-			
-				File[] listOfFiles = aFile.listFiles();
+			File[] listOfFiles = aFile.listFiles();
 			if(listOfFiles!=null) {
 				for (int i = 0; i < listOfFiles.length; i++)
 					sum = sum+ getFiles(listOfFiles[i], depth-1);
-				
+
 				if(depth>=0){
-				values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", ""+sum, "2", "1"};
-				files.add(values);
+					values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", ""+sum, "2", "1"};
+					files.add(values);
 				}
 			}
-				return sum;
-			} 
-			else {
-				System.out.println("Directory Read #3 - Access Denied");
-			}
-		
+			return sum;
+		} 
+		else {
+			System.out.println("Directory Read #3 - Access Denied");
+		}
+
 		return 0;
 	}
 
@@ -56,24 +75,23 @@ public class DirectoryReader {
 	public static void DR_init(ArrayList<String> names, boolean force)
 	{  
 		try{
-
 			File aFile;
 			files= new ArrayList<String[]>();
 			for(int i=0;i<names.size();i++)
 			{
 				try{
-				
-				int index= names.get(i).indexOf("::");
-				int val= 128;
-				if(index==-1)
-					index= names.get(i).length();
-				else
-					val= Integer.parseInt(names.get(i).substring(index+2));
-				aFile= new File(names.get(i).substring(0, index));  
-				getFiles(aFile, val);
+
+					int index= names.get(i).indexOf("::");
+					int val= 128;
+					if(index==-1)
+						index= names.get(i).length();
+					else
+						val= Integer.parseInt(names.get(i).substring(index+2).trim());
+					aFile= new File(names.get(i).substring(0, index));  
+					getFiles(aFile, val);
 				}
 				catch(Exception e){
-					
+
 				}
 			}
 
@@ -84,7 +102,7 @@ public class DirectoryReader {
 			TableHandler.fillTable(files);
 			fillInMissingHashes();
 			files.clear();
-			
+
 			preserveOldHashedFiles();
 			TableHandler.fillTable(files);
 		}
@@ -135,9 +153,9 @@ public class DirectoryReader {
 			System.out.println("Directory Read #1 "+e.getMessage());
 		}
 	}
-	
+
 	private static void fillInMissingHashes(){
-		
+
 		for(int i=0;i<files.size();i++){
 			if(files.get(i)[3].length()<20 && files.get(i)[5].equals("1")){
 				HashCalculator.getInstance().addNewPath(files.get(i)[2].replace("''", "'"));
@@ -165,13 +183,131 @@ public class DirectoryReader {
 			System.out.println("Directory Reader #4 "+e.getMessage());
 		}
 	}
-	
+
 	public static void updateTableOnDownload(String filepath){
 		File f= new File(filepath);
 		if(f.isFile()){
-			values = new String[]{String.valueOf(TableHandler.getNextId()), f.getName().replace("'", "''").replace("_", " ").replace("?",""), f.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(f.length()), "1", "1"};
-			TableHandler.fillTable(values);
-			HashCalculator.getInstance().addNewPath(filepath);
+			values = new String[]{String.valueOf(TableHandler.getNextId()), f.getName().replace("'", "''").replace("_", " "), f.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(f.length()), "1", "2"};
+			if(type.equals("MySQL")){
+				TableHandler.fillTable(values);
+				HashCalculator.getInstance().addNewPath(filepath);
+			}
+			else{
+				List<String[]> l= new ArrayList<String[]>();
+				l.add(values);
+				HashCalculator.getInstance().addMultiplePaths(l, 2);
+			}
 		}
-	}	
+	}
+
+	public void indexDirectories(ArrayList<String> names){
+
+		type= "Lucene";
+		try{
+			File aFile;
+			files= new ArrayList<String[]>();
+			for(int i=0;i<names.size();i++)
+			{
+				try{
+					int index= names.get(i).indexOf("::");
+					int val= 128;
+					if(index==-1)
+						index= names.get(i).length();
+					else
+						val= Integer.parseInt(names.get(i).substring(index+2).trim());
+					aFile= new File(names.get(i).substring(0, index));  
+					getFiles(aFile, val);
+				}
+				catch(Exception e){
+
+				}
+			}
+			getAllIndexes(files);
+		}
+		catch(Exception e){
+			System.out.println("Directory Reader #5 "+e.getMessage());
+		}
+	}
+
+	public void getAllIndexes(List<String[]> files) throws Exception{
+		HashMap<String, Integer> paths= new HashMap<String, Integer>();
+		IndexReader reader = null;
+		IndexSearcher searcher = null;
+		ScoreDoc[] hits = null;
+		try {
+			reader = org.apache.lucene.index.DirectoryReader.open(FSDirectory.open(Paths.get(TableHandler.INDEX_DIRECTORY)));
+			searcher = new IndexSearcher(reader);
+			Query query= new MatchAllDocsQuery();
+			hits = searcher.search(query, 100).scoreDocs;
+
+			for(int i=0;i<hits.length;i++){
+				Document doc= searcher.doc(hits[i].doc);
+				paths.put(doc.get("Path")+"::"+doc.get("FileSize"), i);
+				if(Integer.parseInt(doc.get("FileID")) > TableHandler.FileID){
+					TableHandler.FileID += 10;
+				}
+			}
+		} catch (Exception e) {
+			//e.printStackTrace();
+		}
+		matchPaths(files, hits, paths, searcher);
+		if(reader!=null)
+			reader.close();
+	}
+
+	public void matchPaths(List<String[]> files,
+			ScoreDoc[] hits, HashMap<String, Integer> paths, IndexSearcher searcher) throws Exception{
+
+		int rem[], found[];
+		rem = new int[files.size()];
+		found= new int[files.size()];
+		int r=0, f=0;
+
+		for(int i=0;i<files.size();i++){
+			String []fl= files.get(i);
+			if(paths.containsKey(fl[2]+"::"+fl[4])){
+				found[f++]= paths.get(fl[2]+"::"+fl[4]);
+			}
+			else
+				rem[r++]= i;
+		}
+
+		IndexWriter writer= LuceneHandler.createNewIndex(TableHandler.INDEX_DIRECTORY);
+		for(int i=0;i<f;i++){
+			Document doc= searcher.doc(hits[found[i]].doc);
+			doc.add(new IntPoint(TableHandler.columns[0], Integer.parseInt(doc.get(TableHandler.columns[0]))));
+			writer.addDocument(doc);
+		}
+		writer.close();
+
+		remFiles= new ArrayList<String[]>();
+		for(int i=0;i<r;i++){
+			remFiles.add(files.get(rem[i]));
+		}
+
+		paths.clear();
+		paths= null;
+		files.clear();
+		files = null;
+
+		CallbackRegister.getInstance().registerForCallback("p2p-app-hashing-done", "p2pApp.p2pIndexer.DirectoryReader", "addNewHashes", false, DirectoryReader.this);
+		if(r>0)
+			HashCalculator.getInstance().addMultiplePaths(remFiles, 2);
+
+	}
+
+	//callback functions 
+
+	@SuppressWarnings("unchecked")
+	public void addNewHashes(String action, Object obj){
+		if(action.equals("p2p-app-hashing-done")){
+			try {
+				remFiles= (List<String[]>)obj;
+				TableHandler.createIndex(remFiles, false);
+				remFiles.clear();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

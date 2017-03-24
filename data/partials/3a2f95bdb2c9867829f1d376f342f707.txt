@@ -1,1 +1,0 @@
-{"searchResults":{"ip":"","filename":"hyouka/Hyouka 18.mp4","hash":"3a2f95bdb2c9867829f1d376f342f707","filesize":"79360623","userid":"","fileid":"10020","type":"1","altIps":[]},"segMode":"short","totalParts":4,"partsDone":[1,0,0,0],"partsCompleted":0,"activeIps":{"":0},"ips":[],"activeSeeds":1,"isComplete":false,"isPaused":false}

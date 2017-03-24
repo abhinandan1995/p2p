@@ -13,6 +13,7 @@ import p2pApp.p2pQueries.GetDirQuery;
 import p2pApp.p2pQueries.SearchQuery;
 import tcpServer.BaseController;
 import tcpUtilities.CallbackRegister;
+import utility.LuceneHandler;
 import utility.Query_v12;
 public class AppServer {
 
@@ -32,7 +33,7 @@ public class AppServer {
 			searchQuery= (SearchQuery) utility.Utilities.getObjectFromJson(query.getPayload(), SearchQuery.class);
 
 			if(searchQuery.mode.equals("search")){
-//				BaseNetworkEngine.getInstance().forwardRequests(query);
+				//				BaseNetworkEngine.getInstance().forwardRequests(query);
 				SearchDatabase sd= new SearchDatabase(searchQuery);
 				sendResults(sd.getResults(), sd.getSize());
 			}
@@ -49,12 +50,12 @@ public class AppServer {
 		if(query.getResponseType().equals("DownloadQuery")){
 			DownloadQuery dq= (DownloadQuery)utility.Utilities.getObjectFromJson(query.getPayload(), DownloadQuery.class);
 			String path= TableHandler.getFilePath(dq.key);
-	//		new DownloadResponse(path, output); 
+			//		new DownloadResponse(path, output); 
 			// DownloadResponse is for sequential download
 			//UploadThread is for segmented downloading
 			new UploadThread(path, output, dq.part, dq.segMode);
 		}
-		
+
 		if(query.getResponseType().equals("GetDirQuery")){
 			GetDirQuery gdq= (GetDirQuery)utility.Utilities.getObjectFromJson(query.getPayload(), GetDirQuery.class);
 			if(gdq.action.equals("search")){
@@ -73,9 +74,9 @@ public class AppServer {
 		try{
 			BaseController.getInstance().sendRequest(data, query.getModule(), "SearchQuery", false, "", query.getSourceIp(), 1);
 			if(size >= utility.Utilities.resultSetSize) 
-					BaseNetworkEngine.getInstance().forwardRequests(query, true);
+				BaseNetworkEngine.getInstance().forwardRequests(query, true);
 			else
-					BaseNetworkEngine.getInstance().forwardRequests(query, false);
+				BaseNetworkEngine.getInstance().forwardRequests(query, false);
 		}
 		catch(Exception e){
 			System.out.println("AppServer #1 "+e.getMessage());
@@ -89,10 +90,17 @@ public class AppServer {
 	}
 
 	private void sendDirFiles(int id, String key, String name){
-		List<Map<String, Object>> l= TableHandler.getFilesFromDir(key);
-		ArrayList<SearchResults> al= new ArrayList<SearchResults>();
-		for(int i=0;i<l.size();i++){
-			al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("Path").toString().replaceFirst("(.*)"+name+"/", name+"/"), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString()));
+
+		ArrayList<SearchResults> al= null;
+		if(p2pApp.p2pIndexer.DirectoryReader.type.equals("MySQL")){
+			List<Map<String, Object>> l= TableHandler.getFilesFromDir(key);
+			al = new ArrayList<SearchResults>();
+			for(int i=0;i<l.size();i++){
+				al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("Path").toString().replaceFirst("(.*)"+name+"/", name+"/"), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString()));
+			}
+		}
+		else{
+			al = LuceneHandler.getDirValues(TableHandler.INDEX_DIRECTORY, TableHandler.columns[0], TableHandler.columns[2], key, name);
 		}
 		BaseController.getInstance().sendResponse(
 				new GetDirQuery(id, "results", name, al), query.getModule(), "GetDirQuery", false, "", output);

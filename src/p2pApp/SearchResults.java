@@ -84,15 +84,15 @@ public class SearchResults {
 		return hash;
 	}
 	
-	public void addNewAltIp(AlternateIps ip){
-		if(ip.getIp().equals(ip)){
+	public void addNewAltIp(AlternateIps aip){
+		if(aip.getIp().equals(ip)){
 			return;
 		}
 		for(int i=0;i<altIps.size();i++){
-			if(ip.getIp().equals(altIps.get(i).getIp()))
+			if(aip.getIp().equals(altIps.get(i).getIp()))
 				return;
 		}
-		altIps.add(ip);
+		altIps.add(aip);
 	}
 }
 

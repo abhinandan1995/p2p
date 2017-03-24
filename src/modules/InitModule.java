@@ -17,7 +17,6 @@ import tcpServer.BaseController;
 import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
-import utility.MySqlHandler;
 
 public class InitModule {
 
@@ -31,7 +30,7 @@ public class InitModule {
 		peersTable= PeersTable.getInstance();
 		callbackRegis= CallbackRegister.getInstance();
 		networkEngine= BaseNetworkEngine.getInstance();
-		MySqlHandler.getInstance();
+		//MySqlHandler.getInstance();
 		SearchTable.getInstance();
 		
 		initPingPongCallbacks();
@@ -69,17 +68,17 @@ public class InitModule {
 			stopServer();
 		}
 		
-		if(shutDown)
-			return;
-		
-		try{
-			MySqlHandler.getInstance().TestDatabase();
-		}
-		catch(Exception e){
-			System.out.println("Can't connect to database. : "+e.getMessage());
-			stopServer();
-			return;
-		}
+//		if(shutDown)
+//			return;
+//		
+//		try{
+//			MySqlHandler.getInstance().TestDatabase();
+//		}
+//		catch(Exception e){
+//			System.out.println("Can't connect to database. : "+e.getMessage());
+//			stopServer();
+//			return;
+//		}
 		
 		System.out.println("Loading databases... \n");
 		
@@ -88,8 +87,8 @@ public class InitModule {
 			names.add(utility.Utilities.inputFolders[i].trim());
 		}
 		names.add(utility.Utilities.outputFolder.trim());
-		
-		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
+		p2pApp.p2pIndexer.DirectoryReader.getInstance().indexDirectories(names);
+//		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
 		System.out.println("Finished loading databases. \n");
 	}
 	
