@@ -68,7 +68,7 @@ public class HashCalculator {
 					running1= true;
 					while(true){
 						String[] p= getFilePath();
-						
+
 						if(p==null)
 							break;
 						String path= p[0];
@@ -83,8 +83,13 @@ public class HashCalculator {
 							if(storageType==0)
 								MySqlHandler.getInstance().updateTable(TableHandler.TblName, "Hash", h, "Path", path.replace("\\", "/").replace("'", "''"));
 							if(storageType==1){
-								int j= Integer.parseInt(p[1]);
-								paths.get(j)[3]= h;
+								if(paths.size()>0)
+								{
+									int j= Integer.parseInt(p[1]);
+									String []a= paths.get(j);
+									a[3]= h;
+									paths.set(j, a);
+								}
 							}
 						}
 						else 
@@ -116,10 +121,13 @@ public class HashCalculator {
 							if(storageType==0)
 								MySqlHandler.getInstance().updateTable(TableHandler.TblName, "Hash", h, "Path", path.replace("\\", "/").replace("'", "''"));
 							if(storageType==1){
-								int j= Integer.parseInt(p[1]);
-								String []a= paths.get(j);
-								a[3]= h;
-								paths.set(j, a);
+								if(paths.size()>0)
+								{
+									int j= Integer.parseInt(p[1]);
+									String []a= paths.get(j);
+									a[3]= h;
+									paths.set(j, a);
+								}
 							}
 						}
 						else 

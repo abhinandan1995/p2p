@@ -84,6 +84,7 @@ public class InitModule {
 		
 		ArrayList<String> names= new ArrayList<String>();
 		for(int i=0;i<utility.Utilities.inputFolders.length;i++){
+			if(utility.Utilities.inputFolders[i].trim().length()>2)
 			names.add(utility.Utilities.inputFolders[i].trim());
 		}
 		names.add(utility.Utilities.outputFolder.trim());

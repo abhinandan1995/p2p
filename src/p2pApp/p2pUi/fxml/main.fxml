@@ -4,8 +4,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -22,17 +20,6 @@
                </font>
             </TextField>
             <Button fx:id="searchButton" layoutX="700.0" layoutY="48.0" mnemonicParsing="false" onAction="#handleClickOnSearch" prefHeight="34.0" prefWidth="86.0" text="Search" />
-            <TableView fx:id="resultsTable" layoutX="64.0" layoutY="95.0" prefHeight="313.0" prefWidth="782.0" AnchorPane.leftAnchor="9.0" AnchorPane.rightAnchor="9.0">
-              <columns>
-                <TableColumn fx:id="Source" editable="false" minWidth="100.0" prefWidth="151.0" resizable="false" sortable="false" text="Source" />
-                <TableColumn fx:id="Filename" editable="false" minWidth="250.0" prefWidth="397.0" resizable="false" text="Filename" />
-                  <TableColumn fx:id="Filesize" editable="false" minWidth="31.0" prefWidth="124.0" resizable="false" text="Filesize" />
-                  <TableColumn fx:id="Download" editable="false" minWidth="47.0" prefWidth="109.0" resizable="false" sortable="false" text="Download" />
-              </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
             <Label layoutX="34.0" layoutY="31.0" prefHeight="34.0" prefWidth="155.0" />
             <Button fx:id="settings" layoutX="69.0" layoutY="2.0" mnemonicParsing="false" onAction="#openPreferences" text="Settings" />
             <Button fx:id="startServer" layoutX="19.0" layoutY="2.0" mnemonicParsing="false" onAction="#initServer" text="Start" />
@@ -48,6 +35,7 @@
             <TextArea fx:id="consoleArea" editable="false" focusTraversable="false" layoutX="17.0" layoutY="428.0" prefHeight="145.0" prefWidth="543.0" promptText="Console" wrapText="true" />
             <Separator layoutX="571.0" layoutY="428.0" orientation="VERTICAL" prefHeight="145.0" prefWidth="1.0" />
             <Separator layoutX="19.0" layoutY="37.0" prefHeight="4.0" prefWidth="772.0" />
+            <ListView fx:id="resultList" layoutX="18.0" layoutY="101.0" prefHeight="305.0" prefWidth="766.0" />
          </children>
     </AnchorPane>
   </children>

@@ -225,7 +225,7 @@ public class DirectoryReader {
 			getAllIndexes(files);
 		}
 		catch(Exception e){
-			System.out.println("Directory Reader #5 "+e.getMessage());
+			System.out.println("Directory Reader #8 "+e.getMessage());
 		}
 	}
 
@@ -272,14 +272,15 @@ public class DirectoryReader {
 				rem[r++]= i;
 		}
 
-		IndexWriter writer= LuceneHandler.createNewIndex(TableHandler.INDEX_DIRECTORY);
-		for(int i=0;i<f;i++){
-			Document doc= searcher.doc(hits[found[i]].doc);
-			doc.add(new IntPoint(TableHandler.columns[0], Integer.parseInt(doc.get(TableHandler.columns[0]))));
-			writer.addDocument(doc);
+		if(f>0){
+			IndexWriter writer= LuceneHandler.createNewIndex(TableHandler.INDEX_DIRECTORY);
+			for(int i=0;i<f;i++){
+				Document doc= searcher.doc(hits[found[i]].doc);
+				doc.add(new IntPoint(TableHandler.columns[0], Integer.parseInt(doc.get(TableHandler.columns[0]))));
+				writer.addDocument(doc);
+			}
+			writer.close();
 		}
-		writer.close();
-
 		remFiles= new ArrayList<String[]>();
 		for(int i=0;i<r;i++){
 			remFiles.add(files.get(rem[i]));

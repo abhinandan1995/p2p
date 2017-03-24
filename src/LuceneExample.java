@@ -53,7 +53,7 @@ public class LuceneExample {
     Field pathField = new StringField("filename", l.get(count).get("filename").toString(), Field.Store.YES);
     System.out.println(l.get(count).get("filename").toString());
     doc.add(pathField);
-    Field path= new TextField("path", l.get(count).get("Path").toString(), Field.Store.YES);
+    Field path= new StringField("path", l.get(count).get("Path").toString(), Field.Store.YES);
     doc.add(path);
     writer.addDocument(doc);
     count++;
@@ -105,7 +105,7 @@ public class LuceneExample {
     System.out.println(doc.get("path") + hits[i].score);
    }
    
-   PrefixQuery pq= new PrefixQuery(new Term("path", "f:/animes/hyouka"));
+   PrefixQuery pq= new PrefixQuery(new Term("path", "f:/animes/hyouka/Hyouka 1-10"));
 	System.out.println(pq.toString());
 	hits = searcher.search(pq, 100).scoreDocs; // run the query
 	for (int i = 0; i < hits.length && i<100; i++) {
