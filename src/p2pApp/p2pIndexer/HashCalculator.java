@@ -18,7 +18,7 @@ public class HashCalculator {
 	private int count = 0;
 	private boolean running1= false, running2= false;
 	List<String[]> paths;
-
+	boolean reported = false;
 	/*
 	 storageType: Mysql or lucene
 	 0- mysql
@@ -61,7 +61,9 @@ public class HashCalculator {
 	}
 
 	private void startHashing(){
-
+		
+		reported= false;
+		
 		if(!running1){
 			Thread t1= new Thread(){
 				public void run(){
@@ -148,7 +150,11 @@ public class HashCalculator {
 			fileList.remove(0);
 			return path;
 		}
-		CallbackRegister.getInstance().notifyCallbacks("p2p-app-hashing-done", paths);
+		if(!reported){
+			reported= true;
+			CallbackRegister.getInstance().notifyCallbacks("p2p-app-hashing-done", paths);
+		}
+		
 		System.out.println("**File hashing Completed. Total files hashed: "+ count);
 		count=0;
 		return null;

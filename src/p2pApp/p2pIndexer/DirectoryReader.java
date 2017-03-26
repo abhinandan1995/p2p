@@ -1,23 +1,17 @@
 package p2pApp.p2pIndexer;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.store.FSDirectory;
 
 import p2pApp.p2pDownloader.DownloadEngine;
 import tcpUtilities.CallbackRegister;
@@ -31,7 +25,6 @@ public class DirectoryReader {
 	private static HashMap<String, Object> fileList= null;
 	private static DownloadEngine de= DownloadEngine.getInstance();
 	private static DirectoryReader directoryReader;
-	public static String type= "MySQL";
 
 	public static DirectoryReader getInstance(){
 		if(directoryReader==null)
@@ -39,11 +32,24 @@ public class DirectoryReader {
 		return directoryReader;
 	}
 
-	static long getFiles (File aFile, int depth) throws Exception {	
+	private static String parseInvalidNames(String n){
+		if(TableHandler.tableType.equals("mysql")){
+			return n.replace("'", "''").replace("\\", "/").replace("_", " ");
+		}
+		return n.replace("\\","/").replace( "_"," ");
+	}
+	
+	private static String parseInvalidPaths(String n){
+		if(TableHandler.tableType.equals("mysql")){
+			return n.replace("'", "''").replace("\\", "/");
+		}
+		return n.replace("\\","/");
+	}
+	static long getFiles (File aFile, int depth) {	
 		long sum=0;
 		if(aFile.isFile()){
-			if(depth>=0 && !de.isPresentInPaused(aFile)){
-				values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(aFile.length()), "1", "1"};
+			if(!de.isPresentInPaused(aFile)){
+				values = new String[]{String.valueOf(TableHandler.FileID++),parseInvalidNames(aFile.getName()), parseInvalidPaths(aFile.getPath()), "null", String.valueOf(aFile.length()), "1", (depth > -1)?"1":"2"};
 				files.add(values);
 			}
 			return aFile.length();
@@ -54,10 +60,8 @@ public class DirectoryReader {
 				for (int i = 0; i < listOfFiles.length; i++)
 					sum = sum+ getFiles(listOfFiles[i], depth-1);
 
-				if(depth>=0){
-					values = new String[]{String.valueOf(TableHandler.FileID++),aFile.getName().replace("'", "''").replace("_", " "), aFile.getPath().replace("\\", "/").replace("'", "''"), "null", ""+sum, "2", "1"};
-					files.add(values);
-				}
+				values = new String[]{String.valueOf(TableHandler.FileID++),parseInvalidNames(aFile.getName()), parseInvalidPaths(aFile.getPath()), "null", ""+sum, "2", (depth > -1)?"1":"2"};
+				files.add(values);
 			}
 			return sum;
 		} 
@@ -103,7 +107,7 @@ public class DirectoryReader {
 			fillInMissingHashes();
 			files.clear();
 
-			preserveOldHashedFiles();
+			//			preserveOldHashedFiles();
 			TableHandler.fillTable(files);
 		}
 		catch(Exception e){
@@ -163,32 +167,32 @@ public class DirectoryReader {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private static void preserveOldHashedFiles(){
-		try{
-
-			if(!fileList.isEmpty()){
-				Set<String> paths= fileList.keySet();
-				Iterator<String> itr= paths.iterator();
-				while(itr.hasNext()){
-					String s= itr.next();
-					HashMap<String, Object> o= (HashMap<String, Object>)fileList.get(s);
-					values = new String[]{String.valueOf(TableHandler.FileID++),o.get("FileName").toString().replace("'", "''"), o.get("Path").toString().replace("'", "''"), o.get("Hash").toString(), o.get("FileSize").toString(), o.get("Type").toString(), "0"};
-					files.add(values);
-				}
-			}
-
-		}
-		catch(Exception e){
-			System.out.println("Directory Reader #4 "+e.getMessage());
-		}
-	}
+	//	@SuppressWarnings("unchecked")
+	//	private static void preserveOldHashedFiles(){
+	//		try{
+	//
+	//			if(!fileList.isEmpty()){
+	//				Set<String> paths= fileList.keySet();
+	//				Iterator<String> itr= paths.iterator();
+	//				while(itr.hasNext()){
+	//					String s= itr.next();
+	//					HashMap<String, Object> o= (HashMap<String, Object>)fileList.get(s);
+	//					values = new String[]{String.valueOf(TableHandler.FileID++),o.get("FileName").toString().replace("'", "''"), o.get("Path").toString().replace("'", "''"), o.get("Hash").toString(), o.get("FileSize").toString(), o.get("Type").toString(), "0"};
+	//					files.add(values);
+	//				}
+	//			}
+	//
+	//		}
+	//		catch(Exception e){
+	//			System.out.println("Directory Reader #4 "+e.getMessage());
+	//		}
+	//	}
 
 	public static void updateTableOnDownload(String filepath){
 		File f= new File(filepath);
 		if(f.isFile()){
 			values = new String[]{String.valueOf(TableHandler.getNextId()), f.getName().replace("'", "''").replace("_", " "), f.getPath().replace("\\", "/").replace("'", "''"), "null", String.valueOf(f.length()), "1", "2"};
-			if(type.equals("MySQL")){
+			if(TableHandler.tableType.equals("mysql")){
 				TableHandler.fillTable(values);
 				HashCalculator.getInstance().addNewPath(filepath);
 			}
@@ -200,9 +204,25 @@ public class DirectoryReader {
 		}
 	}
 
-	public void indexDirectories(ArrayList<String> names){
+	public static void updateTableOnDownload(String filepath, String hash){
+		File f= new File(filepath);
+		if(f.isFile()){
+			values = new String[]{String.valueOf(TableHandler.getNextId()), f.getName().replace("'", "''").replace("_", " "), f.getPath().replace("\\", "/").replace("'", "''"), hash, String.valueOf(f.length()), "1", "2"};
+			if(TableHandler.tableType.equals("mysql")){
+				TableHandler.fillTable(values);
+			}
+			else{
+				List<String[]> l= new ArrayList<String[]>();
+				l.add(values);
+				try {
+					TableHandler.createIndex(l, false);
+				} catch (Exception e) {
+				}
+			}
+		}
+	}
 
-		type= "Lucene";
+	public void indexDirectories(ArrayList<String> names){
 		try{
 			File aFile;
 			files= new ArrayList<String[]>();
@@ -231,28 +251,27 @@ public class DirectoryReader {
 
 	public void getAllIndexes(List<String[]> files) throws Exception{
 		HashMap<String, Integer> paths= new HashMap<String, Integer>();
-		IndexReader reader = null;
 		IndexSearcher searcher = null;
 		ScoreDoc[] hits = null;
 		try {
-			reader = org.apache.lucene.index.DirectoryReader.open(FSDirectory.open(Paths.get(TableHandler.INDEX_DIRECTORY)));
-			searcher = new IndexSearcher(reader);
+			searcher= new IndexSearcher(LuceneHandler.getReader(TableHandler.INDEX_DIRECTORY));
 			Query query= new MatchAllDocsQuery();
-			hits = searcher.search(query, 100).scoreDocs;
+			hits = searcher.search(query, 10000000).scoreDocs;
 
 			for(int i=0;i<hits.length;i++){
 				Document doc= searcher.doc(hits[i].doc);
-				paths.put(doc.get("Path")+"::"+doc.get("FileSize"), i);
+				paths.put(doc.get("pathstring")+"::"+doc.get(TableHandler.columns[4]), i);
 				if(Integer.parseInt(doc.get("FileID")) > TableHandler.FileID){
 					TableHandler.FileID += 10;
 				}
 			}
-		} catch (Exception e) {
-			//e.printStackTrace();
+		} 
+		catch(IndexNotFoundException f){
+
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 		matchPaths(files, hits, paths, searcher);
-		if(reader!=null)
-			reader.close();
 	}
 
 	public void matchPaths(List<String[]> files,
@@ -273,13 +292,23 @@ public class DirectoryReader {
 		}
 
 		if(f>0){
-			IndexWriter writer= LuceneHandler.createNewIndex(TableHandler.INDEX_DIRECTORY);
+			//			IndexWriter writer= LuceneHandler.createNewIndex(TableHandler.INDEX_DIRECTORY);
+			List<String[]> list= new ArrayList<String[]>();
 			for(int i=0;i<f;i++){
 				Document doc= searcher.doc(hits[found[i]].doc);
-				doc.add(new IntPoint(TableHandler.columns[0], Integer.parseInt(doc.get(TableHandler.columns[0]))));
-				writer.addDocument(doc);
+				//				doc.add(new IntPoint(TableHandler.columns[0], Integer.parseInt(doc.get(TableHandler.columns[0]))));
+				//				writer.addDocument(doc);
+				list.add(new String[]{doc.get(TableHandler.columns[0]),
+						doc.get(TableHandler.columns[1]),
+						doc.get("pathstring"),
+						doc.get(TableHandler.columns[3]),
+						doc.get(TableHandler.columns[4]),
+						doc.get(TableHandler.columns[5]),
+						doc.get(TableHandler.columns[6])});
 			}
-			writer.close();
+			TableHandler.createIndex(list, true);
+			list= null;
+			//writer.close();
 		}
 		remFiles= new ArrayList<String[]>();
 		for(int i=0;i<r;i++){

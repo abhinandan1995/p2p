@@ -2,6 +2,7 @@ package p2pApp.p2pUi.controller;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -10,14 +11,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pDownloader.DownloadNodes;
@@ -25,7 +32,7 @@ import p2pApp.p2pQueries.GetDirQuery;
 
 public class DirDownloadController implements Initializable {
 
-	@FXML private Label speedLabel;
+	@FXML private Label speedLabel, titleLabel, minLabel, closeLabel;
 	@FXML private Label dirsize;
 	@FXML private Label dirname;
 	@FXML private ProgressBar progressBar;
@@ -51,9 +58,31 @@ public class DirDownloadController implements Initializable {
 		openFolderLocation(utility.Utilities.outputFolder + dirname.getText());
 	}
 
+	@FXML protected void minClicked(MouseEvent ae){
+		stage.setIconified(true);
+	}
+	
+	@FXML protected void closeClicked(MouseEvent ae){
+		if(isComplete)
+			stage.hide();
+		else
+			showCloseConfirm();
+	}
+	
+	public void stopAllDownloads(){
+		if(stopButton.getText().equals("Stop")){
+			stopUpdates= true;
+			for(int i=0;i<files.size();i++){
+				files.get(i).stopDownload();
+			}
+		}
+		stage.hide();
+	}
+	
 	@FXML protected void onPausePressed(ActionEvent ae){
 		if(pauseButton.getText().equals("Pause")){
 			pauseButton.setText("Resume");
+			titleLabel.setText("Download Paused");
 			stopUpdates= true;
 			for(int i=0; i< files.size();i++){
 				files.get(i).pauseDownload();
@@ -64,6 +93,7 @@ public class DirDownloadController implements Initializable {
 		if(pauseButton.getText().equals("Resume")){
 			pauseButton.setText("Pause");
 			setUpdates();
+			titleLabel.setText("Downloading directory");
 			stopUpdates= false;
 			for(int i=0; i< files.size();i++){
 				files.get(i).resumeDownload();
@@ -73,13 +103,10 @@ public class DirDownloadController implements Initializable {
 	}
 
 	@FXML protected void onStopPressed(ActionEvent ae){
-		if(stopButton.getText().equals("Stop")){
-			stopUpdates= true;
-			for(int i=0;i<files.size();i++){
-				files.get(i).stopDownload();
-			}
-		}
-		stage.hide();
+		if(isComplete)
+			stage.hide();
+		else
+			showCloseConfirm();
 	}
 
 	@Override 
@@ -202,5 +229,29 @@ public class DirDownloadController implements Initializable {
 			System.out.println(e.getMessage());
 		}
 	}
+	
+	public void showCloseConfirm(){
+		
+		try {
+			Stage dialog = new Stage();
+			dialog.initOwner(stage);
+			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/alert.fxml"));
+			Parent root = (Parent)loader.load();
+			AlertController controller = (AlertController)loader.getController();
+			controller.setupDetails(dialog,
+					"exit-confirm", DirDownloadController.this,
+					"Stop downloading all files?", "Closing this window will stop download of all the files.", "Yes", "No");
+			
+			Scene scene = new Scene(root);
+			dialog.setScene(scene);
+			dialog.initStyle(StageStyle.UNDECORATED);
+			dialog.initModality(Modality.WINDOW_MODAL);
+			dialog.show();
+		} catch (IOException e) {
+		}
+
+	}
+
 }
 

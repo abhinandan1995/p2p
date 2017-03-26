@@ -206,7 +206,7 @@ public class DownloadNodes {
 			
 			DirectoryReader.updateTableOnDownload(
 					utility.Utilities.outputFolder + 
-					utility.Utilities.parseInvalidFilenames(searchResults.getFilename()));
+					utility.Utilities.parseInvalidFilenames(searchResults.getFilename()), searchResults.getHash());
 			
 			new File("data/partials/"+searchResults.getHash()+".txt").delete();
 			}

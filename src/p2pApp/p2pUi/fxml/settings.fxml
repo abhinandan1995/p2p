@@ -7,34 +7,57 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="450.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="p2pApp.p2pUi.controller.PreferencesDialogController">
+<VBox prefHeight="532.0" prefWidth="300.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="p2pApp.p2pUi.controller.PreferencesDialogController">
   <children>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" minHeight="-Infinity" prefHeight="450.0" prefWidth="300.0" VBox.vgrow="ALWAYS">
+      <HBox prefHeight="32.0" prefWidth="298.0" style="-fx-background-color: #9dd2d3;">
          <children>
-            <TextField fx:id="ipAddress" layoutX="96.0" layoutY="57.0" onKeyPressed="#notifyChanges3" prefHeight="25.0" prefWidth="175.0" />
-            <TextArea fx:id="addedPaths" layoutX="25.0" layoutY="169.0" onKeyTyped="#notifyChanges3" prefHeight="141.0" prefWidth="247.0" />
-            <TextField fx:id="outputFolder" editable="false" layoutX="97.0" layoutY="108.0" onKeyPressed="#notifyChanges3" prefHeight="25.0" prefWidth="129.0" />
+            <Label alignment="CENTER" prefHeight="32.0" prefWidth="66.0" text="Share It">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" prefHeight="32.0" prefWidth="198.0">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="closeLabel" alignment="CENTER" onMouseClicked="#closeClicked" prefHeight="32.0" prefWidth="44.0" text="X">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" minHeight="-Infinity" prefHeight="450.0" prefWidth="298.0" VBox.vgrow="ALWAYS">
+         <children>
+            <TextField fx:id="ipAddress" layoutX="95.0" layoutY="57.0" onKeyPressed="#notifyChanges3" prefHeight="25.0" prefWidth="175.0" promptText="172" />
+            <TextArea fx:id="addedPaths" layoutX="25.0" layoutY="169.0" onKeyTyped="#notifyChanges3" prefHeight="136.0" prefWidth="247.0" />
+            <TextField fx:id="outputFolder" editable="false" layoutX="97.0" layoutY="108.0" onKeyPressed="#notifyChanges3" prefHeight="25.0" prefWidth="129.0" promptText="d:/p2p/downloads/" />
             <Label layoutX="22.0" layoutY="57.0" prefHeight="25.0" prefWidth="71.0" text="Ip Address:" />
             <Label layoutX="22.0" layoutY="108.0" prefHeight="25.0" prefWidth="71.0" text="Save in: " />
-            <TextField fx:id="inputPath" accessibleText="Hello" editable="false" layoutX="22.0" layoutY="360.0" prefHeight="25.0" prefWidth="191.0" promptText="Selected path will be shown here..." />
+            <TextField fx:id="inputPath" accessibleText="Hello" editable="false" layoutX="23.0" layoutY="385.0" prefHeight="25.0" prefWidth="191.0" promptText="Selected path will be shown here..." />
             <Label layoutX="22.0" layoutY="145.0" prefHeight="25.0" prefWidth="96.0" text="Shared Paths:" />
             <Label layoutX="91.0" layoutY="4.0" prefHeight="35.0" prefWidth="104.0" text=" Preferences" textAlignment="CENTER">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
-            <ComboBox fx:id="inputDepth" layoutX="195.0" layoutY="329.0" prefHeight="25.0" prefWidth="78.0" />
-            <Label layoutX="22.0" layoutY="329.0" prefHeight="25.0" prefWidth="71.0" text="Add Path:" />
-            <Button fx:id="addPathBtn" layoutX="222.0" layoutY="360.0" mnemonicParsing="false" onAction="#addNewPath" prefHeight="25.0" prefWidth="51.0" text="Add " />
-            <Button fx:id="saveBtn" layoutX="110.0" layoutY="411.0" mnemonicParsing="false" onAction="#saveChanges" prefHeight="25.0" prefWidth="78.0" text="Save" />
-            <Button fx:id="fileBtn" layoutX="89.0" layoutY="329.0" mnemonicParsing="false" onAction="#openFileList" prefHeight="25.0" prefWidth="41.0" text="File" />
-            <Button fx:id="folderBtn" layoutX="136.0" layoutY="329.0" mnemonicParsing="false" onAction="#openDirList" prefHeight="25.0" prefWidth="51.0" text="Folder" />
-            <Separator layoutX="17.0" layoutY="317.0" prefHeight="0.0" prefWidth="262.0" />
-            <Separator layoutX="18.0" layoutY="396.0" prefHeight="3.0" prefWidth="256.0" />
-            <Label fx:id="statusLabel" layoutX="25.0" layoutY="411.0" prefHeight="25.0" prefWidth="71.0">
+            <ComboBox fx:id="inputDepth" layoutX="190.0" layoutY="342.0" prefHeight="25.0" prefWidth="90.0" />
+            <Label layoutX="22.0" layoutY="311.0" prefHeight="25.0" prefWidth="59.0" text="Add Path" />
+            <Button fx:id="addPathBtn" layoutX="224.0" layoutY="385.0" mnemonicParsing="false" onAction="#addNewPath" prefHeight="25.0" prefWidth="51.0" text="Add " />
+            <Button fx:id="saveBtn" defaultButton="true" layoutX="110.0" layoutY="453.0" mnemonicParsing="false" onAction="#saveChanges" prefHeight="35.0" prefWidth="78.0" text="Save">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Button>
+            <Button fx:id="fileBtn" layoutX="68.0" layoutY="342.0" mnemonicParsing="false" onAction="#openFileList" prefHeight="25.0" prefWidth="51.0" text="File" />
+            <Button fx:id="folderBtn" layoutX="124.0" layoutY="342.0" mnemonicParsing="false" onAction="#openDirList" prefHeight="25.0" prefWidth="59.0" text="Folder" />
+            <Separator layoutX="82.0" layoutY="320.0" prefHeight="3.0" prefWidth="197.0" />
+            <Separator layoutX="20.0" layoutY="422.0" prefHeight="3.0" prefWidth="256.0" />
+            <Label fx:id="statusLabel" layoutX="22.0" layoutY="458.0" prefHeight="25.0" prefWidth="71.0">
                <font>
                   <Font size="14.0" />
                </font>
@@ -44,6 +67,7 @@
                   <Font size="10.0" />
                </font>
             </Button>
+            <Label layoutX="23.0" layoutY="342.0" prefHeight="25.0" prefWidth="38.0" text="Select:" />
          </children>
     </AnchorPane>
   </children>

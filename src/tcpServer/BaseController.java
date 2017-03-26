@@ -40,8 +40,17 @@ public class BaseController {
 	}
 
 	public void stopServer() throws IOException{
-		server.stop();
-		System.exit(0);
+		if(server.isServerRunning()){
+			server.stop();
+			server= null;
+		}
+//		System.exit(0);
+	}
+	
+	public boolean isServerRunning(){
+		if(server==null)
+			return false;
+		return server.isServerRunning();
 	}
 	
 	public int getServerPort(){

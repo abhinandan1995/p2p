@@ -1,6 +1,5 @@
 package p2pApp;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,16 +7,18 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.search.TermQuery;
 
-import p2pApp.p2pIndexer.DirectoryReader;
 import p2pApp.p2pIndexer.TableHandler;
 import p2pApp.p2pQueries.SearchQuery;
+import utility.LuceneHandler;
 import utility.MySqlHandler;
 
 public class SearchDatabase {
@@ -44,7 +45,7 @@ public class SearchDatabase {
 
 	private void searchByKeyword(){
 
-		if(DirectoryReader.type.equals("MySQL")){
+		if(TableHandler.tableType.equals("mysql")){
 			List<Map<String, Object>> l;
 			String key= searchQuery.data.replace("'", "''");	
 			String TblName = "DirReader";
@@ -59,22 +60,29 @@ public class SearchDatabase {
 			return;
 		}
 
-		if(DirectoryReader.type.equals("Lucene")){
-
+		if(TableHandler.tableType.equals("lucene")){
 			try {
-
-				IndexReader reader = org.apache.lucene.index.DirectoryReader.open(FSDirectory.open(Paths.get(TableHandler.INDEX_DIRECTORY)));
-				IndexSearcher searcher = new IndexSearcher(reader);
+				IndexSearcher searcher = LuceneHandler.getSearcher(TableHandler.INDEX_DIRECTORY);
 				Analyzer analyzer = new StandardAnalyzer();
-				QueryParser mqp = new QueryParser("Path", analyzer);
+				QueryParser mqp = new QueryParser(TableHandler.columns[2], analyzer);
 				Query query = mqp.parse(searchQuery.data);//search the given keyword
-
-				//System.out.println("query >> " + query);
-
-				ScoreDoc[] hits = searcher.search(query, 100).scoreDocs; // run the query
-
-				//System.out.println("Results found >> " +hits.length);
-
+//				Query view = 
+//				PhraseQuery.Builder builder = new PhraseQuery.Builder();
+//				 builder.add(new Term(TableHandler.columns[1], "mp4"), 4);
+//				 builder.add(new Term(TableHandler.columns[1], "mkv"), 5);
+//				 PhraseQuery pq = builder.build();
+				 
+//				 BooleanQuery bq = new BooleanQuery.Builder()
+//						 .add(new TermQuery(new Term(TableHandler.columns[1], "mp4")), BooleanClause.Occur.SHOULD)
+//						 .add(new TermQuery(new Term(TableHandler.columns[1], "mkv")), BooleanClause.Occur.SHOULD)
+//						 .build();
+						    
+				BooleanQuery booleanQuery = new BooleanQuery.Builder()
+					    .add(query, BooleanClause.Occur.MUST)
+					    .add(new TermQuery(new Term(TableHandler.columns[6], "1")), BooleanClause.Occur.MUST)
+					    .build();
+				
+				ScoreDoc[] hits = searcher.search(booleanQuery, 100).scoreDocs; // run the query
 				ArrayList<SearchResults> al= new ArrayList<SearchResults>();
 				for (int i = 0; i < hits.length && i<100; i++) {
 					Document doc = searcher.doc(hits[i].doc);//get the next  document
@@ -87,6 +95,7 @@ public class SearchDatabase {
 				return;
 
 			} catch (Exception e) {
+				searchQuery= new SearchQuery(searchQuery.searchId, "results", "", null);
 				e.printStackTrace();
 			}
 		}

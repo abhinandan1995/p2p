@@ -8,18 +8,18 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -84,30 +84,30 @@ public class LuceneExample {
    //Searching
 	  IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(INDEX_DIRECTORY)));
 	   IndexSearcher searcher = new IndexSearcher(reader);
-	      Analyzer analyzer = new StandardAnalyzer();
-   //MultiFieldQueryParser is used to search multiple fields
-   String files= "path";
-   QueryParser mqp = new QueryParser(files , analyzer);
+//	      Analyzer analyzer = new StandardAnalyzer();
+//   //MultiFieldQueryParser is used to search multiple fields
+//   String files= "path";
+//   QueryParser mqp = new QueryParser(files , analyzer);
+//   
+// //  Term term = new Term("filename",keyword);
+////   //create the term query object
+//   //Query query = new FuzzyQuery(term, 0.5f);
+//   Query query = mqp.parse(keyword);//search the given keyword
+//   
+//   System.out.println("query >> " + query);
+//   
+//   ScoreDoc[] hits = searcher.search(query, 100).scoreDocs; // run the query
+//   
+//   System.out.println("Results found >> " +hits.length);
+//   
+//   for (int i = 0; i < hits.length && i<100; i++) {
+//    Document doc = searcher.doc(hits[i].doc);//get the next  document
+//    System.out.println(doc.get("path") + hits[i].score);
+//   }
    
- //  Term term = new Term("filename",keyword);
-//   //create the term query object
-   //Query query = new FuzzyQuery(term, 0.5f);
-   Query query = mqp.parse(keyword);//search the given keyword
-   
-   System.out.println("query >> " + query);
-   
-   ScoreDoc[] hits = searcher.search(query, 100).scoreDocs; // run the query
-   
-   System.out.println("Results found >> " +hits.length);
-   
-   for (int i = 0; i < hits.length && i<100; i++) {
-    Document doc = searcher.doc(hits[i].doc);//get the next  document
-    System.out.println(doc.get("path") + hits[i].score);
-   }
-   
-   PrefixQuery pq= new PrefixQuery(new Term("path", "f:/animes/hyouka/Hyouka 1-10"));
+   WildcardQuery pq= new WildcardQuery(new Term("filename", "f:/animes/hyouka/Hyouka 1-10*"));
 	System.out.println(pq.toString());
-	hits = searcher.search(pq, 100).scoreDocs; // run the query
+	ScoreDoc[] hits = searcher.search(pq, 100).scoreDocs; // run the query
 	for (int i = 0; i < hits.length && i<100; i++) {
 	    Document doc = searcher.doc(hits[i].doc);//get the next  document
 	    System.out.println(doc.get("path") + hits[i].score);
@@ -128,7 +128,7 @@ public class LuceneExample {
   LuceneExample obj = new LuceneExample();
   
   //creating index
-  obj.createIndex();
+ // obj.createIndex();
   
   //searching keyword
   Scanner in= new Scanner(System.in);

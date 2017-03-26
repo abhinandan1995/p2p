@@ -6,31 +6,56 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="160.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="p2pApp.p2pUi.controller.FileDownloadController">
+<VBox prefHeight="180.0" prefWidth="500.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="p2pApp.p2pUi.controller.FileDownloadController">
   <children>
-    <AnchorPane fx:id="anchorPane" VBox.vgrow="ALWAYS">
+      <HBox prefHeight="28.0" prefWidth="498.0">
          <children>
-            <ImageView fx:id="image" fitHeight="61.0" fitWidth="73.0" layoutX="18.0" layoutY="18.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../img/Downloads.png" />
-               </image></ImageView>
-            <Label fx:id="title" alignment="TOP_CENTER" layoutX="108.0" layoutY="21.0" prefHeight="54.0" prefWidth="377.0" text="Cristiano ronaldo the story of a legentd. what he did was asehedsf sdfk sdkfjkdjsfj" textFill="#1e241a" wrapText="true">
+            <Label alignment="CENTER" prefHeight="28.0" prefWidth="80.0" style="-fx-background-color: #9dd2d3;" text="Share It">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="titleLabel" alignment="CENTER" prefHeight="28.0" prefWidth="345.0" style="-fx-background-color: #9dd2d3;" text="Downloading file">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <ProgressBar fx:id="progressBar" layoutX="108.0" layoutY="81.0" prefHeight="18.0" prefWidth="348.0" progress="0.0" />
-            <Button fx:id="pauseButton" defaultButton="true" layoutX="187.0" layoutY="119.0" mnemonicParsing="false" onAction="#controlAction" prefHeight="32.0" prefWidth="110.0" text="Pause" />
-            <Button fx:id="closeButton" cancelButton="true" layoutX="420.0" layoutY="124.0" mnemonicParsing="false" onAction="#stopAction" prefHeight="25.0" prefWidth="65.0" text="Stop" />
-            <Label fx:id="speedLabel" layoutX="18.0" layoutY="93.0" prefHeight="42.0" prefWidth="80.0" textFill="#2bc317">
+            <Label fx:id="minLabel" alignment="CENTER" onMouseClicked="#minClicked" prefHeight="28.0" prefWidth="40.0" style="-fx-background-color: #9dd2d3;" text="_">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="closeLabel" alignment="CENTER" onMouseClicked="#closeClicked" prefHeight="28.0" prefWidth="37.0" style="-fx-background-color: #9dd2d3;" text="X">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+    <AnchorPane fx:id="anchorPane" prefHeight="145.0" prefWidth="498.0" VBox.vgrow="ALWAYS">
+         <children>
+            <ImageView fx:id="image" fitHeight="61.0" fitWidth="73.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/Downloads.png" />
+               </image></ImageView>
+            <Label fx:id="title" alignment="TOP_CENTER" layoutX="90.0" layoutY="14.0" prefHeight="48.0" prefWidth="385.0" text="Cristiano ronaldo the story of a legentd. what he did was ase hedsf sdfk sdkfjkdjsfj" textFill="#1e241a" wrapText="true">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ProgressBar fx:id="progressBar" layoutX="90.0" layoutY="69.0" prefHeight="18.0" prefWidth="373.0" progress="0.0" />
+            <Button fx:id="pauseButton" defaultButton="true" layoutX="194.0" layoutY="109.0" mnemonicParsing="false" onAction="#controlAction" prefHeight="32.0" prefWidth="110.0" text="Pause" />
+            <Button fx:id="closeButton" cancelButton="true" layoutX="423.0" layoutY="113.0" mnemonicParsing="false" onAction="#stopAction" prefHeight="25.0" prefWidth="65.0" text="Stop" />
+            <Label fx:id="speedLabel" layoutX="12.0" layoutY="98.0" prefHeight="42.0" prefWidth="71.0" textFill="#2bc317">
                <font>
                   <Font size="15.0" />
                </font>
             </Label>
-            <Button fx:id="openExplorer" graphicTextGap="2.0" layoutX="303.0" layoutY="119.0" mnemonicParsing="false" onAction="#openInExplorer" prefHeight="32.0" prefWidth="110.0" text="Open file location" visible="false" />
+            <Button fx:id="openExplorer" graphicTextGap="2.0" layoutX="309.0" layoutY="109.0" mnemonicParsing="false" onAction="#openInExplorer" prefHeight="32.0" prefWidth="110.0" text="Open file location" />
          </children>
     </AnchorPane>
   </children>

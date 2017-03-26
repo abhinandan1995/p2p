@@ -19,6 +19,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -35,10 +36,16 @@ public class PreferencesDialogController  implements Initializable {
 	@FXML private Button fileBtn;
 	@FXML private Button folderBtn;
 	
+	private String systemId;
+	
 	Stage stage=null;
 	private final ObservableList<String> depths =
 	        FXCollections.observableArrayList();   
 	
+	
+	@FXML protected void closeClicked(MouseEvent ae){
+		stage.hide();
+	}
 	
 	@FXML protected void addNewPath(ActionEvent ae){
 		if(inputPath.getText().length()>2){
@@ -63,7 +70,7 @@ public class PreferencesDialogController  implements Initializable {
 		Properties props = new Properties();
 		
 		props.setProperty("p2p.baseIp", ipAddress.getText());
-		
+		props.setProperty("p2p.systemId", systemId);
 		if(outputFolder.getText().length()<3){
 			throw new Exception();
 		}
@@ -153,6 +160,13 @@ public class PreferencesDialogController  implements Initializable {
 		fis = new FileInputStream("./data/config.properties");
 		props.load(fis);
 		fis.close();
+		
+		systemId= props.getProperty("p2p.systemId");
+		
+		if(systemId==null){
+			systemId= utility.Utilities.getSystemId();
+		}
+		
 		ipAddress.setText(props.getProperty("p2p.baseIp"));
 		ipAddress.setTooltip(new Tooltip("Set the default ip address of the network"));
 		

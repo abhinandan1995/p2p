@@ -14,10 +14,13 @@ import org.skife.jdbi.v2.Batch;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Query;
+import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+
+import p2pApp.p2pIndexer.TableHandler;
 
 public class MySqlHandler {
 
@@ -151,10 +154,12 @@ public class MySqlHandler {
 			
             handle.execute("INSERT into "+tblName+" ( "+ cms+")" +"VALUES " +"( "+vs+")");
         } 
-        catch(Exception e){
-        	if(e instanceof MySQLIntegrityConstraintViolationException){
+		catch(UnableToExecuteStatementException e){
+			if(e.getCause() instanceof MySQLIntegrityConstraintViolationException){
+				updateTable(TableHandler.TblName, "Hash", values[3], "Path", values[2].replace("\\", "/").replace("'", "''"));
 			}
-			else
+		}
+        catch(Exception e){
 				System.out.println("Database Exception #4: "+e.getMessage());
         }
         finally {

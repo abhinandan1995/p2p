@@ -103,6 +103,10 @@ public class Utilities{
 		return null;
 	}
 
+	public static void setSystemId(String x){
+		systemId= x;
+	}
+	
 	public static String getSystemId(){
 		
 		if(systemId!=null && !systemId.isEmpty())

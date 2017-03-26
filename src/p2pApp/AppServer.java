@@ -40,7 +40,8 @@ public class AppServer {
 
 			if(searchQuery.mode.equals("results")){
 				SearchTable.getInstance().addEntries(searchQuery.results, query.getSourceIp(), searchQuery.searchId);
-				echoResults(SearchTable.getInstance().getSearchTable());
+				if(utility.Utilities.debugMode)
+					echoResults(SearchTable.getInstance().getSearchTable());
 				//UISearch.updateTable(SearchTable.getInstance().getSearchTable());
 				//UIController.addResults(SearchTable.getInstance().getSearchTable());
 				CallbackRegister.getInstance().notifyCallbacks("p2p-app-results", query);
@@ -66,6 +67,7 @@ public class AppServer {
 			if(gdq.action.equals("results")){
 				//DownloadEngine.getInstance().batchAdd(gdq.name, gdq.files);
 				CallbackRegister.getInstance().notifyCallbacks("p2p-app-dir-listfiles", gdq);
+				CallbackRegister.getInstance().notifyCallbacks("p2p-app-dir-listfiles-only", gdq);
 			}
 		}
 	}
@@ -92,7 +94,7 @@ public class AppServer {
 	private void sendDirFiles(int id, String key, String name){
 
 		ArrayList<SearchResults> al= null;
-		if(p2pApp.p2pIndexer.DirectoryReader.type.equals("MySQL")){
+		if(TableHandler.tableType.equals("mysql")){
 			List<Map<String, Object>> l= TableHandler.getFilesFromDir(key);
 			al = new ArrayList<SearchResults>();
 			for(int i=0;i<l.size();i++){
@@ -100,7 +102,7 @@ public class AppServer {
 			}
 		}
 		else{
-			al = LuceneHandler.getDirValues(TableHandler.INDEX_DIRECTORY, TableHandler.columns[0], TableHandler.columns[2], key, name);
+			al = LuceneHandler.getDirValues(TableHandler.INDEX_DIRECTORY, TableHandler.columns[0], "pathstring", key, name);
 		}
 		BaseController.getInstance().sendResponse(
 				new GetDirQuery(id, "results", name, al), query.getModule(), "GetDirQuery", false, "", output);

@@ -13,143 +13,124 @@ import p2pApp.SearchTable;
 import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pDownloader.DownloadNodes;
 import p2pApp.p2pDownloader.SaveDownloadNodes;
-import tcpServer.BaseController;
+import p2pApp.p2pIndexer.TableHandler;
 import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersEntries;
 import tcpUtilities.PeersTable;
+import utility.MySqlHandler;
 
 public class InitModule {
 
 	PeersTable peersTable;
 	CallbackRegister callbackRegis;
 	BaseNetworkEngine networkEngine;
-	boolean shutDown= false;
-	
+
 	public InitModule(){
-		
+
 		peersTable= PeersTable.getInstance();
 		callbackRegis= CallbackRegister.getInstance();
 		networkEngine= BaseNetworkEngine.getInstance();
-		//MySqlHandler.getInstance();
 		SearchTable.getInstance();
-		
+	}
+
+	public void initSystem() throws Exception{
 		initPingPongCallbacks();
 		initUserValues();
-		getPausedDownloads();
-		
 		initSystemValues();
+		
+		getPausedDownloads();
 		initPeersTable();
-		
-		
 	}
 	
 	private void initPingPongCallbacks(){
-//		callbackRegis.registerForCallback("tcp-server-pong", "tcpUtilities.PeersTable", "echoEntries", false, peersTable);
 		callbackRegis.registerForCallback("tcp-server-pong", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
 		callbackRegis.registerForCallback("tcp-server-ping", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
-//		callbackRegis.registerForCallback("tcp-server-pong-point", "modules.TCPServerModule", "", false, this);		
 		callbackRegis.registerForCallback("ServerException-TimedOut", "baseServer.BaseNetworkEngine", "TimedOutHandler", false, networkEngine);
 	}
-	
-	private void initSystemValues(){
-		
-		if(shutDown){
-			return;
-		}
-		
+
+	private void initSystemValues() throws Exception{
+
 		String ip;
 		System.out.println("\nInitialising System variables... \n");
 		System.out.println("User-Ip: " + (ip= utility.Utilities.getIpAddress(utility.Utilities.baseIp)));
-		System.out.println("User-Id: " + utility.Utilities.getSystemId());
-		System.out.println("\n");
-		
+		System.out.println("User-Id: " + utility.Utilities.getSystemId()+"\n");
+
 		if(ip==null){
-			System.out.println("\n *** Unable to find a network connection. Shutting down. *** ");
-			stopServer();
+			throw new Exception("** Unable to find a network connection. Connect to network. **");
 		}
-		
-//		if(shutDown)
-//			return;
-//		
-//		try{
-//			MySqlHandler.getInstance().TestDatabase();
-//		}
-//		catch(Exception e){
-//			System.out.println("Can't connect to database. : "+e.getMessage());
-//			stopServer();
-//			return;
-//		}
-		
-		System.out.println("Loading databases... \n");
 		
 		ArrayList<String> names= new ArrayList<String>();
 		for(int i=0;i<utility.Utilities.inputFolders.length;i++){
 			if(utility.Utilities.inputFolders[i].trim().length()>2)
-			names.add(utility.Utilities.inputFolders[i].trim());
+				names.add(utility.Utilities.inputFolders[i].trim().replace("\\", "/"));
 		}
-		names.add(utility.Utilities.outputFolder.trim());
-		p2pApp.p2pIndexer.DirectoryReader.getInstance().indexDirectories(names);
-//		p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
-		System.out.println("Finished loading databases. \n");
-	}
-	
-	private void initPeersTable(){
+		names.add(utility.Utilities.outputFolder.trim().replace("\\","/"));
+
+		if(!new File(utility.Utilities.outputFolder).exists()){
+			new File(utility.Utilities.outputFolder).mkdirs();
+		}
 		
-		if(shutDown)
-			return;
-		
-		String s= utility.Utilities.readFromIpFile("data/ips.dat");
+		System.out.println("Loading databases... \n");
+
 		try{
-			
-		String [] arr= s.split("\n");
-		for(int i=0;i <arr.length;i++){
-			String []temp= arr[i].split(" ");
-			PeersTable.getInstance().addEntry(temp[0], temp[1], "connected");
-		}
-		
-		List<PeersEntries> pe= PeersTable.getInstance().getAll();
-		for(int i=0;i<pe.size();i++){
-			utility.Utilities.writeToFile("data/ips.dat", pe.get(i).ip+" "+pe.get(i).systemId, false);
-		}
-		System.out.println(s);
+			if(TableHandler.tableType.equals("mysql")){
+				MySqlHandler.getInstance().TestDatabase();
+				p2pApp.p2pIndexer.DirectoryReader.DR_init(names, true);
+			}
+			else{
+				p2pApp.p2pIndexer.DirectoryReader.getInstance().indexDirectories(names);
+			}
 		}
 		catch(Exception e){
-			
+			throw e;
+		}
+		
+		System.out.println("Finished Loading databases... \n");
+
+	}
+
+	private void initPeersTable(){
+
+		String s= utility.Utilities.readFromIpFile("data/ips.dat");
+		try{
+
+			String [] arr= s.split("\n");
+			for(int i=0;i <arr.length;i++){
+				String []temp= arr[i].split(" ");
+				PeersTable.getInstance().addEntry(temp[0], temp[1], "connected");
+			}
+
+			List<PeersEntries> pe= PeersTable.getInstance().getAll();
+			for(int i=0;i<pe.size();i++){
+				utility.Utilities.writeToFile("data/ips.dat", pe.get(i).ip+" "+pe.get(i).systemId, false);
+			}
+		}
+		catch(Exception e){
+
 		}
 	}
-	
-	private void initUserValues(){
+
+	private void initUserValues() throws Exception{
 
 		try{
 			Properties props = new Properties();
 			FileInputStream fis = null;
 			fis = new FileInputStream("data/config.properties");
 			props.load(fis);
-			
+
 			utility.Utilities.baseIp= props.getProperty("p2p.baseIp");
 			utility.Utilities.outputFolder= props.getProperty("p2p.outputFolder");
 			String str= props.getProperty("p2p.inputFolder");
 			utility.Utilities.inputFolders= str.split(",");
+			utility.Utilities.setSystemId(props.getProperty("p2p.systemId"));
 		}
 		catch(Exception e){
-			System.out.println("Exception: Config file not found!");
-			stopServer();
+			throw new Exception("Error: Config file not found. "+e.getMessage());
 		}
 	}
-	
-	private void stopServer(){
-		try{
-			shutDown= true;
-			BaseController.getInstance().stopServer();
-		}
-		catch(Exception e){
-			System.out.println("Init Module: Can't stop server. "+e.getMessage());
-		}
-		
-	}
-	
+
 	private void getPausedDownloads(){
-		
+
 		ArrayList<DownloadNodes> an= new ArrayList<DownloadNodes>();
 		File aFile= new File("data/partials");
 		File[] listOfFiles = aFile.listFiles();
@@ -172,5 +153,5 @@ public class InitModule {
 			DownloadEngine.getInstance().AddPausedDownloads(an);
 		}
 	}
-	
+
 }

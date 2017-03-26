@@ -36,7 +36,7 @@
                </font>
             </Label>
             <Button fx:id="downloadbtn" layoutX="620.0" layoutY="6.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="72.0" text="Download" />
-            <Label fx:id="dirlabel" alignment="CENTER" layoutX="480.0" layoutY="13.0" prefHeight="17.0" prefWidth="24.0" style="-fx-background-color: yellow; -fx-background-radius: 8px; -fx-padding: 1px; -fx-border-color: black; -fx-border-radius: 8px;" text="dir">
+            <Label fx:id="dirlabel" alignment="CENTER" layoutX="480.0" layoutY="13.0" onMouseClicked="#dirClicked" prefHeight="21.0" prefWidth="27.0" style="-fx-background-color: yellow; -fx-background-radius: 8px; -fx-padding: 1px; -fx-border-color: black; -fx-border-radius: 10px;" text="dir">
                <font>
                   <Font size="10.0" />
                </font>

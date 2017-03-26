@@ -7,7 +7,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import p2pApp.SearchResults;
 
@@ -22,6 +24,7 @@ public class ResultRow {
 	@FXML private Label dirlabel;
 	@FXML private Button downloadbtn;
 	
+	private Image fileImage, dirImage;
 	UIController controller;
 		
 	public ResultRow(UIController controller){
@@ -29,12 +32,19 @@ public class ResultRow {
 		
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../fxml/results_row.fxml"));
 		fxmlLoader.setController(this);
+		
 		try{
 			fxmlLoader.load();
+			fileImage= new Image(getClass().getResourceAsStream("../img/file_r.png"));
+			dirImage= new Image(getClass().getResourceAsStream("../img/folder.png"));
 		}
 		catch(Exception e){
 			System.out.println("Failed to load the list row: "+e.getMessage());
 		}
+	}
+	
+	@FXML public void dirClicked(MouseEvent me){
+		controller.showFileListDialog(controller.resultList.getSelectionModel().getSelectedIndex());
 	}
 	
 	public void setDetails(final SearchResults sr){
@@ -44,10 +54,12 @@ public class ResultRow {
 		
 		if(sr.getType().equals("1")){
 			dirlabel.setVisible(false);
+			image.setImage(fileImage);
 		}
 		else{
 			dirlabel.setVisible(true);
-			dirlabel.setTooltip(new Tooltip("its a directory containing multiple files"));
+			dirlabel.setTooltip(new Tooltip("CLICK to get list of files."));
+			image.setImage(dirImage);
 		}
 		
 		sourceip.setText(sr.getIp());

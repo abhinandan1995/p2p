@@ -21,6 +21,7 @@ public class TableHandler {
 	public final static String[] columns = new String[]{"FileID","FileName","Path","Hash","FileSize", "Type", "Valid"};
 	private static String[] data = new String[]{"FileID int not null","FileName varchar(255) not null","Path varchar(255) CHARACTER SET utf8 COLLATE utf8_spanish_ci not null","Hash char(40) null","FileSize char(20)", "Type char(1) not null default '1'", "Valid char(1) not null default '1'", "primary key(FileID)", "FULLTEXT("+utility.Utilities.searchCol+")", "Unique key (Path)", "key(valid)", "key(hash)"};
 	public static final String INDEX_DIRECTORY = "data/DirIndex";
+	public static String tableType= "lucene";
 
 	public static void createTable(boolean force){
 		MySqlHandler.getInstance().createTable(TblName, data, null, force);
@@ -33,12 +34,12 @@ public class TableHandler {
 
 	public static String getFilePath(String FileID)
 	{
-		if(DirectoryReader.type.equals("MySQL")){
+		if(tableType.equals("mysql")){
 			String query = "SELECT Path from "+ TblName + " WHERE FileID = "+ FileID;
 			return (String)(MySqlHandler.getInstance().fetchQuery(query)).get(0).get("Path");
 		}
 		else{
-			return LuceneHandler.getFieldValue(INDEX_DIRECTORY, columns[0], columns[2], FileID);
+			return LuceneHandler.getFieldValue(INDEX_DIRECTORY, columns[0], "pathstring", FileID);
 		}
 	}
 
@@ -47,7 +48,7 @@ public class TableHandler {
 	}
 
 	public static int getNextId(){
-		if(DirectoryReader.type.equals("MySQL")){
+		if(tableType.equals("mysql")){
 			List<Map<String, Object>> l= MySqlHandler.getInstance().fetchQuery("SELECT max(FileId) as max from "+TblName);
 			return (Integer.parseInt(l.get(0).get("max").toString())+1);
 		}
@@ -63,13 +64,14 @@ public class TableHandler {
 		String query = "SELECT Path from "+ TblName + " WHERE FileID = "+ fileId;
 		String path = (String)(MySqlHandler.getInstance().fetchQuery(query)).get(0).get("Path");
 		return MySqlHandler.getInstance().fetchQuery(
-				"SELECT * from "+TblName + " WHERE Path like '"+path+"/%' && Valid= '1'");
+				"SELECT * from "+TblName + " WHERE Path like '"+path+"/%'");
 	}
 
 	//Lucene Functions
 	public static void createIndex(List<String[]> files, boolean newIndex) throws Exception{
 		if(files.size()==0)
 			return;
+		int fileId= 0;
 		IndexWriter writer= null;
 		if(newIndex)
 			writer= LuceneHandler.createNewIndex(INDEX_DIRECTORY);
@@ -77,32 +79,42 @@ public class TableHandler {
 			writer= LuceneHandler.createIndex(INDEX_DIRECTORY);
 
 		for(int i=0;i<files.size();i++){
-			Document doc= new Document();
-			String arr[]= files.get(i);
-			Field filename = new TextField(columns[1], arr[1], Field.Store.YES);
-			doc.add(filename);
-			Field path= new TextField(columns[2], arr[2], Field.Store.YES);
-			doc.add(path);
-			Field pathString= new StringField("pathstring", arr[2], Field.Store.YES);
-			doc.add(pathString);
+			try {
+				Document doc= new Document();
+				String arr[]= files.get(i);
 
-			if(arr[5].equals("2"))
-				arr[3]="null";
+				if(newIndex)
+					fileId= Integer.parseInt(arr[0]);
+				else
+					fileId= (int)FileID;
 
-			Field hash= new StringField(columns[3], arr[3], Field.Store.YES);
-			doc.add(hash);
-			Field size= new StringField(columns[4], arr[4], Field.Store.YES);
-			doc.add(size);
-			Field type= new StringField(columns[5], arr[5], Field.Store.YES);
-			doc.add(type);
-			Field valid= new StringField(columns[6], arr[6], Field.Store.YES);
-			doc.add(valid);
-			Field fileid= new IntPoint(columns[0], (int)FileID);
-			doc.add(fileid);
-			doc.add(new StoredField(columns[0], (int)FileID));
-			FileID++;
-			writer.addDocument(doc);
+				Field path= new TextField(columns[2], arr[2], Field.Store.YES);
+				doc.add(path);
+				Field pathString= new StringField("pathstring", arr[2], Field.Store.YES);
+				doc.add(pathString);
+				Field filename = new TextField(columns[1], arr[1], Field.Store.YES);
+				doc.add(filename);
+				if(arr[3]==null)
+					arr[3]="null";
+
+				Field hash= new StringField(columns[3], arr[3], Field.Store.YES);
+				doc.add(hash);
+				Field size= new StringField(columns[4], arr[4], Field.Store.YES);
+				doc.add(size);
+				Field type= new StringField(columns[5], arr[5], Field.Store.YES);
+				doc.add(type);
+				Field valid= new StringField(columns[6], arr[6], Field.Store.YES);
+				doc.add(valid);
+				Field fileid= new IntPoint(columns[0], fileId);
+				doc.add(fileid);
+				doc.add(new StoredField(columns[0], fileId));
+				FileID++;
+				writer.addDocument(doc);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-		writer.close();
+		LuceneHandler.closeWriter();
+		//writer.close();
 	}
 }

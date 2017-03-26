@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import p2pApp.p2pUi.controller.UIController;
 
 public class AppUi extends Application{
 
@@ -18,12 +20,16 @@ public class AppUi extends Application{
 
 		try{
 			
-			Parent root = FXMLLoader.load(getClass().getResource("fxml/main.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/main.fxml"));
+			Parent root = (Parent)loader.load();
+			UIController controller = (UIController)loader.getController();
+			controller.setupStage(primaryStage);
 			Scene scene = new Scene(root);
 			primaryStage.setTitle("p2p application");
 			primaryStage.setScene(scene);
 			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("img/File.png")));
-			
+			primaryStage.initStyle(StageStyle.UNDECORATED);
+			UIController.makeDraggable(primaryStage);
 			primaryStage.show();
 			
 		}
@@ -31,7 +37,5 @@ public class AppUi extends Application{
 			System.out.println(e.getMessage());
 		}
 		
-	}
-	
-	
+	}	
 }
