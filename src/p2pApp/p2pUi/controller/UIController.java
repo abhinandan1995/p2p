@@ -51,11 +51,6 @@ public class UIController implements Initializable{
 
 	@FXML private TextField searchField;
 	@FXML private Button searchButton, clrBtn;
-	//	@FXML private TableView<Records> resultsTable;
-	//	@FXML private TableColumn<Records, String> Source;
-	//    @FXML private TableColumn<Records, String> Filename;
-	//    @FXML private TableColumn<Records, String> Filesize;
-	//    @FXML private TableColumn<Records, Boolean> Download;
 	@FXML public ListView<SearchResults> resultList;
 	@FXML private Label startLabel, settingsLabel, minLabel, closeLabel;
 	@FXML private AnchorPane anchorPane;
@@ -154,13 +149,13 @@ public class UIController implements Initializable{
 	@FXML public void clearConsole(ActionEvent ae){
 		consoleArea.clear();
 	}
-	
+
 	private void performSearch(){
 		if(!BaseController.getInstance().isServerRunning()){
 			showAlert("Can't do the search!", "Server not started!", null, "OK");
 			return;
 		}
-		
+
 		if(peers.size()>0){
 			String str= searchField.getText();
 			totalResults.setText("Searching...");
@@ -301,8 +296,8 @@ public class UIController implements Initializable{
 			dialog.show();
 
 			controller.setDownloadNode(DownloadEngine.getInstance().addDownload(sr));
-			CallbackRegister.getInstance().registerForCallback(
-					"p2p-app-download-file-"+sr.getIp()+"-"+sr.getFileId(), "p2pApp.p2pUi.controller.FileDownloadController", "completeDownload", true, controller);
+//			CallbackRegister.getInstance().registerForCallback(
+//					"p2p-app-download-file-"+sr.getIp()+"-"+sr.getFileId(), "p2pApp.p2pUi.controller.FileDownloadController", "completeDownload", true, controller);
 		}
 
 		catch(Exception e){
@@ -431,7 +426,7 @@ public class UIController implements Initializable{
 		public void write(int b) throws IOException {
 			appendText(String.valueOf((char)b));
 		}
-		
+
 		public TextArea getConsole(){
 			return console;
 		}

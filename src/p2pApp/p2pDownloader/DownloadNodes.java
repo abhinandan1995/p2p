@@ -10,7 +10,6 @@ import java.util.HashMap;
 import p2pApp.AlternateIps;
 import p2pApp.SearchResults;
 import p2pApp.p2pIndexer.DirectoryReader;
-import tcpUtilities.CallbackRegister;
 import utility.PercentKeeper;
 
 public class DownloadNodes {
@@ -103,12 +102,7 @@ public class DownloadNodes {
 					fos.close();
 				}
 				new File(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(searchResults.getFilename())).delete();
-			}
-			else{
-				if(fos!=null){
-					fos.getChannel().close();
-					fos.close();
-				}
+				new File("data/partials/"+searchResults.getHash()+".txt").delete();
 			}
 			fos= null;
 		}
@@ -126,7 +120,6 @@ public class DownloadNodes {
 		if(isComplete)
 			return 100;
 		return percentKeeper.getPercent();
-		//return 45;
 	}
 	
 	public long getSizeDone(){
@@ -201,8 +194,9 @@ public class DownloadNodes {
 			fos.getChannel().close();
 			fos.close();
 			isComplete= true;
-			CallbackRegister.getInstance().notifyCallbacks(
-					"p2p-app-download-file-"+searchResults.getIp()+"-"+searchResults.getFileId(), searchResults);
+			
+//			CallbackRegister.getInstance().notifyCallbacks(
+//					"p2p-app-download-file-"+searchResults.getIp()+"-"+searchResults.getFileId(), searchResults);
 			
 			DirectoryReader.updateTableOnDownload(
 					utility.Utilities.outputFolder + 

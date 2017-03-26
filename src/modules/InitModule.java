@@ -36,6 +36,7 @@ public class InitModule {
 	public void initSystem() throws Exception{
 		initPingPongCallbacks();
 		initDirs();
+		loadSystemVariables();
 		initUserValues();
 		initSystemValues();
 
@@ -173,6 +174,53 @@ public class InitModule {
 
 			utility.Utilities.writeToFile("data/db-ms.properties", data, false);
 		}
+
+		if(!new File("data/system.properties").exists()){
+			String data= "#system variables\n\n"+
+					"neighbourCount= 3\n"+
+					"maxRequests= 3\n"+
+					"connectTimeout= 3000\n"+
+					"maxHop= 7\n"+
+					"maxClientRequest= 20\n"+
+					"maxServerResponse= 50\n"+
+					"selfExplicit= false\n"+
+					"selfNeighbour= true\n"+
+					"selfRequest= true\n"+
+					"bufferSize= 8192\n"+
+					"maxDownloadThread= 4\n"+
+					"maxParallelDownloads= 3\n"+ 
+					"resultSetSize= 2\n"+
+					"debugMode= false";
+			utility.Utilities.writeToFile("data/system.properties", data, false);
+		}
 	}
 
+	private void loadSystemVariables(){
+
+		try{
+			Properties props = new Properties();
+			FileInputStream fis = null;
+			fis = new FileInputStream("data/system.properties");
+			props.load(fis);
+
+			utility.Utilities.neighbourPeersCount= Integer.parseInt(props.getProperty("neighbourCount").trim());
+			utility.Utilities.maxSimultaneousRequests= Integer.parseInt(props.getProperty("maxRequests").trim());
+			utility.Utilities.connectionTimeout= Integer.parseInt(props.getProperty("connectTimeout").trim());
+			utility.Utilities.maxHopCount=Integer.parseInt(props.getProperty("maxHop").trim());
+			utility.Utilities.maxParallelClientRequests= Integer.parseInt(props.getProperty("maxClientRequest").trim());
+			utility.Utilities.maxParallelServerRequests= Integer.parseInt(props.getProperty("maxServerResponse").trim());
+			utility.Utilities.selfExplicit= Boolean.parseBoolean(props.getProperty("selfExplicit").trim());
+			utility.Utilities.selfNeighbour= Boolean.parseBoolean(props.getProperty("selfNeighbour").trim());
+			utility.Utilities.selfRequest= Boolean.parseBoolean(props.getProperty("selfRequest").trim());
+			utility.Utilities.bufferSize= Integer.parseInt(props.getProperty("bufferSize").trim());
+			utility.Utilities.maxDownloadThreadCount= Integer.parseInt(props.getProperty("maxDownloadThread").trim());
+			utility.Utilities.maxParallelDownloads= Integer.parseInt(props.getProperty("maxParallelDownloads").trim());
+			utility.Utilities.resultSetSize= Integer.parseInt(props.getProperty("resultSetSize").trim());
+			utility.Utilities.debugMode= Boolean.parseBoolean(props.getProperty("debugMode").trim());
+		}
+		catch(Exception e){
+			System.out.println("Error while loading system variables. "+e.getMessage());
+		}
+
+	}
 }

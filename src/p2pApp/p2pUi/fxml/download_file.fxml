@@ -55,7 +55,7 @@
                   <Font size="15.0" />
                </font>
             </Label>
-            <Button fx:id="openExplorer" graphicTextGap="2.0" layoutX="309.0" layoutY="109.0" mnemonicParsing="false" onAction="#openInExplorer" prefHeight="32.0" prefWidth="110.0" text="Open file location" />
+            <Button fx:id="openExplorer" graphicTextGap="2.0" layoutX="309.0" layoutY="109.0" mnemonicParsing="false" onAction="#openInExplorer" prefHeight="32.0" prefWidth="110.0" text="Open file location" visible="false" />
          </children>
     </AnchorPane>
   </children>

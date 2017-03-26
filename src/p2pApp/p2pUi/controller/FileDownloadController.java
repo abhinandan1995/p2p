@@ -38,6 +38,7 @@ public class FileDownloadController implements Initializable {
 	private SearchResults sr;
 	private DownloadNodes node;
 	private Stage stage;
+	private boolean reported = false;
 
 	@Override 
 	public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
@@ -59,7 +60,7 @@ public class FileDownloadController implements Initializable {
 	}
 
 	@FXML protected void controlAction(ActionEvent ae){
-		if(pauseButton.getText().equals("Open")){
+		if(pauseButton.getText().contains("Open")){
 			openFile(new File(utility.Utilities.outputFolder+ utility.Utilities.parseInvalidFilenames(sr.getFilename())));
 		}
 
@@ -74,6 +75,7 @@ public class FileDownloadController implements Initializable {
 			node.resumeDownload();
 			pauseButton.setText("Pause");
 			titleLabel.setText("Downloading file");
+			setProgress();
 			return;
 		}
 	}
@@ -92,7 +94,6 @@ public class FileDownloadController implements Initializable {
 		this.node= node;
 		this.sr= node.getSearchResults();
 		title.setText(sr.getFilename());
-
 		setProgress();
 	}
 
@@ -105,9 +106,18 @@ public class FileDownloadController implements Initializable {
 						Platform.runLater(new Runnable(){
 							public void run(){	
 								try{	
-									progressBar.setProgress(node.getPercent()/100.0);
-									if(node.isComplete)
+									
+									if(node.isComplete){
 										progressBar.setProgress(1);
+										pauseButton.setText("Open file");
+										titleLabel.setText("Download Completed");
+										closeButton.setText("Close");
+										openExplorer.setVisible(true);
+										reported= true;
+									}
+									else
+										progressBar.setProgress(node.getPercent()/100.0);
+									
 									speedLabel.setText(node.getSpeed(8)+"\nMbps");
 								}
 								catch(Exception e){
@@ -115,7 +125,10 @@ public class FileDownloadController implements Initializable {
 								}
 							}
 						});
-						if(node.getPercent()>=100 || node.isComplete || node.isStopped)
+						
+						if(node.isPaused || node.isStopped)
+							break;
+						if(node.isComplete && reported)
 							break;
 					}	
 				}

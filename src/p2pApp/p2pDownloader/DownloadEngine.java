@@ -45,6 +45,7 @@ public class DownloadEngine {
 				if(temp.getIp().equals(node.getSearchResults().getIp())){
 					node= pausedList.get(i);
 					node.isPaused= false;
+					node.isStopped= false;
 				}
 				pausedList.remove(i);
 				break;
@@ -65,6 +66,7 @@ public class DownloadEngine {
 				if(temp.getIp().equals(sr.getIp())){
 					dn= pausedList.get(i);
 					dn.isPaused= false;
+					dn.isStopped= false;
 				}
 				pausedList.remove(i);
 				break;
@@ -167,6 +169,12 @@ public class DownloadEngine {
 		for(int i=0;i<downloadList.size();i++){
 			if(downloadList.get(i)==node){
 				downloadList.remove(i);
+				return true;
+			}
+		}
+		for(int i=0;i<pausedList.size();i++){
+			if(pausedList.get(i)==node){
+				pausedList.remove(i);
 				return true;
 			}
 		}

@@ -1,6 +1,5 @@
 package p2pApp.p2pUi.controller;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -39,62 +38,70 @@ public class ListRow {
 		}
 	}
 		
+	@FXML protected void playDownload(MouseEvent me){
+		dc.listView.getSelectionModel().getSelectedItem().resumeDownload();
+	}
+	
+	@FXML protected void pauseDownload(MouseEvent me){
+		dc.listView.getSelectionModel().getSelectedItem().pauseDownload();
+	}
+	
+	@FXML protected void cancelDownload(MouseEvent me){
+		dc.listView.getSelectionModel().getSelectedItem().stopDownload();
+	}
+	
 	public void setDetails(DownloadNodes node){
 		SearchResults sr= node.getSearchResults();
 		filename.setText(getFilename(sr.getFilename()));
 		filename.setTooltip(new Tooltip("Path: "+sr.getFilename()));
 		filesize.setText(utility.Utilities.humanReadableByteCount(sr.getFileSize(), false));
 		progress.setProgress(node.getPercent()/ 100.0);
-		
-//		final ImageView startImage= this.startImage;
-//		final ImageView pauseImage= this.pauseImage;
-//		final ImageView cancelImage= this.cancelImage;
-		
+
 		startImage.setVisible(true);
 		pauseImage.setVisible(true);
 		cancelImage.setVisible(true);
 		
-		if(node.isPaused){
-			image.setImage(dc.pauseImage);
-		}
-		else if(node.isStopped){
+		if(node.isStopped){
 			image.setImage(dc.cancelImage);
 			startImage.setVisible(false);
 			pauseImage.setVisible(false);
+		}
+		else if(node.isPaused){
+			image.setImage(dc.pauseImage);
 		}
 		else{
 			image.setImage(dc.runImage);
 		}
 		
-		startImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
-		     @Override
-		     public void handle(MouseEvent event) {
-		    	 System.out.println("Selected item: " + dc.listView.getSelectionModel().getSelectedItem());
-		    	 dc.listView.getSelectionModel().getSelectedItem().resumeDownload();
-		        // node.resumeDownload();
-		         event.consume();
-		     }
-		});
-		
-		pauseImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
-		     @Override
-		     public void handle(MouseEvent event) {
-		        // node.pauseDownload();
-		         dc.listView.getSelectionModel().getSelectedItem().pauseDownload();
-		         event.consume();
-		     }
-		});
-		
-		cancelImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-			
-			@Override
-			public void handle(MouseEvent event){
-				dc.listView.getSelectionModel().getSelectedItem().stopDownload();
-				event.consume();
-			}
-		});
+//		startImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+//
+//		     @Override
+//		     public void handle(MouseEvent event) {
+//		    	// System.out.println("Selected item: " + dc.listView.getSelectionModel().getSelectedItem());
+//		    	 dc.listView.getSelectionModel().getSelectedItem().resumeDownload();
+//		        // node.resumeDownload();
+//		         event.consume();
+//		     }
+//		});
+//		
+//		pauseImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+//
+//		     @Override
+//		     public void handle(MouseEvent event) {
+//		        // node.pauseDownload();
+//		         dc.listView.getSelectionModel().getSelectedItem().pauseDownload();
+//		         event.consume();
+//		     }
+//		});
+//		
+//		cancelImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+//			
+//			@Override
+//			public void handle(MouseEvent event){
+//				dc.listView.getSelectionModel().getSelectedItem().stopDownload();
+//				event.consume();
+//			}
+//		});
 		
 	}
 	
