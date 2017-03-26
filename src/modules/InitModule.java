@@ -35,13 +35,14 @@ public class InitModule {
 
 	public void initSystem() throws Exception{
 		initPingPongCallbacks();
+		initDirs();
 		initUserValues();
 		initSystemValues();
-		
+
 		getPausedDownloads();
 		initPeersTable();
 	}
-	
+
 	private void initPingPongCallbacks(){
 		callbackRegis.registerForCallback("tcp-server-pong", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
 		callbackRegis.registerForCallback("tcp-server-ping", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
@@ -58,7 +59,7 @@ public class InitModule {
 		if(ip==null){
 			throw new Exception("** Unable to find a network connection. Connect to network. **");
 		}
-		
+
 		ArrayList<String> names= new ArrayList<String>();
 		for(int i=0;i<utility.Utilities.inputFolders.length;i++){
 			if(utility.Utilities.inputFolders[i].trim().length()>2)
@@ -69,7 +70,7 @@ public class InitModule {
 		if(!new File(utility.Utilities.outputFolder).exists()){
 			new File(utility.Utilities.outputFolder).mkdirs();
 		}
-		
+
 		System.out.println("Loading databases... \n");
 
 		try{
@@ -84,7 +85,7 @@ public class InitModule {
 		catch(Exception e){
 			throw e;
 		}
-		
+
 		System.out.println("Finished Loading databases... \n");
 
 	}
@@ -125,7 +126,7 @@ public class InitModule {
 			utility.Utilities.setSystemId(props.getProperty("p2p.systemId"));
 		}
 		catch(Exception e){
-			throw new Exception("Error: Config file not found. "+e.getMessage());
+			throw new Exception("Error: Config file not found. "+e.getMessage()+" Go to settings to create a new file.");
 		}
 	}
 
@@ -151,6 +152,26 @@ public class InitModule {
 				}
 			}
 			DownloadEngine.getInstance().AddPausedDownloads(an);
+		}
+	}
+
+	private void initDirs(){
+
+		if(!new File("data/partials").exists())
+			new File("data/partials").mkdirs();
+
+		if(!new File("data/db-ms.properties").exists()){
+			String data= "# mysql properties\n"+
+					"# complete url= url+':'+port+'/'+database\n\n"+
+					"mysql.driver=com.mysql.jdbc.Driver\n"+
+					"mysql.url=jdbc:mysql://localhost\n"+
+					"mysql.port=3306\n"+
+					"mysql.database=test\n"+
+					"mysql.username=root\n"+
+					"mysql.password=\n"+
+					"mysql.unicode=useUnicode=yes&characterEncoding=UTF-8\n";
+
+			utility.Utilities.writeToFile("data/db-ms.properties", data, false);
 		}
 	}
 

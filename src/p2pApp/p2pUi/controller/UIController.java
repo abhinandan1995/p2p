@@ -27,6 +27,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -49,7 +50,7 @@ import tcpUtilities.PeersTable;
 public class UIController implements Initializable{
 
 	@FXML private TextField searchField;
-	@FXML private Button searchButton;
+	@FXML private Button searchButton, clrBtn;
 	//	@FXML private TableView<Records> resultsTable;
 	//	@FXML private TableColumn<Records, String> Source;
 	//    @FXML private TableColumn<Records, String> Filename;
@@ -145,15 +146,31 @@ public class UIController implements Initializable{
 				listRow.setDetails(sr);
 				setGraphic(listRow.getRow());
 			}
+			else
+				setGraphic(null);
 		}
 	}
 
+	@FXML public void clearConsole(ActionEvent ae){
+		consoleArea.clear();
+	}
+	
 	private void performSearch(){
-		String str= searchField.getText();
-		//		System.out.println(str);
-		totalResults.setText("Searching...");
-		int id= SearchTable.getInstance().getNewSearchId(true);
-		BaseNetworkEngine.getInstance().sendMultipleRequests(new SearchQuery(id, "search", str, null), "p2p-app", "SearchQuery", false);
+		if(!BaseController.getInstance().isServerRunning()){
+			showAlert("Can't do the search!", "Server not started!", null, "OK");
+			return;
+		}
+		
+		if(peers.size()>0){
+			String str= searchField.getText();
+			totalResults.setText("Searching...");
+			int id= SearchTable.getInstance().getNewSearchId(true);
+			BaseNetworkEngine.getInstance().sendMultipleRequests(new SearchQuery(id, "search", str, null), "p2p-app", "SearchQuery", false);
+		}
+		else{
+			showAlert("Can't do the search!", "Not connected to any user to perform the search!", null, "OK");
+			textIp.requestFocus();
+		}
 	}
 
 	@Override 
@@ -164,6 +181,9 @@ public class UIController implements Initializable{
 
 		//totalResults.setText("hello");
 		//makeDraggable();
+		Image imageOk = new Image(getClass().getResourceAsStream("../img/clear.png"));
+		clrBtn.setGraphic(new ImageView(imageOk));
+		clrBtn.setTooltip(new Tooltip("Clear the console area. Should be cleared to free up some memory!"));
 		ps = new PrintStream(new Console(consoleArea)) ;
 		System.setOut(ps);
 		System.setErr(ps);
@@ -182,187 +202,12 @@ public class UIController implements Initializable{
 				return new ResultRowCell();
 			}
 		});
-
-		//		Source.setCellValueFactory(new PropertyValueFactory<Records, String>("Source"));
-		//		Filename.setCellValueFactory(new PropertyValueFactory<Records, String>("Filename"));
-		//		Filesize.setCellValueFactory(new PropertyValueFactory<Records, String>("Filesize"));
-		//		//Download.setCellValueFactory(new PropertyValueFactory<Records, Boolean>("Download"));
-		//		
-		//		Download.setSortable(false);
-		//		// define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
-		//	    Download.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Records, Boolean>, ObservableValue<Boolean>>() {
-		//	      @Override public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Records, Boolean> features) {
-		//	        return new SimpleBooleanProperty(features.getValue() != null);
-		//	      }
-		//	    });
-		//
-		//	 // create a cell value factory with an add button for each row in the table.
-		//	    Download.setCellFactory(new Callback<TableColumn<Records, Boolean>, TableCell<Records, Boolean>>() {
-		//	      @Override public TableCell<Records, Boolean> call(TableColumn<Records, Boolean> personBooleanTableColumn) {
-		//	        return new DownloadFile(resultsTable);
-		//	      }
-		//	    });
-
-		/*
-		//resultsTable.setEditable(true);
-
-//	    resultsTable.setRowFactory(new Callback<TableView<Records>, TableRow<Records>>() {
-//			@Override
-//			public TableRow<Records> call(TableView<Records> tv) {
-//				return new TableRow<Records>() {
-//				    private Tooltip tooltip = new Tooltip();
-//				    @Override
-//				    public void updateItem(Records record, boolean empty) {
-//				        super.updateItem(record, empty);
-//				        if (record == null) {
-//				            setTooltip(null);
-//				        } else {
-//				           // tooltip.setText(person.getFirstName()+" "+person.getLastName());
-//				            tooltip.setText(record.getFilename());
-//				        	setTooltip(tooltip);
-//				        }
-//				    }
-//				};
-//			}
-//		});
-		 */
-
-		//	    Source.setCellFactory
-		//	    (
-		//	      new Callback<TableColumn<Records, String>, TableCell<Records, String>>() {
-		//			@Override
-		//			public TableCell<Records, String> call(TableColumn<Records, String> column) {
-		//			     return new TableCell<Records, String>()
-		//			      {
-		//			        @Override
-		//			        protected void updateItem(String item, boolean empty)
-		//			         {
-		//			            super.updateItem(item, empty);
-		//			            
-		//			            String txt= "Source: "+ item;
-		//			            try{
-		//			            ArrayList<AlternateIps> as= SearchTable.getInstance().getFromSearchTable(getTableRow().getIndex()).getAlternateIps();
-		//			            	if(as.size()>0){
-		//			            		txt= "Multiple sources available";
-		//			            		txt= txt+"\n"+item;
-		//			            		for(int i=0;i<as.size();i++)
-		//			            			txt= txt+"\n"+as.get(i).getIp();
-		//			            		
-		//			            		setText(item + "   +"+ as.size());
-		//			            	}
-		//			            	else
-		//			            	setText(item);
-		//			            }
-		//			            catch(Exception e){
-		//			            	setText( item );
-		//			            }
-		//			            
-		//			            setTooltip(new Tooltip(txt));
-		//			         }
-		//			      };
-		//			   }
-		//		});
-		//	    
-		//	    Filename.setCellFactory
-		//	    (
-		//	      new Callback<TableColumn<Records, String>, TableCell<Records, String>>() {
-		//			@Override
-		//			public TableCell<Records, String> call(TableColumn<Records, String> column) {
-		//			     return new TableCell<Records, String>()
-		//			      {
-		//			        @Override
-		//			        protected void updateItem(String item, boolean empty)
-		//			         {
-		//			            super.updateItem(item, empty);
-		//			            setText( item );
-		//			            if(item!= null && item.contains("(DIR)")){
-		//			            	setTooltip(new Tooltip("This is a folder consisting of multiple files"));
-		//			            }
-		//			            else
-		//			            setTooltip(new Tooltip(item));
-		//			         }
-		//			      };
-		//			   }
-		//		});
-		//	    
-		//	    
-		//		resultsTable.setItems(records);
-		//		//records.add(new Records("349", "Ronaldo", "67mb"));
 	}
-	/*
-//	private void init(){
-//		System.out.println("called");
-//		resultsTable.setEditable(true);
-////		TableColumn firstNameCol = new TableColumn("Source");
-////	    firstNameCol.setCellValueFactory(new PropertyValueFactory<Records,String>("Source"));
-//		resultsTable.setItems(data);
-//	}
-//	
-//
-//	private void addRow(){
-//		data.add(new Records("192","Ronaldo", "400Mb"));
-//	}
-	 */
-
-	//	public class Records {
-	//        private final SimpleStringProperty Source = new SimpleStringProperty("");
-	//        private final SimpleStringProperty Filename = new SimpleStringProperty("");
-	//        private final SimpleStringProperty Filesize = new SimpleStringProperty("");
-	//        //private final SimpleStringProperty Download = new SimpleStringProperty("");
-	//       // public String type= "2";
-	//        
-	//        public Records(SearchResults sr){
-	//        	setSource(sr.getIp());
-	//        	if(sr.getType().equals("2"))
-	//        		setFilename(" (DIR) "+ sr.getFilename());
-	//        	else
-	//        		setFilename( sr.getFilename());
-	//        	setFilesize( utility.Utilities.humanReadableByteCount(sr.getFileSize(), false));
-	//        }
-	//        public Records(String source, String filename, String filesize){
-	//        	setSource(source);
-	//        	setFilename(filename);
-	//        	setFilesize(filesize);
-	//        	//setDownload("download");
-	//        	
-	//        }
-	//        
-	//        public void setSource(String s){
-	//        	Source.set(s);
-	//        }
-	//        public void setFilename(String s){
-	//        	Filename.set(s);
-	//        }
-	//        public void setFilesize(String s){
-	//        	Filesize.set(s);
-	//        }
-	////        public void setDownload(String s){
-	////        	Download.set(s);
-	////        }
-	////        
-	//        public String getSource(){
-	//        	return Source.get();
-	//        }
-	//        
-	//        public String getFilename(){
-	//        	return Filename.get();
-	//        }
-	//        
-	//        public String getFilesize(){
-	//        	return Filesize.get();
-	//        }
-	//        
-	////        public String getDownload(){
-	////        	return Download.get();
-	////        }
-	//    }
 
 	synchronized public void addResults(final ArrayList<SearchResults> sr,final int size){
-
 		Platform.runLater(new Runnable(){
-			public void run(){		
-				results.clear();	
-				
+			public void run(){	
+				results.clear();
 				for(int i=0; i < size;i++){
 					results.add(sr.get(i));
 				}
@@ -375,62 +220,6 @@ public class UIController implements Initializable{
 	public static void appendResults(ArrayList<SearchResults> sr){
 
 	}
-
-	//	private class DownloadFile extends TableCell<Records, Boolean> {
-	//	    // a button for adding a new person.
-	//		
-	//	    final Button addButton       = new Button("Download");
-	//	    // pads and centers the add button in the cell.
-	//	    final StackPane paddedButton = new StackPane();
-	//	    // records the y pos of the last button press so that the add person dialog can be shown next to the cell.
-	//	    final DoubleProperty buttonY = new SimpleDoubleProperty();
-	//
-	//	    /**
-	//	     * AddPersonCell constructor
-	//	     * @param stage the stage in which the table is placed.
-	//	     * @param table the table to which a new person can be added.
-	//	     */
-	//	    DownloadFile(final TableView<Records> table) {
-	//	      paddedButton.setPadding(new Insets(3));
-	//	      paddedButton.getChildren().add(addButton);
-	//	     
-	//	      addButton.setOnMousePressed(new EventHandler<MouseEvent>() {
-	//	        @Override public void handle(MouseEvent mouseEvent) {
-	//	          buttonY.set(mouseEvent.getScreenY());
-	//	        }
-	//	      });
-	//	      addButton.setOnAction(new EventHandler<ActionEvent>() {
-	//	        @Override public void handle(ActionEvent actionEvent) {
-	//	        //  showAddPersonDialog(stage, table, buttonY.get());
-	//	        	SearchResults sr= SearchTable.getInstance().getFromSearchTable(
-	//	        			getTableRow().getIndex());
-	//	        	
-	//	        	if(sr.getType().equals("1")){
-	//	        		//DownloadEngine.getInstance().addDownload(sr);
-	//	        		showFileDownloadDialog(sr);
-	//	        	}
-	//	        	if(sr.getType().equals("2")){
-	//	        			//GetDirQuery.getDirQuery(sr);
-	//	        		showDirDownloadDialog(sr);
-	//	        	}
-	//	          table.getSelectionModel().select(getTableRow().getIndex());
-	//	        }
-	//	      });
-	//	    }
-	//
-	//	    /** places an add button in the row only if the row is not empty. */
-	//	    @Override protected void updateItem(Boolean item, boolean empty) {
-	//	      super.updateItem(item, empty);
-	//	      if (!empty) {
-	//	        setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-	//	        setGraphic(paddedButton);
-	//	        setTooltip(new Tooltip("Download the file"));
-	//	      } else {
-	//	        setGraphic(null);
-	//	      }
-	//	    }
-	//	  }
-	//
 
 	private void startServer(){
 
@@ -459,16 +248,13 @@ public class UIController implements Initializable{
 							totalResults.setText("Server Offline!");
 						}
 					});
-					
+
 					try{
 						BaseController.getInstance().stopServer();
 
 					}
 					catch(Exception t){	}
 				}
-			
-				//infinite loop. Perform all actions before it.
-				//consoleSupport();
 			}
 		};
 		serv.setDaemon(true);
@@ -575,7 +361,7 @@ public class UIController implements Initializable{
 		}
 
 	}
-	
+
 	public void showAlert(String title, String msg, String bt1, String bt2){
 
 		try {
@@ -644,6 +430,10 @@ public class UIController implements Initializable{
 
 		public void write(int b) throws IOException {
 			appendText(String.valueOf((char)b));
+		}
+		
+		public TextArea getConsole(){
+			return console;
 		}
 	}
 

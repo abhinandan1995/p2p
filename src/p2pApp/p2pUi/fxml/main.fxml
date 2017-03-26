@@ -46,7 +46,7 @@
       </HBox>
     <AnchorPane fx:id="anchorPane" maxHeight="-1.0" maxWidth="-1.0" prefHeight="439.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
          <children>
-            <TextField fx:id="searchField" layoutX="496.0" layoutY="83.0" onKeyPressed="#handleKeyOnSearch" prefHeight="42.0" prefWidth="230.0" promptText="Search for...">
+            <TextField fx:id="searchField" layoutX="496.0" layoutY="83.0" onKeyTyped="#handleKeyOnSearch" prefHeight="42.0" prefWidth="230.0" promptText="Search for...">
                <font>
                   <Font size="14.0" />
                </font>
@@ -61,7 +61,7 @@
                   <Font name="Castellar" size="14.0" />
                </font>
             </Label>
-            <ListView fx:id="peersList" layoutX="584.0" layoutY="485.0" prefHeight="101.0" prefWidth="200.0" />
+            <ListView fx:id="peersList" layoutX="584.0" layoutY="508.0" prefHeight="82.0" prefWidth="200.0" />
             <Separator layoutX="14.0" layoutY="465.0" prefHeight="10.0" prefWidth="771.0" />
             <TextField fx:id="textIp" layoutX="584.0" layoutY="596.0" prefHeight="34.0" prefWidth="143.0" promptText="Enter an IP to ping" />
             <Button layoutX="727.0" layoutY="596.0" mnemonicParsing="false" onAction="#pingIp" prefHeight="34.0" prefWidth="57.0" text="Ping" />
@@ -78,6 +78,12 @@
             </Label>
             <ComboBox layoutX="421.0" layoutY="83.0" prefHeight="42.0" prefWidth="75.0" promptText="All" style="-fx-background-color: cyan;" />
             <Label alignment="CENTER" layoutX="327.0" layoutY="638.0" prefHeight="17.0" prefWidth="175.0" text="Copyright. Abhi. 2017" textFill="#633939c0" />
+            <Button fx:id="clrBtn" layoutX="495.0" layoutY="485.0" mnemonicParsing="false" onAction="#clearConsole" prefHeight="34.0" prefWidth="35.0" style="-fx-background-color: #2ca770;" />
+            <Label layoutX="584.0" layoutY="485.0" prefHeight="23.0" prefWidth="115.0" text="Connected peers">
+               <font>
+                  <Font name="Century Schoolbook Bold" size="12.0" />
+               </font>
+            </Label>
          </children>
     </AnchorPane>
   </children>

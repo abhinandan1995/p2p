@@ -59,18 +59,18 @@ public class FileDownloadController implements Initializable {
 	}
 
 	@FXML protected void controlAction(ActionEvent ae){
-		if(pauseButton.getText().contains("Open")){
+		if(pauseButton.getText().equals("Open")){
 			openFile(new File(utility.Utilities.outputFolder+ utility.Utilities.parseInvalidFilenames(sr.getFilename())));
 		}
 
-		if(pauseButton.getText().contains("Pause")){
+		if(pauseButton.getText().equals("Pause")){
 			pauseButton.setText("Resume");
 			titleLabel.setText("Download Paused");
 			node.pauseDownload();
 			return;
 		}
 
-		if(pauseButton.getText().contains("Resume")){
+		if(pauseButton.getText().equals("Resume")){
 			node.resumeDownload();
 			pauseButton.setText("Pause");
 			titleLabel.setText("Downloading file");

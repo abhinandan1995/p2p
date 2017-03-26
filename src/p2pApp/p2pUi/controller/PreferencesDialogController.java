@@ -35,18 +35,18 @@ public class PreferencesDialogController  implements Initializable {
 	@FXML private Label statusLabel;
 	@FXML private Button fileBtn;
 	@FXML private Button folderBtn;
-	
+
 	private String systemId;
-	
+
 	Stage stage=null;
 	private final ObservableList<String> depths =
-	        FXCollections.observableArrayList();   
-	
-	
+			FXCollections.observableArrayList();   
+
+
 	@FXML protected void closeClicked(MouseEvent ae){
 		stage.hide();
 	}
-	
+
 	@FXML protected void addNewPath(ActionEvent ae){
 		if(inputPath.getText().length()>2){
 			String str= inputPath.getText();
@@ -55,7 +55,7 @@ public class PreferencesDialogController  implements Initializable {
 			}
 			else
 				str= str+"::"+inputDepth.getSelectionModel().getSelectedItem();
-			
+
 			addedPaths.setText(addedPaths.getText()+"\n"+str);
 			inputPath.setText("");
 		}
@@ -64,28 +64,29 @@ public class PreferencesDialogController  implements Initializable {
 
 	@FXML protected void saveChanges(ActionEvent ae){
 		FileOutputStream fos = null;
-		
+
 		try{
-		
-		Properties props = new Properties();
-		
-		props.setProperty("p2p.baseIp", ipAddress.getText());
-		props.setProperty("p2p.systemId", systemId);
-		if(outputFolder.getText().length()<3){
-			throw new Exception();
-		}
-		
-		props.setProperty("p2p.outputFolder", outputFolder.getText());
-		
-		if(addedPaths.getText().length()<3){
-			throw new Exception();
-		}
-		
-		props.setProperty("p2p.inputFolder", addedPaths.getText().replace("\n", ", "));
-		fos = new FileOutputStream("./data/config.properties");
-		props.store(fos, "p2p properties");
-		fos.close();
-		statusLabel.setText("Saved: \u2713");
+
+			Properties props = new Properties();
+
+			props.setProperty("p2p.baseIp", ipAddress.getText());
+			if(systemId!=null)
+				props.setProperty("p2p.systemId", systemId);
+			if(outputFolder.getText().length()<3){
+				throw new Exception();
+			}
+
+			props.setProperty("p2p.outputFolder", outputFolder.getText());
+
+			if(addedPaths.getText().length()<3){
+				throw new Exception();
+			}
+
+			props.setProperty("p2p.inputFolder", addedPaths.getText().replace("\n", ", "));
+			fos = new FileOutputStream("./data/config.properties");
+			props.store(fos, "p2p properties");
+			fos.close();
+			statusLabel.setText("Saved: \u2713");
 		}
 		catch(Exception e){
 			System.out.println(e.getMessage());
@@ -94,85 +95,69 @@ public class PreferencesDialogController  implements Initializable {
 		finally{
 		}
 	}
-	
+
 	@FXML protected void openFileList(ActionEvent ae){
 		statusLabel.setText("");
 		final FileChooser fileChooser =
-                new FileChooser();
-            final File selectedFile =
-                    fileChooser.showOpenDialog(stage);
-            if (selectedFile != null) {
-                inputPath.setText(selectedFile.getAbsolutePath());
-            }
+				new FileChooser();
+		final File selectedFile =
+				fileChooser.showOpenDialog(stage);
+		if (selectedFile != null) {
+			inputPath.setText(selectedFile.getAbsolutePath());
+		}
 	}
-	
+
 	@FXML protected void openDirList(ActionEvent ae){
 		statusLabel.setText("");
-	            final DirectoryChooser directoryChooser =
-	                new DirectoryChooser();
-	            final File selectedDirectory =
-	                    directoryChooser.showDialog(stage);
-	            if (selectedDirectory != null) {
-	                inputPath.setText(selectedDirectory.getAbsolutePath());
-	            }
+		final DirectoryChooser directoryChooser =
+				new DirectoryChooser();
+		final File selectedDirectory =
+				directoryChooser.showDialog(stage);
+		if (selectedDirectory != null) {
+			inputPath.setText(selectedDirectory.getAbsolutePath());
+		}
 	}
-	
+
 	@FXML protected void outputDir(ActionEvent ae){
 		statusLabel.setText("");
-	            final DirectoryChooser directoryChooser =
-	                new DirectoryChooser();
-	            final File selectedDirectory =
-	                    directoryChooser.showDialog(stage);
-	            if (selectedDirectory != null) {
-	                outputFolder.setText(selectedDirectory.getAbsolutePath().replace("\\", "/")+"/");
-	            }
+		final DirectoryChooser directoryChooser =
+				new DirectoryChooser();
+		final File selectedDirectory =
+				directoryChooser.showDialog(stage);
+		if (selectedDirectory != null) {
+			outputFolder.setText(selectedDirectory.getAbsolutePath().replace("\\", "/")+"/");
+		}
 	}
-	
+
 	@FXML protected void notifyChanges1(ActionEvent ae){
 		statusLabel.setText("");
 	}
-	
+
 	@FXML protected void notifyChanges2(ActionEvent ae){
 		statusLabel.setText("");
 	}
-	
+
 	@FXML protected void notifyChanges3(KeyEvent ae){
 		statusLabel.setText("");
 	}
-	
+
 	public void setupStage(Stage stage){
 		this.stage= stage;
 	}
-	
+
 	public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
 		try{
 			setValues();
 		}
 		catch(Exception e){
-			
+
 		}
 	}
-	
+
 	private void setValues() throws Exception{
-		Properties props = new Properties();
-		FileInputStream fis = null;
-		
-		fis = new FileInputStream("./data/config.properties");
-		props.load(fis);
-		fis.close();
-		
-		systemId= props.getProperty("p2p.systemId");
-		
-		if(systemId==null){
-			systemId= utility.Utilities.getSystemId();
-		}
-		
-		ipAddress.setText(props.getProperty("p2p.baseIp"));
+
 		ipAddress.setTooltip(new Tooltip("Set the default ip address of the network"));
-		
-		outputFolder.setText(props.getProperty("p2p.outputFolder"));
 		outputFolder.setTooltip(new Tooltip("Set the location to save the files downloaded"));
-		
 		depths.add("Default");
 		depths.add("0");
 		depths.add("1");
@@ -182,14 +167,32 @@ public class PreferencesDialogController  implements Initializable {
 		inputDepth.setItems(depths);
 		inputDepth.getSelectionModel().select(0);
 		inputDepth.setTooltip(new Tooltip("Define the depth upto which a folder is explored"));
-		
+
 		inputPath.setTooltip(new Tooltip("Specify a new location to enable it for sharing"));
 		addPathBtn.setTooltip(new Tooltip("Add the new location"));
 		saveBtn.setTooltip(new Tooltip("Save the changes. Restart the server to enable the changes"));
-				
-		String str= props.getProperty("p2p.inputFolder");
-		addedPaths.setText(str.replace(", ", "\n").replace(",", "\n"));
+
 		fileBtn.setTooltip(new Tooltip("Specify the file you want to share"));
 		folderBtn.setTooltip(new Tooltip("Specify the folder you want to share"));
+
+		Properties props = new Properties();
+		FileInputStream fis = null;
+
+		fis = new FileInputStream("./data/config.properties");
+		props.load(fis);
+		fis.close();
+
+		systemId= props.getProperty("p2p.systemId");
+
+		if(systemId==null){
+			systemId= utility.Utilities.getSystemId();
+		}
+
+		ipAddress.setText(props.getProperty("p2p.baseIp"));
+
+		outputFolder.setText(props.getProperty("p2p.outputFolder"));
+
+		String str= props.getProperty("p2p.inputFolder");
+		addedPaths.setText(str.replace(", ", "\n").replace(",", "\n"));
 	}
 }

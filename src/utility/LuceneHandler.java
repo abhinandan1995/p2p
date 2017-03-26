@@ -97,9 +97,9 @@ public class LuceneHandler {
 			String filepath= getFieldValue(path, idfield, pfield, id);
 			IndexSearcher searcher= new IndexSearcher(getReader(path));
 			WildcardQuery pq= new WildcardQuery(new Term("pathstring", filepath+"/*"));
-			ScoreDoc[] hits = searcher.search(pq, 10000000).scoreDocs; // run the query
+			ScoreDoc[] hits = searcher.search(pq, 100000).scoreDocs; // run the query
 			ArrayList<SearchResults> al= new ArrayList<SearchResults>();
-			for (int i = 0; i < hits.length && i<100; i++) {
+			for (int i = 0; i < hits.length; i++) {
 				Document doc = searcher.doc(hits[i].doc);//get the next  document
 				al.add(new SearchResults("", "", doc.get(TableHandler.columns[0]),
 						doc.get(TableHandler.columns[2]).replaceFirst("(.*)"+name+"/", name+"/"), doc.get(TableHandler.columns[3]),

@@ -44,7 +44,7 @@ public class AppServer {
 					echoResults(SearchTable.getInstance().getSearchTable());
 				//UISearch.updateTable(SearchTable.getInstance().getSearchTable());
 				//UIController.addResults(SearchTable.getInstance().getSearchTable());
-				CallbackRegister.getInstance().notifyCallbacks("p2p-app-results", query);
+				CallbackRegister.getInstance().notifyCallbacks("p2p-app-results", null);
 			}
 		}
 

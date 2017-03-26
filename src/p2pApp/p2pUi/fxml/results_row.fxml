@@ -13,9 +13,9 @@
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefWidth="553.0" VBox.vgrow="ALWAYS">
          <children>
-            <Label fx:id="filename" layoutX="186.0" layoutY="1.0" prefHeight="40.0" prefWidth="318.0" text="Name of a file" wrapText="true">
+            <Label fx:id="filename" layoutX="186.0" layoutY="1.0" prefHeight="40.0" prefWidth="318.0" text="Name of a file. if the name is very big. it looks too full. what to do in that case?" wrapText="true">
                <font>
-                  <Font name="System Bold" size="14.0" />
+                  <Font name="Book Antiqua Bold" size="14.0" />
                </font></Label>
             <Separator layoutX="512.0" layoutY="9.0" orientation="VERTICAL" prefHeight="28.0" prefWidth="3.0" />
             <Label fx:id="filesize" alignment="CENTER" layoutX="526.0" layoutY="10.0" prefHeight="25.0" prefWidth="72.0" text="67 MB" />
