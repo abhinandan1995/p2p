@@ -217,6 +217,7 @@ public class InitModule {
 			utility.Utilities.maxParallelDownloads= Integer.parseInt(props.getProperty("maxParallelDownloads").trim());
 			utility.Utilities.resultSetSize= Integer.parseInt(props.getProperty("resultSetSize").trim());
 			utility.Utilities.debugMode= Boolean.parseBoolean(props.getProperty("debugMode").trim());
+			fis.close();
 		}
 		catch(Exception e){
 			System.out.println("Error while loading system variables. "+e.getMessage());
