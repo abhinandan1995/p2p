@@ -53,7 +53,7 @@ public class SearchDatabase {
 
 			ArrayList<SearchResults> al= new ArrayList<SearchResults>();
 			for(int i=0;i<l.size();i++){
-				al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString() ));
+				al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("FileName").toString(), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString(), StreamServer.getFileType(l.get(i).get("FileName").toString()) ));
 			}
 			size= al.size();
 			searchQuery=new SearchQuery(searchQuery.searchId, "results", "", al); 
@@ -88,7 +88,8 @@ public class SearchDatabase {
 					Document doc = searcher.doc(hits[i].doc);//get the next  document
 					al.add(new SearchResults("", "", doc.get(TableHandler.columns[0]),
 							doc.get(TableHandler.columns[1]), doc.get(TableHandler.columns[3]),
-							doc.get(TableHandler.columns[4]), doc.get(TableHandler.columns[5])));
+							doc.get(TableHandler.columns[4]), doc.get(TableHandler.columns[5]), 
+							StreamServer.getFileType(doc.get(TableHandler.columns[1]))));
 				}
 				size= al.size();
 				searchQuery=new SearchQuery(searchQuery.searchId, "results", "", al); 

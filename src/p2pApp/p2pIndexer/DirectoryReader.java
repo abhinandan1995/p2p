@@ -205,6 +205,10 @@ public class DirectoryReader {
 	}
 
 	public static void updateTableOnDownload(String filepath, String hash){
+		
+		if(hash== null || hash.length()<10)
+			updateTableOnDownload(filepath);
+		
 		File f= new File(filepath);
 		if(f.isFile()){
 			values = new String[]{String.valueOf(TableHandler.getNextId()), f.getName().replace("'", "''").replace("_", " "), f.getPath().replace("\\", "/").replace("'", "''"), hash, String.valueOf(f.length()), "1", "2"};

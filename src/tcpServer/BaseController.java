@@ -9,7 +9,7 @@ import utility.Query_v12;
 
 public class BaseController {
 	private ArrayList<Integer> queryIdSet;
-	private int MAX_SIZE_SET= 1000;
+	private int MAX_SIZE_SET= utility.Utilities.maxQuerySet;
 	private static BaseController baseInstance;
 	private TCPServer server=null;
 

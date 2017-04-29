@@ -105,8 +105,11 @@ public class TCPClient extends Thread {
 		catch (IOException e){
 			System.out.println("IO:"+e.getMessage());
 			if(e.getMessage().contains("timed out")){
-				CallbackRegister.getInstance().notifyCallbacks("ServerException-TimedOut", new String(this.ip));
+				CallbackRegister.getInstance().notifyCallbacks("ConnectionError", new String[]{"TimedOut", this.ip});
 			} 
+			else{
+				CallbackRegister.getInstance().notifyCallbacks("ConnectionError", new String[]{"Refused", this.ip});
+			}
 		}
 
 		finally {

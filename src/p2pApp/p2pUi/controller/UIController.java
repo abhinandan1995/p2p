@@ -39,6 +39,7 @@ import javafx.util.Callback;
 import modules.InitModule;
 import p2pApp.SearchResults;
 import p2pApp.SearchTable;
+import p2pApp.StreamServer;
 import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pQueries.GetDirQuery;
 import p2pApp.p2pQueries.SearchQuery;
@@ -50,7 +51,7 @@ import tcpUtilities.PeersTable;
 public class UIController implements Initializable{
 
 	@FXML private TextField searchField;
-	@FXML private Button searchButton, clrBtn;
+	@FXML private Button searchButton, clrBtn, sendBtn;
 	@FXML public ListView<SearchResults> resultList;
 	@FXML private Label startLabel, settingsLabel, minLabel, closeLabel;
 	@FXML private AnchorPane anchorPane;
@@ -58,8 +59,13 @@ public class UIController implements Initializable{
 	@FXML private TextArea consoleArea;
 	@FXML private TextField textIp;
 	@FXML private ListView<String> peersList;
+	@FXML private TextField textMessage;
+	@FXML private TextArea chatArea;
+	
+	private boolean streamStarted= false;
 	private Stage stage;
 	private PrintStream ps ;
+
 	private final ObservableList<SearchResults> results =
 			FXCollections.observableArrayList();   
 	private final ObservableList<String> peers= 
@@ -111,6 +117,27 @@ public class UIController implements Initializable{
 		closeLabel.setStyle("-fx-background-color:  #9dd2d3");
 	}
 
+	@FXML protected void enterOnMessage(KeyEvent ke){
+		if(ke.getCode()== KeyCode.ENTER){
+			sendBtn.fire();
+			ke.consume();
+		}
+		
+	}
+	
+	@FXML protected void sendMessage(ActionEvent ae){
+		String text= textMessage.getText();
+		if(text== null || text.length()==0)
+			return;
+		
+		if(peers.size()==0){
+			System.out.println("\n**Can't send the message. Not connected to anyone!");
+			return;
+		}
+		textMessage.setText("");
+		BaseNetworkEngine.getInstance().sendMultipleRequests(new PingQuery("ping-message-all", utility.Utilities.userName, null, text), "tcp-server", "PingQuery", false);
+	}
+	
 	@FXML protected void pingIp(ActionEvent ae){
 		String text= textIp.getText();
 		textIp.setText("");
@@ -125,8 +152,10 @@ public class UIController implements Initializable{
 	}
 
 	@FXML protected void handleKeyOnSearch(KeyEvent ke){
-		if(ke.getCode()== KeyCode.ENTER)
+		if(ke.getCode()== KeyCode.ENTER){
 			performSearch();
+			ke.consume();
+		}
 	}
 
 	private class ResultRowCell extends ListCell<SearchResults>{
@@ -176,8 +205,8 @@ public class UIController implements Initializable{
 
 		//totalResults.setText("hello");
 		//makeDraggable();
-		Image imageOk = new Image(getClass().getResourceAsStream("../img/clear.png"));
-		clrBtn.setGraphic(new ImageView(imageOk));
+		Image clr = new Image(getClass().getClassLoader().getResourceAsStream("img/clear.png"));
+		clrBtn.setGraphic(new ImageView(clr));
 		clrBtn.setTooltip(new Tooltip("Clear the console area. Should be cleared to free up some memory!"));
 		ps = new PrintStream(new Console(consoleArea)) ;
 		System.setOut(ps);
@@ -225,6 +254,8 @@ public class UIController implements Initializable{
 					new InitModule().initSystem();
 					CallbackRegister.getInstance().registerForCallback("p2p-app-results", "p2pApp.p2pUi.controller.UIController", "handleResults", false, UIController.this);
 					CallbackRegister.getInstance().registerForCallback("tcp-server-neighbours", "p2pApp.p2pUi.controller.UIController", "modifyPeersList", false, UIController.this);
+					CallbackRegister.getInstance().registerForCallback("tcp-server-ping-message-all", "p2pApp.p2pUi.controller.UIController", "handleChatMessage", false, UIController.this);
+					
 					//returns true if peers table has some entries (some possibility for connections).
 					//returns false if peers table is empty.
 					if(!BaseNetworkEngine.getInstance().connectToNetwork()){
@@ -254,6 +285,23 @@ public class UIController implements Initializable{
 		};
 		serv.setDaemon(true);
 		serv.start();
+
+		Thread stream = new Thread(){
+			public void run(){
+				try{
+					new StreamServer();
+				}
+				catch(Exception e){
+					System.out.println("Streaming Server #1: "+e.getMessage());
+				}
+			}
+		};
+
+		if(!streamStarted){
+			streamStarted= true;
+			stream.setDaemon(true);
+			stream.start();
+		}
 	}
 
 	public void showPreferencesDialog(){
@@ -261,14 +309,15 @@ public class UIController implements Initializable{
 
 			Stage dialog = new Stage();
 			dialog.setTitle("Preferences");
-			dialog.getIcons().add(new Image(getClass().getResourceAsStream("../img/File.png")));
+			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/File.png")));
 			dialog.initOwner(anchorPane.getScene().getWindow());
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/settings.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/settings.fxml"));
 			Parent root = (Parent)loader.load();
 			PreferencesDialogController controller = (PreferencesDialogController)loader.getController();
 			controller.setupStage(dialog);
 			Scene scene = new Scene(root);
 			dialog.setScene(scene);
+			makeDraggable(dialog);
 			dialog.initStyle(StageStyle.UNDECORATED);
 			dialog.show();
 		}
@@ -283,9 +332,9 @@ public class UIController implements Initializable{
 			dialog.setTitle("Downloading: "+sr.getFilename());
 			dialog.setX(400+ 40*Math.random());
 			dialog.setY(200+ 20*Math.random());
-			dialog.getIcons().add(new Image(getClass().getResourceAsStream("../img/File.png")));
+			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/File.png")));
 
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/download_file.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/download_file.fxml"));
 			Parent root = (Parent)loader.load();
 			FileDownloadController controller = (FileDownloadController)loader.getController();
 			controller.setupStage(dialog);
@@ -296,8 +345,8 @@ public class UIController implements Initializable{
 			dialog.show();
 
 			controller.setDownloadNode(DownloadEngine.getInstance().addDownload(sr));
-//			CallbackRegister.getInstance().registerForCallback(
-//					"p2p-app-download-file-"+sr.getIp()+"-"+sr.getFileId(), "p2pApp.p2pUi.controller.FileDownloadController", "completeDownload", true, controller);
+			//			CallbackRegister.getInstance().registerForCallback(
+			//					"p2p-app-download-file-"+sr.getIp()+"-"+sr.getFileId(), "p2pApp.p2pUi.controller.FileDownloadController", "completeDownload", true, controller);
 		}
 
 		catch(Exception e){
@@ -310,9 +359,9 @@ public class UIController implements Initializable{
 
 			Stage dialog = new Stage();
 			dialog.setTitle("Downloading: "+sr.getFilename());
-			dialog.getIcons().add(new Image(getClass().getResourceAsStream("../img/File.png")));
+			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/File.png")));
 
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/download_dir.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/download_dir.fxml"));
 			Parent root = (Parent)loader.load();
 			DirDownloadController controller = (DirDownloadController)loader.getController();
 			controller.setupStage(dialog);
@@ -340,7 +389,7 @@ public class UIController implements Initializable{
 			Stage dialog = new Stage();
 			dialog.initOwner(anchorPane.getScene().getWindow());
 
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,
@@ -363,7 +412,7 @@ public class UIController implements Initializable{
 			Stage dialog = new Stage();
 			dialog.initOwner(anchorPane.getScene().getWindow());
 
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,
@@ -386,7 +435,7 @@ public class UIController implements Initializable{
 		try {
 			Stage dialog = new Stage();
 			dialog.initOwner(anchorPane.getScene().getWindow());
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,
@@ -409,9 +458,11 @@ public class UIController implements Initializable{
 
 	public class Console extends OutputStream {
 		private TextArea console;
+		private String consoleText;
 
 		public Console(TextArea console) {
 			this.console = console;
+			consoleText="";
 		}
 
 		public void appendText(final String valueOf) {
@@ -424,7 +475,14 @@ public class UIController implements Initializable{
 		}
 
 		public void write(int b) throws IOException {
-			appendText(String.valueOf((char)b));
+			consoleText= consoleText + (char)b;
+			if(consoleText.contains("\n")){
+				String text= consoleText;
+				consoleText="";
+				if(text.contains("NanoHTTPD") || text.contains("SocketOutputStream"))
+					return;
+				appendText(text);
+			}
 		}
 
 		public TextArea getConsole(){
@@ -482,6 +540,19 @@ public class UIController implements Initializable{
 				public void run() {
 					peers.clear();
 					peers.addAll(PeersTable.getInstance().getNeighbourIps());
+				}
+			});
+		}
+	}
+	
+	public void handleChatMessage(String action, Object obj){
+		if(obj instanceof PingQuery){
+			final PingQuery pq= (PingQuery) obj;
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					String mes= "\n"+pq.result+" :: "+pq.getExtraData();
+					chatArea.appendText(mes);
 				}
 			});
 		}

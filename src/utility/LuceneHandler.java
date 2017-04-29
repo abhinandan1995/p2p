@@ -21,6 +21,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import p2pApp.SearchResults;
+import p2pApp.StreamServer;
 import p2pApp.p2pIndexer.TableHandler;
 
 public class LuceneHandler {
@@ -103,7 +104,7 @@ public class LuceneHandler {
 				Document doc = searcher.doc(hits[i].doc);//get the next  document
 				al.add(new SearchResults("", "", doc.get(TableHandler.columns[0]),
 						doc.get(TableHandler.columns[2]).replaceFirst("(.*)"+name+"/", name+"/"), doc.get(TableHandler.columns[3]),
-						doc.get(TableHandler.columns[4]), doc.get(TableHandler.columns[5])));
+						doc.get(TableHandler.columns[4]), doc.get(TableHandler.columns[5]), StreamServer.getFileType(TableHandler.columns[1])));
 			}
 			return al;
 		}

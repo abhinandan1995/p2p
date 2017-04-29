@@ -12,14 +12,16 @@ public class SearchResults {
 	String fileid;
 	String path;
 	String type;
+	int stream;
+	
 	ArrayList<AlternateIps> altIps;
 	
-	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize){
-		this(ip, userid, fileid, filename, hash, filesize, "1");
+	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, int stream){
+		this(ip, userid, fileid, filename, hash, filesize, "1", stream);
 	}
 	
-	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, String type){
-		this(ip, userid, fileid, filename, hash, filesize, new ArrayList<AlternateIps>(), type);
+	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, String type, int stream){
+		this(ip, userid, fileid, filename, hash, filesize, new ArrayList<AlternateIps>(), type, stream);
 	}
 	
 	public SearchResults(String fileid, String filename, String hash, String filesize){
@@ -29,7 +31,19 @@ public class SearchResults {
 		this.filesize= filesize;
 	}
 	
-	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, ArrayList<AlternateIps> altIps, String type){
+//	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, ArrayList<AlternateIps> altIps, String type){
+//		this.ip= ip;
+//		this.fileid= fileid;
+//		this.filename= filename;
+//		this.hash= hash;
+//		this.filesize= filesize;
+//		this.userid= userid;
+//		this.altIps= altIps;
+//		this.type= type;
+//		stream= 0;
+//	}
+	
+	public SearchResults(String ip, String userid, String fileid, String filename, String hash, String filesize, ArrayList<AlternateIps> altIps, String type, int stream){
 		this.ip= ip;
 		this.fileid= fileid;
 		this.filename= filename;
@@ -38,8 +52,7 @@ public class SearchResults {
 		this.userid= userid;
 		this.altIps= altIps;
 		this.type= type;
-		
-		//this.altIps.add(new AlternateIps("193.12.1.14","34","something", "89"));
+		this.stream= stream;
 	}
 	
 	public String getFileId(){
@@ -72,6 +85,13 @@ public class SearchResults {
 		return altIps;
 	}
 	
+	public void addAlternateIps(ArrayList<AlternateIps> ips){
+		if(ips == null || ips.size()==0)
+			return;
+		for(int i=0;i<ips.size();i++)
+			addNewAltIp(ips.get(i));
+	}
+	
 	public String getType(){
 		return type;
 	}
@@ -93,6 +113,10 @@ public class SearchResults {
 				return;
 		}
 		altIps.add(aip);
+	}
+	
+	public int getStream(){
+		return stream;
 	}
 }
 

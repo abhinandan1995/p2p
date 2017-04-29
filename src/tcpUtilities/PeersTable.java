@@ -14,6 +14,7 @@ public class PeersTable{
 	private List<PeersEntries> peersEntries;
 	private Set<String> peersSystemIds;
 	private List<PeersEntries> neighbourPeers;
+	private String markedIp= null;
 	
 	private PeersTable(){
 		peersEntries= new ArrayList<PeersEntries>();
@@ -170,7 +171,8 @@ public class PeersTable{
 			neighbourPeers.add(new PeersEntries(i, sid, st, t));
 		else{
 			if(force){
-				neighbourPeers.remove(0);
+				if(!removeMarked())
+					neighbourPeers.remove(0);
 				neighbourPeers.add(new PeersEntries(i, sid, st, t));
 			}
 		}
@@ -184,6 +186,19 @@ public class PeersTable{
 				neighbourPeers.remove(i);
 		}
 		CallbackRegister.getInstance().notifyCallbacks("tcp-server-neighbours", null);
+	}
+	
+	private synchronized boolean removeMarked(){
+		if(markedIp!=null){
+			for(int i=0;i<neighbourPeers.size();i++){
+				if(neighbourPeers.get(i).ip.equals(markedIp)){
+					neighbourPeers.remove(i);
+					markedIp= null;
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	public boolean isNeighbourPresent(String sid){
@@ -217,6 +232,10 @@ public class PeersTable{
 	public void addEntryAndNeighbour(String ip, String sid, boolean force){
 		addEntry(ip, sid, "connected");
 		addNeighbourPeers(ip, sid, "connected", true);
+	}
+	
+	public void markForRemoval(String ip){
+		markedIp = ip;
 	}
 }
 

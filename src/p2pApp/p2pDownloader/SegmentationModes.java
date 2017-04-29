@@ -28,6 +28,9 @@ public class SegmentationModes {
 		case "long":
 			size= 160*1000*1000;
 			break;
+		case "single":
+			size= Long.MAX_VALUE;
+			break;
 		}
 	}
 	
@@ -36,7 +39,7 @@ public class SegmentationModes {
 		if(totalSize < 40){
 			name= "very-short";
 		}
-		else if(totalSize < 1000*1000*1000){
+		else if(totalSize < 500*1000*1000){
 			name= "short";
 		}
 		else if(totalSize < 4000*1000*1000){
@@ -54,5 +57,9 @@ public class SegmentationModes {
 	
 	public long getSize(){
 		return size;
+	}
+	
+	public void setSingleMode(){
+		name= "single";
 	}
 }

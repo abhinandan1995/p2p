@@ -19,19 +19,17 @@ public class AppUi extends Application{
 	public void start(Stage primaryStage) {
 
 		try{
-			
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/main.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/main.fxml"));
 			Parent root = (Parent)loader.load();
 			UIController controller = (UIController)loader.getController();
 			controller.setupStage(primaryStage);
 			Scene scene = new Scene(root);
 			primaryStage.setTitle("p2p application");
 			primaryStage.setScene(scene);
-			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("img/File.png")));
+			primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/share.png")));
 			primaryStage.initStyle(StageStyle.UNDECORATED);
 			UIController.makeDraggable(primaryStage);
 			primaryStage.show();
-			
 		}
 		catch(Exception e){
 			System.out.println(e.getMessage());

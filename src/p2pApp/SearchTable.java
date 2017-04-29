@@ -31,7 +31,7 @@ public class SearchTable {
 
 		for(int i=0;i<sr.size();i++){
 			SearchResults temp= sr.get(i);
-			addNew( new SearchResults(ip, temp.userid, temp.fileid, utility.Utilities.parseInvalidFilenames(temp.filename), temp.hash, temp.filesize, temp.type));
+			addNew( new SearchResults(ip, temp.userid, temp.fileid, utility.Utilities.parseInvalidFilenames(temp.filename), temp.hash, temp.filesize, temp.type, temp.stream));
 		}
 
 	}
@@ -81,5 +81,12 @@ public class SearchTable {
 		existingHashes.put(sr.hash, loadedSize);
 		loadedSize++;
 		return ;
+	}
+	
+	public SearchResults processResults(SearchResults sr){
+		if(existingHashes.containsKey(sr.hash)){
+			sr.addAlternateIps(searchResults.get(existingHashes.get(sr.hash)).getAlternateIps());
+		}
+		return sr;
 	}
 }

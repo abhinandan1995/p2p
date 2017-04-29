@@ -134,9 +134,10 @@ class PingModule{
 		}
 		
 		if(pq.action.equals("ping-message-all")){
-			System.out.println(pq.getExtraData());
+			//System.out.println(pq.getExtraData());
+			//valid= true;
 			BaseNetworkEngine.getInstance().forwardRequests(baseQuery);
-			return;
+			CallbackRegister.getInstance().notifyCallbacks("tcp-server-"+pq.action, pq);
 		}
 		
 		if(valid)

@@ -29,22 +29,31 @@ public class PreferencesDialogController  implements Initializable {
 	@FXML private Button addPathBtn;
 	@FXML private TextField outputFolder;
 	@FXML private TextField ipAddress;
-	@FXML private TextField inputPath;
+	@FXML private TextField inputPath, playerLocation;
 	@FXML private ComboBox<String> inputDepth;
 	@FXML private TextArea addedPaths;
-	@FXML private Label statusLabel;
+	@FXML private Label statusLabel, closeLabel;
 	@FXML private Button fileBtn;
 	@FXML private Button folderBtn;
 
 	private String systemId;
-
+	private String userName;
+	
 	Stage stage=null;
 	private final ObservableList<String> depths =
 			FXCollections.observableArrayList();   
 
 
 	@FXML protected void closeClicked(MouseEvent ae){
-		stage.hide();
+		stage.close();
+	}
+	
+	@FXML protected void mouseEntered(MouseEvent ae){
+		closeLabel.setStyle("-fx-background-color: red");
+	}
+
+	@FXML protected void mouseExited(MouseEvent ae){
+		closeLabel.setStyle("-fx-background-color:  #9dd2d3");
 	}
 
 	@FXML protected void addNewPath(ActionEvent ae){
@@ -72,12 +81,18 @@ public class PreferencesDialogController  implements Initializable {
 			props.setProperty("p2p.baseIp", ipAddress.getText());
 			if(systemId!=null)
 				props.setProperty("p2p.systemId", systemId);
+			if(userName==null){
+				userName="";
+				props.setProperty("p2p.userName", userName);
+			}
+			
 			if(outputFolder.getText().length()<3){
 				throw new Exception();
 			}
 
 			props.setProperty("p2p.outputFolder", outputFolder.getText());
-
+			props.setProperty("p2p.streamPlayer", playerLocation.getText());
+			
 			if(addedPaths.getText().length()<3){
 				throw new Exception();
 			}
@@ -129,6 +144,19 @@ public class PreferencesDialogController  implements Initializable {
 		}
 	}
 
+	@FXML protected void locatePlayer(ActionEvent ae){
+		statusLabel.setText("");
+		final FileChooser fileChooser =
+				new FileChooser();
+		final File selectedFile =
+				fileChooser.showOpenDialog(stage);
+		if (selectedFile != null) {
+			String loc= selectedFile.getAbsolutePath();
+			if(loc.contains(".exe") && loc.contains("mpc"))
+				playerLocation.setText(loc);
+		}
+	}
+	
 	@FXML protected void notifyChanges1(ActionEvent ae){
 		statusLabel.setText("");
 	}
@@ -171,7 +199,7 @@ public class PreferencesDialogController  implements Initializable {
 		inputPath.setTooltip(new Tooltip("Specify a new location to enable it for sharing"));
 		addPathBtn.setTooltip(new Tooltip("Add the new location"));
 		saveBtn.setTooltip(new Tooltip("Save the changes. Restart the server to enable the changes"));
-
+		playerLocation.setTooltip(new Tooltip("Specify the location of the player for streaming"));
 		fileBtn.setTooltip(new Tooltip("Specify the file you want to share"));
 		folderBtn.setTooltip(new Tooltip("Specify the folder you want to share"));
 
@@ -183,15 +211,15 @@ public class PreferencesDialogController  implements Initializable {
 		fis.close();
 
 		systemId= props.getProperty("p2p.systemId");
-
+		userName= props.getProperty("p2p.userName");
+		
 		if(systemId==null){
 			systemId= utility.Utilities.getSystemId();
 		}
 
 		ipAddress.setText(props.getProperty("p2p.baseIp"));
-
 		outputFolder.setText(props.getProperty("p2p.outputFolder"));
-
+		playerLocation.setText(props.getProperty("p2p.streamPlayer"));
 		String str= props.getProperty("p2p.inputFolder");
 		addedPaths.setText(str.replace(", ", "\n").replace(",", "\n"));
 	}

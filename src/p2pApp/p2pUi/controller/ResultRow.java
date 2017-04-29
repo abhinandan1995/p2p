@@ -23,6 +23,7 @@ public class ResultRow {
 	@FXML private Label moreip;
 	@FXML private Label dirlabel;
 	@FXML private Button downloadbtn;
+	@FXML private Button streambtn;
 	
 	private Image fileImage, dirImage;
 	UIController controller;
@@ -30,13 +31,13 @@ public class ResultRow {
 	public ResultRow(UIController controller){
 		this.controller= controller;
 		
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../fxml/results_row.fxml"));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/results_row.fxml"));
 		fxmlLoader.setController(this);
 		
 		try{
 			fxmlLoader.load();
-			fileImage= new Image(getClass().getResourceAsStream("../img/file_r.png"));
-			dirImage= new Image(getClass().getResourceAsStream("../img/folder.png"));
+			fileImage= new Image(getClass().getClassLoader().getResourceAsStream("img/file_r.png"));
+			dirImage= new Image(getClass().getClassLoader().getResourceAsStream("img/folder.png"));
 		}
 		catch(Exception e){
 			System.out.println("Failed to load the list row: "+e.getMessage());
@@ -62,7 +63,16 @@ public class ResultRow {
 			image.setImage(dirImage);
 		}
 		
-		sourceip.setText(sr.getIp());
+		if(sr.getStream()==2)
+			streambtn.setVisible(true);
+		else
+			streambtn.setVisible(false);
+		
+		if(sr.getIp().equals(utility.Utilities.getIpAddress()))
+			sourceip.setText("me");
+		else 
+			sourceip.setText(sr.getIp());
+		
 		if(sr.getAlternateIps().size()>0){
 			moreip.setVisible(true);
 			moreip.setText(""+sr.getAlternateIps().size());
@@ -81,6 +91,14 @@ public class ResultRow {
                 }
             }
         });
+		
+		streambtn.setOnAction(new EventHandler<ActionEvent>(){
+			
+			@Override
+			public void handle(ActionEvent event){
+				utility.Utilities.streamOnCommandLine(sr.getIp(), sr.getStream(), sr.getFileId(), sr.getFilename());
+			}
+		});
 	}
 	
 	public VBox getRow(){

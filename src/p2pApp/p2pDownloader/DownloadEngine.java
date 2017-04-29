@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import p2pApp.SearchResults;
+import p2pApp.SearchTable;
 
 public class DownloadEngine {
 	
@@ -103,7 +104,7 @@ public class DownloadEngine {
 				continue;
 			}
 			if(sr.getType().equals("1")){
-				nodes.add(new DownloadNodes(sr));
+				nodes.add(new DownloadNodes(SearchTable.getInstance().processResults(sr)));
 			}
 		}
 		downloadList.addAll(nodes);

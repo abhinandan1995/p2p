@@ -21,6 +21,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -39,7 +40,8 @@ public class DirDownloadController implements Initializable {
 	@FXML private Label progressLabel, filesCount;
 	@FXML public ListView<DownloadNodes> listView;
 	@FXML private Button openButton, pauseButton, stopButton;
-
+	@FXML private ImageView image;
+	
 	private Stage stage;
 	public long totalSize=0;
 	private boolean isComplete;
@@ -67,6 +69,14 @@ public class DirDownloadController implements Initializable {
 			stage.hide();
 		else
 			showCloseConfirm();
+	}
+	
+	@FXML protected void mouseEntered(MouseEvent ae){
+		closeLabel.setStyle("-fx-background-color: red");
+	}
+
+	@FXML protected void mouseExited(MouseEvent ae){
+		closeLabel.setStyle("-fx-background-color:  #9dd2d3");
 	}
 	
 	public void stopAllDownloads(){
@@ -111,6 +121,7 @@ public class DirDownloadController implements Initializable {
 
 	@Override 
 	public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
+		image.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/img_dir.png")));
 		listView.setItems(files);
 		listView.setCellFactory(new Callback<ListView<DownloadNodes>, ListCell<DownloadNodes>>()
 		{
@@ -121,9 +132,9 @@ public class DirDownloadController implements Initializable {
 			}
 		});
 
-		runImage= new Image(getClass().getResourceAsStream("../img/image_pl.png"));
-		pauseImage= new Image(getClass().getResourceAsStream("../img/images_ps.png"));
-		cancelImage= new Image(getClass().getResourceAsStream("../img/images_cn.png"));
+		runImage= new Image(getClass().getClassLoader().getResourceAsStream("img/image_pl.png"));
+		pauseImage= new Image(getClass().getClassLoader().getResourceAsStream("img/images_ps.png"));
+		cancelImage= new Image(getClass().getClassLoader().getResourceAsStream("img/images_cn.png"));
 	}
 
 	public void setupStage(Stage stage){
@@ -236,7 +247,7 @@ public class DirDownloadController implements Initializable {
 			Stage dialog = new Stage();
 			dialog.initOwner(stage);
 			
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,

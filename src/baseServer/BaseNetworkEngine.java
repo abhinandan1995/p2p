@@ -125,9 +125,19 @@ public class BaseNetworkEngine {
 		}
 	}
 
-	public void TimedOutHandler(String action, Object obj){
-		String ip= obj.toString();
-		BaseNetworkEngine.getInstance().manageNeighboursList(ip, true);
+//	public void TimedOutHandler(String action, Object obj){
+//		String ip= obj.toString();
+//		manageNeighboursList(ip, true);
+//	}
+	
+	public void ConnectErrorHandler(String action, Object obj){
+		String[] msg= (String[])obj;
+		if(msg[0].equals("TimedOut")){
+			manageNeighboursList(msg[1], true);
+		}
+		else{
+			PeersTable.getInstance().markForRemoval(msg[1]);
+		}
 	}
 	
 	private void persistActivePeers(List<PeersEntries> pe, String ip, String sid){

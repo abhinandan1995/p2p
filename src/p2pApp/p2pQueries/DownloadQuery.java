@@ -12,6 +12,8 @@ public class DownloadQuery {
 	public DownloadQuery(String mode, String key){
 		this.mode= mode;
 		this.key= key;
+		this.segMode= "single";
+		part= 0;
 	}
 	
 	public DownloadQuery(String mode, String key, String segMode, int part){

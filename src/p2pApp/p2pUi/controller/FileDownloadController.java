@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -42,6 +43,7 @@ public class FileDownloadController implements Initializable {
 
 	@Override 
 	public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
+		image.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/Downloads.png")));
 	}
 
 	@FXML protected void closeClicked(MouseEvent ae){
@@ -51,6 +53,14 @@ public class FileDownloadController implements Initializable {
 			showCloseConfirm();
 	}
 
+	@FXML protected void mouseEntered(MouseEvent ae){
+		closeLabel.setStyle("-fx-background-color: red");
+	}
+
+	@FXML protected void mouseExited(MouseEvent ae){
+		closeLabel.setStyle("-fx-background-color:  #9dd2d3");
+	}
+	
 	@FXML protected void minClicked(MouseEvent ae){
 		stage.setIconified(true);
 	}
@@ -167,7 +177,7 @@ public class FileDownloadController implements Initializable {
 			Stage dialog = new Stage();
 			dialog.initOwner(stage);
 			
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("../fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,

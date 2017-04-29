@@ -47,7 +47,7 @@ public class InitModule {
 	private void initPingPongCallbacks(){
 		callbackRegis.registerForCallback("tcp-server-pong", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
 		callbackRegis.registerForCallback("tcp-server-ping", "baseServer.BaseNetworkEngine", "manageNeighboursList", false, networkEngine);
-		callbackRegis.registerForCallback("ServerException-TimedOut", "baseServer.BaseNetworkEngine", "TimedOutHandler", false, networkEngine);
+		callbackRegis.registerForCallback("ConnectionError", "baseServer.BaseNetworkEngine", "ConnectErrorHandler", false, networkEngine);
 	}
 
 	private void initSystemValues() throws Exception{
@@ -122,6 +122,12 @@ public class InitModule {
 
 			utility.Utilities.baseIp= props.getProperty("p2p.baseIp");
 			utility.Utilities.outputFolder= props.getProperty("p2p.outputFolder");
+			utility.Utilities.streamLocation= props.getProperty("p2p.streamPlayer");
+			utility.Utilities.userName= props.getProperty("p2p.userName");
+			
+			if(utility.Utilities.userName==null || utility.Utilities.userName.length()==0)
+				utility.Utilities.userName= "User";
+			
 			String str= props.getProperty("p2p.inputFolder");
 			utility.Utilities.inputFolders= str.split(",");
 			utility.Utilities.setSystemId(props.getProperty("p2p.systemId"));
@@ -190,7 +196,11 @@ public class InitModule {
 					"maxDownloadThread= 4\n"+
 					"maxParallelDownloads= 3\n"+ 
 					"resultSetSize= 2\n"+
+					"maxQuerySet= 100\n"+
+					"defaultMode= true\n"+
+					"singleMode= false\n"+
 					"debugMode= false";
+			
 			utility.Utilities.writeToFile("data/system.properties", data, false);
 		}
 	}
@@ -203,20 +213,27 @@ public class InitModule {
 			fis = new FileInputStream("data/system.properties");
 			props.load(fis);
 
-			utility.Utilities.neighbourPeersCount= Integer.parseInt(props.getProperty("neighbourCount").trim());
-			utility.Utilities.maxSimultaneousRequests= Integer.parseInt(props.getProperty("maxRequests").trim());
-			utility.Utilities.connectionTimeout= Integer.parseInt(props.getProperty("connectTimeout").trim());
-			utility.Utilities.maxHopCount=Integer.parseInt(props.getProperty("maxHop").trim());
-			utility.Utilities.maxParallelClientRequests= Integer.parseInt(props.getProperty("maxClientRequest").trim());
-			utility.Utilities.maxParallelServerRequests= Integer.parseInt(props.getProperty("maxServerResponse").trim());
-			utility.Utilities.selfExplicit= Boolean.parseBoolean(props.getProperty("selfExplicit").trim());
-			utility.Utilities.selfNeighbour= Boolean.parseBoolean(props.getProperty("selfNeighbour").trim());
-			utility.Utilities.selfRequest= Boolean.parseBoolean(props.getProperty("selfRequest").trim());
-			utility.Utilities.bufferSize= Integer.parseInt(props.getProperty("bufferSize").trim());
-			utility.Utilities.maxDownloadThreadCount= Integer.parseInt(props.getProperty("maxDownloadThread").trim());
-			utility.Utilities.maxParallelDownloads= Integer.parseInt(props.getProperty("maxParallelDownloads").trim());
-			utility.Utilities.resultSetSize= Integer.parseInt(props.getProperty("resultSetSize").trim());
-			utility.Utilities.debugMode= Boolean.parseBoolean(props.getProperty("debugMode").trim());
+			utility.Utilities.defaultMode= Boolean.parseBoolean(props.getProperty("defaultMode").trim());
+			
+			if(!utility.Utilities.defaultMode){
+			
+				utility.Utilities.neighbourPeersCount= Integer.parseInt(props.getProperty("neighbourCount").trim());
+				utility.Utilities.maxSimultaneousRequests= Integer.parseInt(props.getProperty("maxRequests").trim());
+				utility.Utilities.connectionTimeout= Integer.parseInt(props.getProperty("connectTimeout").trim());
+				utility.Utilities.maxHopCount=Integer.parseInt(props.getProperty("maxHop").trim());
+				utility.Utilities.maxParallelClientRequests= Integer.parseInt(props.getProperty("maxClientRequest").trim());
+				utility.Utilities.maxParallelServerRequests= Integer.parseInt(props.getProperty("maxServerResponse").trim());
+				utility.Utilities.selfExplicit= Boolean.parseBoolean(props.getProperty("selfExplicit").trim());
+				utility.Utilities.selfNeighbour= Boolean.parseBoolean(props.getProperty("selfNeighbour").trim());
+				utility.Utilities.selfRequest= Boolean.parseBoolean(props.getProperty("selfRequest").trim());
+				utility.Utilities.bufferSize= Integer.parseInt(props.getProperty("bufferSize").trim());
+				utility.Utilities.maxDownloadThreadCount= Integer.parseInt(props.getProperty("maxDownloadThread").trim());
+				utility.Utilities.maxParallelDownloads= Integer.parseInt(props.getProperty("maxParallelDownloads").trim());
+				utility.Utilities.resultSetSize= Integer.parseInt(props.getProperty("resultSetSize").trim());
+				utility.Utilities.maxQuerySet= Integer.parseInt(props.getProperty("maxQuerySet"));
+				utility.Utilities.debugMode= Boolean.parseBoolean(props.getProperty("debugMode").trim());
+				utility.Utilities.singleMode= Boolean.parseBoolean(props.getProperty("singleMode").trim());
+			}
 			fis.close();
 		}
 		catch(Exception e){

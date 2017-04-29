@@ -139,7 +139,7 @@ public class DownloadNodes {
 	public void setStatus(String status){
 		this.status= status;
 	}
-
+	
 	public void removeIp(String ip, int pt){
 		
 		if(ip.equals(searchResults.getIp())){
@@ -191,10 +191,7 @@ public class DownloadNodes {
 		}
 		if(partsCompleted>=totalParts && !isComplete){
 			try{
-			fos.getChannel().close();
-			fos.close();
 			isComplete= true;
-			
 //			CallbackRegister.getInstance().notifyCallbacks(
 //					"p2p-app-download-file-"+searchResults.getIp()+"-"+searchResults.getFileId(), searchResults);
 			
@@ -203,6 +200,8 @@ public class DownloadNodes {
 					utility.Utilities.parseInvalidFilenames(searchResults.getFilename()), searchResults.getHash());
 			
 			new File("data/partials/"+searchResults.getHash()+".txt").delete();
+			fos.getChannel().close();
+			fos.close();
 			}
 			catch(Exception e){
 				System.out.println("From download nodes "+e.getMessage());
@@ -223,6 +222,22 @@ public class DownloadNodes {
 	public boolean downloadFile(){
 		try{
 			
+			int pt= getRemainingPart();
+			if(pt<0)
+				return true;
+			
+			if(partsCompleted==0)
+				percentKeeper.init();
+			
+			if(utility.Utilities.singleMode){
+				new DownloadRequest(searchResults.getFileId(), searchResults.getIp(),
+						searchResults.getFilename(), searchResults.getUserid(),
+						this);
+				partsDone[0]= 1;
+				totalParts= 1;
+				return true;
+			}
+			
 			if(isPaused==true)
 				return false;
 			
@@ -231,19 +246,11 @@ public class DownloadNodes {
 				return false;
 			}
 			
-			if(partsCompleted==0){
-				percentKeeper.init();
-			}
-			
 			if(fos==null)
 				fos = new RandomAccessFile(utility.Utilities.outputFolder+utility.Utilities.parseInvalidFilenames(searchResults.getFilename()),"rw");
 			
 			if(DownloadThread.DownloadThreadsCount >= utility.Utilities.maxDownloadThreadCount)
 				return false;
-			
-			int pt= getRemainingPart();
-			if(pt<0)
-				return true;
 			
 			AlternateIps sip= new AlternateIps(searchResults);
 			sip= getNextIp(sip, pt);

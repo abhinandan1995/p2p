@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import baseServer.BaseNetworkEngine;
+import p2pApp.p2pDownloader.DownloadResponse;
 import p2pApp.p2pDownloader.UploadThread;
 import p2pApp.p2pIndexer.TableHandler;
 import p2pApp.p2pQueries.DownloadQuery;
@@ -54,7 +55,10 @@ public class AppServer {
 			//		new DownloadResponse(path, output); 
 			// DownloadResponse is for sequential download
 			//UploadThread is for segmented downloading
-			new UploadThread(path, output, dq.part, dq.segMode);
+			if(dq.mode.equals("single"))
+				new DownloadResponse(path, output); 
+			else
+				new UploadThread(path, output, dq.part, dq.segMode);
 		}
 
 		if(query.getResponseType().equals("GetDirQuery")){
@@ -98,7 +102,7 @@ public class AppServer {
 			List<Map<String, Object>> l= TableHandler.getFilesFromDir(key);
 			al = new ArrayList<SearchResults>();
 			for(int i=0;i<l.size();i++){
-				al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("Path").toString().replaceFirst("(.*)"+name+"/", name+"/"), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString()));
+				al.add(new SearchResults("","",l.get(i).get("FileId").toString(), l.get(i).get("Path").toString().replaceFirst("(.*)"+name+"/", name+"/"), l.get(i).get("Hash").toString(), l.get(i).get("FileSize").toString(), l.get(i).get("Type").toString(), 0));
 			}
 		}
 		else{

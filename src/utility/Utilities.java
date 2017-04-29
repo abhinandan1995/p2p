@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -27,6 +28,7 @@ public class Utilities{
 	private static String ipAddress="";
 	private static String systemId="";
 	public static int serverPort= 7000;
+	public static int streamPort= 8000;
 	public static int neighbourPeersCount= 3;
 	public static int maxSimultaneousRequests= 3;
 	public static int connectionTimeout= 3000;
@@ -45,8 +47,13 @@ public class Utilities{
 	public static int maxParallelDownloads= 3;
 	public static String[] inputFolders;
 	public static int resultSetSize= 2;
+	public static int maxQuerySet= 100;
+	public static String streamLocation = "";
 	public static String searchCol= "Path";
-	public static boolean debugMode= false;
+	public static String userName= "Abhi768";
+	public static boolean debugMode= true;
+	public static boolean singleMode= false;
+	public static boolean defaultMode= true;
 	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
@@ -399,5 +406,14 @@ public class Utilities{
 
     public static boolean validateIp(final String ip) {
         return PATTERN.matcher(ip).matches();
+    }
+    
+    public static void streamOnCommandLine(String ip, int stream, String fileid, String filename){
+    	
+    	try {
+			Runtime.getRuntime().exec(new String[] {streamLocation, "http://"+ip+":8000/?f="+fileid+"&NAME= "+ filename});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 }

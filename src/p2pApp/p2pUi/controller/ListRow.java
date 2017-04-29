@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -28,10 +29,14 @@ public class ListRow {
 	public ListRow(DirDownloadController dc){
 		this.dc= dc;
 		
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../fxml/file_row.fxml"));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/file_row.fxml"));
 		fxmlLoader.setController(this);
 		try{
 			fxmlLoader.load();
+			
+			startImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/imag_p.png")));
+			pauseImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/img_ps.png")));
+			cancelImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/images_c.png")));
 		}
 		catch(Exception e){
 			System.out.println("Failed to load the list row: "+e.getMessage());
