@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 
 import modules.ErrorModule;
 import modules.TCPClientModule;
+import p2pApp.AppServer;
 import tcpUtilities.CallbackRegister;
 import utility.Query_v12;
 
@@ -71,6 +72,7 @@ public class TCPClient extends Thread {
 				if(!query.getResponse())
 					output= null;
 				
+				if(utility.Utilities.debugMode)
 				System.out.println("Received from Server ("+ip+":"+serverPort+")\n"+st);
 
 				switch(query.getModule()){
@@ -82,7 +84,10 @@ public class TCPClient extends Thread {
 					case "error":
 						new ErrorModule(query.getPayload());
 						break;
-						
+					
+					case "p2p-app":
+						new AppServer(query, output);
+						break;
 						default:
 							new ErrorModule(query, output, "No such module found!");
 				}
@@ -100,8 +105,11 @@ public class TCPClient extends Thread {
 		catch (IOException e){
 			System.out.println("IO:"+e.getMessage());
 			if(e.getMessage().contains("timed out")){
-				CallbackRegister.getInstance().notifyCallbacks("ServerException-TimedOut", new String(this.ip));
+				CallbackRegister.getInstance().notifyCallbacks("ConnectionError", new String[]{"TimedOut", this.ip});
 			} 
+			else{
+				CallbackRegister.getInstance().notifyCallbacks("ConnectionError", new String[]{"Refused", this.ip});
+			}
 		}
 
 		finally {

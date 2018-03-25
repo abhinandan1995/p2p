@@ -18,7 +18,7 @@ public class CallbackRegister {
 	}
 	
 	public void registerForCallback(String action, String className, String methodName, boolean singleRun, Object baseObj){
-		callbacks.add(new callbackFields(action, className, methodName, singleRun, baseObj));
+		addNew(new callbackFields(action, className, methodName, singleRun, baseObj));
 	}
 	
 	public void notifyCallbacks(String action, Object obj){
@@ -38,6 +38,18 @@ public class CallbackRegister {
 					callbacks.remove(i--);
 			}
 		}
+	}
+	
+	private void addNew(callbackFields callback){
+		for(int i=0;i<callbacks.size();i++){
+			callbackFields c= callbacks.get(i);
+			if(c.action.equals(callback.action)
+					&& c.className.equals(callback.className)
+					&& c.methodName.equals(callback.methodName)){
+				return;
+			}
+		}
+		callbacks.add(callback);
 	}
 	
 	public void echoCallbacks(){

@@ -1,6 +1,10 @@
 package utility;
 
 import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,20 +14,24 @@ import org.skife.jdbi.v2.Batch;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Query;
+import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+
+import p2pApp.p2pIndexer.TableHandler;
 
 public class MySqlHandler {
 
 	private static MySqlHandler mysqlHandler;
-	private String dbName="";
+	private String dbName="p2p_app";
 	private MysqlDataSource dataSource;
 	private DBI dbi;
 	
 	private MySqlHandler(){
 		try{
-			loadDatabase(null);
+			loadDatabase(dbName);
 		}
 		catch(Exception e){
 			System.out.println("Database Exception #1:"+ e.getMessage());
@@ -35,35 +43,31 @@ public class MySqlHandler {
 			mysqlHandler= new MySqlHandler();
 		return mysqlHandler;
 	}
-	
-	public MysqlDataSource getProperties() throws Exception{
-		Properties props = new Properties();
-        FileInputStream fis = null;
-        fis = new FileInputStream("src/resources/db-ms.properties");
-        props.load(fis);
-		return getProperties(props.getProperty("mysql.database"));
-	}
-	
+		
 	public MysqlDataSource getProperties(String dbName) throws Exception{
 		Properties props = new Properties();
         FileInputStream fis = null;
         MysqlDataSource ds = null;
 
-        fis = new FileInputStream("src/resources/db-ms.properties");
+        fis = new FileInputStream("data/db-ms.properties");
         props.load(fis);
         
         ds = new MysqlConnectionPoolDataSource();
-        String url= props.getProperty("mysql.url")+":"+props.getProperty("mysql.port")+"/"+dbName;
-        ds.setURL(url);
-        ds.setUser(props.getProperty("mysql.username"));
-        
+
         String pass=props.getProperty("mysql.password");
         if(pass==null)
         	pass="";
+
+        String url= props.getProperty("mysql.url")+":"+props.getProperty("mysql.port")+"/";
+        
+        createDatabase(url, 
+        		props.getProperty("mysql.username"), pass,
+        		dbName);
+        
+        ds.setURL(url+dbName+"?"+props.getProperty("mysql.unicode"));
+        ds.setUser(props.getProperty("mysql.username"));
         ds.setPassword(pass);
 
-        this.dbName= dbName;
-        
         return ds;
 	}
 	
@@ -72,19 +76,38 @@ public class MySqlHandler {
 	}
 	
 	public void loadDatabase(String dbName) throws Exception{
-		if(this.dbName.equals(dbName)){
-			return;
-		}
 		
-		if(dbName==null)
-			dataSource= getProperties();
-		else
-			dataSource= getProperties(dbName);
-		
+		dataSource= getProperties(dbName);
 		Class.forName("com.mysql.jdbc.Driver");
     	dbi = new DBI(dataSource);
 	}
 	
+	private void createDatabase(String url, String user, String pass, String dbName){
+		Connection connection = null;
+		Statement statement = null;
+	    try {
+	        Class.forName("com.mysql.jdbc.Driver");
+	        connection = DriverManager.getConnection(url,
+	                user, pass);
+	        statement = connection.createStatement();
+	        String sql = "CREATE DATABASE "+dbName;
+	        statement.executeUpdate(sql);
+	        connection.close();
+	        
+	    } catch (SQLException sqlException) {
+	        if (sqlException.getErrorCode() == 1007) {
+	            
+	        } 
+	        else if(sqlException.getErrorCode()== 1044 || sqlException.getErrorCode()== 1045){
+	        	System.out.println("Database Exception #4: Check for database permissions. "+sqlException.getMessage());
+	        }
+	        else {
+	            System.out.println("Database Exception #4: Check for database connectivity. "+sqlException.getMessage());
+	        }
+	    } catch (ClassNotFoundException e) {
+	        
+	    }
+	}
 	public List<Map<String, Object>> fetchQuery(String sql){
 		
 		Handle handle = null;
@@ -131,8 +154,13 @@ public class MySqlHandler {
 			
             handle.execute("INSERT into "+tblName+" ( "+ cms+")" +"VALUES " +"( "+vs+")");
         } 
+		catch(UnableToExecuteStatementException e){
+			if(e.getCause() instanceof MySQLIntegrityConstraintViolationException){
+				updateTable(TableHandler.TblName, "Hash", values[3], "Path", values[2].replace("\\", "/").replace("'", "''"));
+			}
+		}
         catch(Exception e){
-        	System.out.println("Database Exception #3: "+e.getMessage());
+				System.out.println("Database Exception #4: "+e.getMessage());
         }
         finally {
             if (handle != null) {
@@ -172,7 +200,10 @@ public class MySqlHandler {
 			batch.execute();
 		}
 		catch(Exception e){
-			System.out.println("Database Exception #4: "+e.getMessage());
+			if(e instanceof MySQLIntegrityConstraintViolationException){
+			}
+			else
+				System.out.println("Database Exception #4: "+e.getMessage());
 		}
 		finally {
             if (handle != null) {
@@ -210,5 +241,34 @@ public class MySqlHandler {
             }
         }
 	}
+	
+	public void updateTable(String tblName, String setVariable, String setValue, String whereVar, String whereVal){
+		
+		Handle handle= null;
+		try {
+            handle = dbi.open();
+            handle.execute("UPDATE "+tblName+" SET "+setVariable+" = "+ "'"+ setValue+ "'" +" WHERE "+whereVar+ "= "+ "'"+ whereVal +"'");
+        } 
+        catch(Exception e){
+        	if(e instanceof MySQLIntegrityConstraintViolationException){
+			}
+			else
+				System.out.println("Database Exception #4: "+e.getMessage());
+        }
+        finally {
+            if (handle != null) {
+                handle.close();
+            }
+        }
+	}
+	
+	public void TestDatabase() throws Exception{
+		Handle handle= null;
+		
+			handle= dbi.open();
+			handle.execute("USE "+dbName);
+		handle.close();
+	}
+
 	
 }

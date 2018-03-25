@@ -1,7 +1,12 @@
 package utility;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
@@ -14,8 +19,6 @@ import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-import p2pApp.SearchResults;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -25,20 +28,32 @@ public class Utilities{
 	private static String ipAddress="";
 	private static String systemId="";
 	public static int serverPort= 7000;
+	public static int streamPort= 8000;
 	public static int neighbourPeersCount= 3;
 	public static int maxSimultaneousRequests= 3;
-	public static int connectionTimeout= 2500;
-	public static int maxHopCount=6;
+	public static int connectionTimeout= 3000;
+	public static int maxHopCount=7;
 	public static int maxParallelClientRequests= 20;
 	public static int maxParallelServerRequests= 50;
 	public static boolean selfExplicit= false;
 	public static boolean selfNeighbour= true;
 	public static boolean selfRequest= true;
 	public static String modulesBasePath= "lib/app-modules/jars/";
-	public static String baseIp= "192";
-	public static String outputFolder= "e:/appDownloads/";
+	public static String baseIp= "172";
+	public static String outputFolder= "D:/p2p/Downloads/";
 	public static int activeSearchId= 0;
-	public static int bufferSize= 16384;
+	public static int bufferSize= 8192;
+	public static int maxDownloadThreadCount= 4;
+	public static int maxParallelDownloads= 3;
+	public static String[] inputFolders;
+	public static int resultSetSize= 2;
+	public static int maxQuerySet= 100;
+	public static String streamLocation = "";
+	public static String searchCol= "Path";
+	public static String userName= "";
+	public static boolean debugMode= true;
+	public static boolean singleMode= false;
+	public static boolean defaultMode= true;
 	
 	public static String getIpAddress(){
 		if(ipAddress==null || ipAddress.length()<=4){
@@ -95,6 +110,10 @@ public class Utilities{
 		return null;
 	}
 
+	public static void setSystemId(String x){
+		systemId= x;
+	}
+	
 	public static String getSystemId(){
 		
 		if(systemId!=null && !systemId.isEmpty())
@@ -208,7 +227,7 @@ public class Utilities{
 		return null;
 	}
 	
-	public static String makeRequest(List list, String type){
+	public static String makeRequest(List<?> list, String type){
 		try{
 			return getJsonString(new Query_v12(type, getJsonString(list)));
 		}
@@ -227,7 +246,7 @@ public class Utilities{
 		return gson.toJson(obj);
 	}
 
-	public static Object getObjectFromJson(String jsonString, Class toClass){  
+	public static Object getObjectFromJson(String jsonString, Class<?> toClass){  
 		try {
 			return new Gson().fromJson(jsonString, toClass);
 		} catch (Exception e) {
@@ -302,4 +321,100 @@ public class Utilities{
 	public static int getRandomNumber(){
 		return ThreadLocalRandom.current().nextInt(1000000,1000000000);
 	}
+	
+	public static String humanReadableByteCount(String bytes, boolean si) {
+		return humanReadableByteCount( Long.parseLong(bytes), si);
+	}
+	
+	public static String humanReadableByteCount(long bytes, boolean si) {
+	    int unit = si ? 1000 : 1024;
+	    if (bytes < unit) return bytes + " B";
+	    int exp = (int) (Math.log(bytes) / Math.log(unit));
+	    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "");
+	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
+	
+	public static void writeToFile(String path, ArrayList<String> al){
+		
+		try{
+			
+		FileWriter fw= new FileWriter(path);
+		for(int i=0;i<al.size();i++){
+			fw.write(al.get(i));
+		}
+		fw.close();
+		}
+		catch(Exception e){
+			System.out.println("FileWrite Exception #1 " + e.getMessage());
+		}
+		
+	}
+	
+	public static void writeToFile(String path, String data, boolean append){
+		
+		try{
+			
+		FileWriter fw= new FileWriter(path, append);
+		fw.write(data+"\n");
+		fw.close();
+		}
+		catch(Exception e){
+			System.out.println("FileWrite Exception #2 " + e.getMessage());
+		}
+		
+	}
+	
+	public static void writeObjectToFile(String path, Object obj){
+		
+		try{
+			
+		FileOutputStream fos= new FileOutputStream(path);
+		ObjectOutputStream oos= new ObjectOutputStream(fos);
+		oos.writeObject(obj);
+		oos.close();
+		fos.close();
+		}
+		catch(Exception e){
+			System.out.println("FileWriteToObject Exception #3 " + e.getMessage());
+		}
+		
+	}
+	public static String readFromIpFile(String path){
+	
+	    String s="";
+		
+		 try{  
+			    FileInputStream fin=new FileInputStream(path);  
+			    int i=0;  
+			    while((i=fin.read())!=-1){  
+			     s=s+(char)i; 
+			    }  
+			    fin.close();  
+			  }
+		 catch(Exception e){
+				  System.out.println("FileRead Exception #1 "+e.getMessage());
+		 }
+		 return s;
+	}  
+	
+	public static String parseInvalidFilenames(String filename){
+		return filename.replace("?", "").trim();
+	}
+	
+	private static final Pattern PATTERN = Pattern.compile(
+            "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+
+    public static boolean validateIp(final String ip) {
+        return PATTERN.matcher(ip).matches();
+    }
+    
+    public static void streamOnCommandLine(String ip, int stream, String fileid, String filename){
+    	
+    	try {
+    		String streamUrl = "http://"+ip+":8000/?f="+fileid+"&NAME= "+ filename;
+			Runtime.getRuntime().exec(new String[] {streamLocation, streamUrl});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
 }

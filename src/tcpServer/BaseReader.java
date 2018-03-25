@@ -57,6 +57,7 @@ public class BaseReader extends Thread {
 			if(!BaseController.getInstance().allowFurtherProcessing(query))
 				return;
 			
+			if(utility.Utilities.debugMode)
 			System.out.println ("Received from Client : " + 
 					clientSocket.getInetAddress() + ":" +
 					clientSocket.getPort() + "\n" + data);

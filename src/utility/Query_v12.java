@@ -2,18 +2,18 @@ package utility;
 
 public class Query_v12 {
 	
-	int queryId;
-	String module;
-	String code;
-	String payload;
-	String sourceSid;
-	String destSid;
-	String sourceIp;
-	String sourcePort;
-	String destPort;
-	boolean response;
-	String rtype;
-	int hopCount;
+	private int queryId;
+	private String module;
+	private String code;
+	private String payload;
+	private String sourceSid;
+	private String destSid;
+	private String sourceIp;
+	private String sourcePort;
+	private String destPort;
+	private boolean response;
+	private String responseType;
+	private int hopCount;
 	
 	Query_v12(String m, String p){
 		this(utility.Utilities.getRandomNumber(), m, p, null, null, null, null, null, null, false, null);
@@ -34,7 +34,7 @@ public class Query_v12 {
 		sourcePort=sp;
 		destPort= dp;
 		response= r;
-		rtype= rt;
+		responseType = rt;
 		setHopCount(hc);
 	}
 	
@@ -47,26 +47,26 @@ public class Query_v12 {
 	}
 	
 	public String getCode(){
-		if(code==null)
-			code="";
+		if(code == null)
+			code = "";
 		return code;
 	}
 	
 	public String getSourceSid(){
-		if(sourceSid==null)
-			sourceSid="";
+		if(sourceSid == null)
+			sourceSid = "";
 		return sourceSid;
 	}
 	
 	public String getDestSid(){
-		if(destSid==null)
-			destSid="";
+		if(destSid == null)
+			destSid = "";
 		return destSid;
 	}
 	
 	public String getSourceIp(){
-		if(sourceIp==null)
-			sourceIp="";
+		if(sourceIp == null)
+			sourceIp = "";
 		return sourceIp;
 	}
 	
@@ -101,9 +101,9 @@ public class Query_v12 {
 	}
 	
 	public String getResponseType(){
-		if(rtype==null)
-			rtype="string";
-		return rtype;
+		if(responseType ==null)
+			responseType ="string";
+		return responseType;
 	}
 	
 	public void setResponse(boolean x){
@@ -111,7 +111,7 @@ public class Query_v12 {
 	}
 	
 	public void setResponseType(String t){
-		rtype=t;
+		responseType =t;
 	}
 	
 	public void setQueryId(int i){
@@ -129,6 +129,13 @@ public class Query_v12 {
 	}
 
 	public void decrementHop(){
-		hopCount--;
+		decrementHop(false);
+	}
+	
+	public void decrementHop(boolean found){
+		if(found)
+			hopCount= hopCount / 3;
+		else
+			hopCount--;
 	}
 }

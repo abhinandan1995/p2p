@@ -18,22 +18,23 @@ public class BaseNetworkEngine {
 		peersTable= PeersTable.getInstance();
 	}
 
+	// Ensures a single instance of this class.
 	public static BaseNetworkEngine getInstance(){
-		if(baseEngineInstance==null)
-			baseEngineInstance= new BaseNetworkEngine();
+		if(baseEngineInstance == null)
+			baseEngineInstance = new BaseNetworkEngine();
 		return baseEngineInstance;
 	}
-
-
-	public void manageNeighboursList(){
-		
+	
+	public void manageNeighboursList() {
 		PeersTable pt= peersTable;
-		List<PeersEntries> pe= pt.getConnected();
+		List<PeersEntries> pe = pt.getConnected();
 			
 		for(int i=0;i< pe.size() && pt.getNeighbourPeers().size()<=utility.Utilities.neighbourPeersCount; i++){
 			if(!pt.isNeighbourPresentByIp(pe.get(i).ip)){
 				pt.addNeighbourPeers(pe.get(i).ip, pe.get(i).systemId, "unknown", false);
-				BaseController.getInstance().sendRequest(new PingQuery("ping",null,null), "tcp-server", "PingQuery", true, "", pe.get(i).ip);
+				BaseController.getInstance().sendRequest(
+						new PingQuery("ping",null,null), "tcp-server",
+						"PingQuery", true, "", pe.get(i).ip);
 			}
 		}
 	}
@@ -78,7 +79,11 @@ public class BaseNetworkEngine {
 	}
 	
 	public void forwardRequests(Query_v12 query){
-		query.decrementHop();
+		forwardRequests(query, false);
+	}
+	
+	public void forwardRequests(Query_v12 query, boolean found){
+		query.decrementHop(found);
 		query.setResponse(false);
 		if(query.getHopCount()<=0){
 			return;
@@ -89,13 +94,14 @@ public class BaseNetworkEngine {
 		}
 	}
 	
-	public void connectToNetwork(){
+	public boolean connectToNetwork(){
 		
 		if(peersTable.getConnected().size()==0){
 			System.out.println("No peers found. Please ping an active user to connect!");
-			return;
+			return false;
 		}
 		manageNeighboursList();
+		return true;
 	}
 	
 	//Callback Functions
@@ -103,14 +109,17 @@ public class BaseNetworkEngine {
 	public void manageNeighboursList(String action, Object obj){
 		try{
 			if(action.equals("tcp-server-pong")){
+				//UISearch.enableSearchButon(true);
 				Query_v12 query= (Query_v12)obj;
 				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", true);
+				persistActivePeers(((PingQuery)utility.Utilities.getObjectFromJson(query.getPayload(), PingQuery.class)).peers, query.getSourceIp(), query.getSourceSid());
 				manageNeighboursList(((PingQuery)utility.Utilities.getObjectFromJson(query.getPayload(), PingQuery.class)).peers);
 			}
 			
 			if(action.equals("tcp-server-ping")){
 				Query_v12 query= Query_v12.class.cast(obj);
 				peersTable.updateNeighbourPeer(query.getSourceIp(), query.getSourceSid(), "connected", false);
+				persistActivePeers(null, query.getSourceIp(), query.getSourceSid());
 			}
 		}
 		catch(Exception e){
@@ -118,9 +127,29 @@ public class BaseNetworkEngine {
 		}
 	}
 
-	public void TimedOutHandler(String action, Object obj){
-		String ip= obj.toString();
-		BaseNetworkEngine.getInstance().manageNeighboursList(ip, true);
+//	public void TimedOutHandler(String action, Object obj){
+//		String ip= obj.toString();
+//		manageNeighboursList(ip, true);
+//	}
+	
+	public void ConnectErrorHandler(String action, Object obj){
+		String[] msg= (String[])obj;
+		if(msg[0].equals("TimedOut")){
+			manageNeighboursList(msg[1], true);
+		}
+		else{
+			PeersTable.getInstance().markForRemoval(msg[1]);
+		}
+	}
+	
+	private void persistActivePeers(List<PeersEntries> pe, String ip, String sid){
+		if(pe!=null){
+			for(int i=0;i<pe.size();i++){
+				utility.Utilities.writeToFile("data/ips.dat", pe.get(i).ip + " "+ pe.get(i).systemId, true);
+			}
+		}
+		if(ip!=null)
+		utility.Utilities.writeToFile("data/ips.dat", ip+ " "+ sid, true);
 	}
 
 }

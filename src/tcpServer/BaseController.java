@@ -9,7 +9,7 @@ import utility.Query_v12;
 
 public class BaseController {
 	private ArrayList<Integer> queryIdSet;
-	private int MAX_SIZE_SET= 1000;
+	private int MAX_SIZE_SET= utility.Utilities.maxQuerySet;
 	private static BaseController baseInstance;
 	private TCPServer server=null;
 
@@ -40,7 +40,17 @@ public class BaseController {
 	}
 
 	public void stopServer() throws IOException{
-		server.stop();
+		if(server.isServerRunning()){
+			server.stop();
+			server= null;
+		}
+//		System.exit(0);
+	}
+	
+	public boolean isServerRunning(){
+		if(server==null)
+			return false;
+		return server.isServerRunning();
 	}
 	
 	public int getServerPort(){
