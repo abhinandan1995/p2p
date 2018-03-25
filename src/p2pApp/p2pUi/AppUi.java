@@ -14,19 +14,29 @@ public class AppUi extends Application{
 	public static void main(String []args){
 		launch(args);	
 	}
-	
+
+	private static String APP_NAME = "P2P App";
+
+	public static String getAppName() {
+		return APP_NAME;
+	}
+
+	public static String FXML_PATH = "resources/fxml/";
+	public static String IMG_PATH = "resources/img/";
+
 	@Override
 	public void start(Stage primaryStage) {
 
 		try{
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/main.fxml"));
-			Parent root = (Parent)loader.load();
-			UIController controller = (UIController)loader.getController();
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "main.fxml"));
+			Parent root = loader.load();
+			UIController controller = loader.getController();
 			controller.setupStage(primaryStage);
 			Scene scene = new Scene(root);
-			primaryStage.setTitle("p2p application");
+			primaryStage.setTitle(getAppName());
 			primaryStage.setScene(scene);
-			primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/share.png")));
+			primaryStage.getIcons().add(new Image(getClass().getClassLoader()
+					.getResourceAsStream(IMG_PATH + "share.png")));
 			primaryStage.initStyle(StageStyle.UNDECORATED);
 			UIController.makeDraggable(primaryStage);
 			primaryStage.show();

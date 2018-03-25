@@ -53,9 +53,10 @@ public class PeersTable{
 	}
 	
 	public static PeersTable getInstance(){
-		if(peersInstance==null)
-			peersInstance= new PeersTable();
-			return peersInstance;
+		if(peersInstance==null) {
+            peersInstance= new PeersTable();
+        }
+		return peersInstance;
 	}
 	
 	public List<PeersEntries> getConnected(){
@@ -64,7 +65,7 @@ public class PeersTable{
 	
 	public List<PeersEntries> getConnected(int size){
 		List<PeersEntries> tempList=new ArrayList<PeersEntries>();
-		for(int i=0; i<size;i++){
+		for(int i = 0; i < size; i++){
 			if(peersEntries.get(i).status.equals("connected"))
 				tempList.add(peersEntries.get(i));
 		}
@@ -88,10 +89,10 @@ public class PeersTable{
 	public void updateEntry(String ip, String sid, String st, long t){
 		for(int i=0; i<peersEntries.size();i++){
 			if(peersEntries.get(i).systemId.equals(sid)){
-				if(peersEntries.get(i).time< t){
-					peersEntries.get(i).time= t;
-					peersEntries.get(i).ip= ip;
-					peersEntries.get(i).status= st;
+				if(peersEntries.get(i).time < t){
+					peersEntries.get(i).time = t;
+					peersEntries.get(i).ip = ip;
+					peersEntries.get(i).status = st;
 				}
 			}
 		}

@@ -48,7 +48,11 @@ public class StreamServer extends NanoHTTPD {
 		}
 		
 		try {
-			return serveFile(session.getUri(), session.getHeaders(),f, Files.probeContentType(f.toPath()));
+			String mimeType = MimeTypes.getInstance().getMimeType(f.getName());
+			if (mimeType == null) {
+				mimeType = Files.probeContentType(f.toPath());
+			}
+			return serveFile(session.getUri(), session.getHeaders(),f, mimeType);
 		} catch (IOException e) {
 		} 
 		catch(Exception e){
@@ -150,7 +154,9 @@ public class StreamServer extends NanoHTTPD {
 			}
 		} catch (IOException ioe) {
 			res = getForbiddenResponse("Reading file failed.");
-		}
+		} catch (Exception e) {
+            res = getForbiddenResponse("Reading file failed.");
+        }
 
 		return res;
 	}
@@ -175,7 +181,7 @@ public class StreamServer extends NanoHTTPD {
 	}    
 
 	public static Response newFixedLengthResponse(IStatus status, String mimeType, String message) {
-		Response response = newFixedLengthResponse(status, mimeType, message);
+		Response response = NanoHTTPD.newFixedLengthResponse(status, mimeType, message);
 		response.addHeader("Accept-Ranges", "bytes");
 		return response;
 	}

@@ -12,6 +12,9 @@ import javafx.scene.layout.VBox;
 import p2pApp.SearchResults;
 import p2pApp.p2pDownloader.DownloadNodes;
 
+import static p2pApp.p2pUi.AppUi.FXML_PATH;
+import static p2pApp.p2pUi.AppUi.IMG_PATH;
+
 public class ListRow {
 
 	@FXML private VBox vBox;
@@ -29,14 +32,14 @@ public class ListRow {
 	public ListRow(DirDownloadController dc){
 		this.dc= dc;
 		
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/file_row.fxml"));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "file_row.fxml"));
 		fxmlLoader.setController(this);
 		try{
 			fxmlLoader.load();
 			
-			startImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/imag_p.png")));
-			pauseImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/img_ps.png")));
-			cancelImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/images_c.png")));
+			startImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "imag_p.png")));
+			pauseImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "img_ps.png")));
+			cancelImage.setImage(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "images_c.png")));
 		}
 		catch(Exception e){
 			System.out.println("Failed to load the list row: "+e.getMessage());

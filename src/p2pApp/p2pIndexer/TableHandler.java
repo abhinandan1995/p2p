@@ -20,7 +20,7 @@ public class TableHandler {
 	public static String TblName = "DirReader";
 	public final static String[] columns = new String[]{"FileID","FileName","Path","Hash","FileSize", "Type", "Valid"};
 	private static String[] data = new String[]{"FileID int not null","FileName varchar(255) not null","Path varchar(255) CHARACTER SET utf8 COLLATE utf8_spanish_ci not null","Hash char(40) null","FileSize char(20)", "Type char(1) not null default '1'", "Valid char(1) not null default '1'", "primary key(FileID)", "FULLTEXT("+utility.Utilities.searchCol+")", "Unique key (Path)", "key(valid)", "key(hash)"};
-	public static final String INDEX_DIRECTORY = "data/DirIndex";
+	public static final String INDEX_DIRECTORY = "data/.searchIndex";
 	public static String tableType= "lucene";
 
 	public static void createTable(boolean force){
@@ -71,8 +71,8 @@ public class TableHandler {
 	public static void createIndex(List<String[]> files, boolean newIndex) throws Exception{
 		if(files.size()==0)
 			return;
-		int fileId= 0;
-		IndexWriter writer= null;
+		int fileId = 0;
+		IndexWriter writer = null;
 		if(newIndex)
 			writer= LuceneHandler.createNewIndex(INDEX_DIRECTORY);
 		else

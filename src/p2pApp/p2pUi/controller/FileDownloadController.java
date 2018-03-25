@@ -26,6 +26,9 @@ import javafx.stage.StageStyle;
 import p2pApp.SearchResults;
 import p2pApp.p2pDownloader.DownloadNodes;
 
+import static p2pApp.p2pUi.AppUi.FXML_PATH;
+import static p2pApp.p2pUi.AppUi.IMG_PATH;
+
 public class FileDownloadController implements Initializable {
 
 	@FXML private Label title, titleLabel, closeLabel;
@@ -43,7 +46,7 @@ public class FileDownloadController implements Initializable {
 
 	@Override 
 	public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
-		image.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/Downloads.png")));
+		image.setImage(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "Downloads.png")));
 	}
 
 	@FXML protected void closeClicked(MouseEvent ae){
@@ -177,7 +180,7 @@ public class FileDownloadController implements Initializable {
 			Stage dialog = new Stage();
 			dialog.initOwner(stage);
 			
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,

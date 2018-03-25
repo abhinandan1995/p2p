@@ -47,6 +47,10 @@ import tcpQueries.PingQuery;
 import tcpServer.BaseController;
 import tcpUtilities.CallbackRegister;
 import tcpUtilities.PeersTable;
+import utility.Utilities;
+
+import static p2pApp.p2pUi.AppUi.FXML_PATH;
+import static p2pApp.p2pUi.AppUi.IMG_PATH;
 
 public class UIController implements Initializable{
 
@@ -70,7 +74,7 @@ public class UIController implements Initializable{
 			FXCollections.observableArrayList();   
 	private final ObservableList<String> peers= 
 			FXCollections.observableArrayList();
-
+	
 	public void setupStage(Stage stage){
 		this.stage= stage;
 	}
@@ -205,13 +209,16 @@ public class UIController implements Initializable{
 
 		//totalResults.setText("hello");
 		//makeDraggable();
-		Image clr = new Image(getClass().getClassLoader().getResourceAsStream("img/clear.png"));
+		Image clr = new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "clear.png"));
 		clrBtn.setGraphic(new ImageView(clr));
 		clrBtn.setTooltip(new Tooltip("Clear the console area. Should be cleared to free up some memory!"));
 		ps = new PrintStream(new Console(consoleArea)) ;
-		System.setOut(ps);
-		System.setErr(ps);
-		System.out.println("System status area");
+
+		if (!Utilities.debugMode) {
+            System.setOut(ps);
+            System.setErr(ps);
+            System.out.println("System status area");
+        }
 
 		peersList.setItems(peers);
 		peersList.setTooltip(new Tooltip("Shows the list of peers with which you are connected"));
@@ -235,7 +242,7 @@ public class UIController implements Initializable{
 				for(int i=0; i < size;i++){
 					results.add(sr.get(i));
 				}
-				totalResults.setText("Total Results: ".toString()+sr.size());
+				totalResults.setText("Total Results: " + sr.size());
 			}
 		});
 
@@ -309,9 +316,9 @@ public class UIController implements Initializable{
 
 			Stage dialog = new Stage();
 			dialog.setTitle("Preferences");
-			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/File.png")));
+			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "File.png")));
 			dialog.initOwner(anchorPane.getScene().getWindow());
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/settings.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "settings.fxml"));
 			Parent root = (Parent)loader.load();
 			PreferencesDialogController controller = (PreferencesDialogController)loader.getController();
 			controller.setupStage(dialog);
@@ -332,9 +339,9 @@ public class UIController implements Initializable{
 			dialog.setTitle("Downloading: "+sr.getFilename());
 			dialog.setX(400+ 40*Math.random());
 			dialog.setY(200+ 20*Math.random());
-			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/File.png")));
+			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "File.png")));
 
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/download_file.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "download_file.fxml"));
 			Parent root = (Parent)loader.load();
 			FileDownloadController controller = (FileDownloadController)loader.getController();
 			controller.setupStage(dialog);
@@ -359,9 +366,9 @@ public class UIController implements Initializable{
 
 			Stage dialog = new Stage();
 			dialog.setTitle("Downloading: "+sr.getFilename());
-			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("img/File.png")));
+			dialog.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "File.png")));
 
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/download_dir.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "download_dir.fxml"));
 			Parent root = (Parent)loader.load();
 			DirDownloadController controller = (DirDownloadController)loader.getController();
 			controller.setupStage(dialog);
@@ -389,7 +396,7 @@ public class UIController implements Initializable{
 			Stage dialog = new Stage();
 			dialog.initOwner(anchorPane.getScene().getWindow());
 
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,
@@ -412,7 +419,7 @@ public class UIController implements Initializable{
 			Stage dialog = new Stage();
 			dialog.initOwner(anchorPane.getScene().getWindow());
 
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,
@@ -435,7 +442,7 @@ public class UIController implements Initializable{
 		try {
 			Stage dialog = new Stage();
 			dialog.initOwner(anchorPane.getScene().getWindow());
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,

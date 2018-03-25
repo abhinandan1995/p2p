@@ -13,11 +13,6 @@ public class ProgressDialog extends javax.swing.JDialog implements Runnable{
 	JScrollPane jp;
 	String filename;
     
-//	public ProgressDialog(java.awt.Frame parent, boolean modal, SearchResults sr) {
-//        super(parent, modal);
-//        initComponents(sr.getFilename());
-//    }
-//    
     public ProgressDialog(java.awt.Frame parent, boolean modal, String filename) {
         this(parent, modal, filename, null);
     }
@@ -112,19 +107,6 @@ public class ProgressDialog extends javax.swing.JDialog implements Runnable{
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ProgressDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                ProgressDialog dialog = new ProgressDialog(new javax.swing.JFrame(), true);
-//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-//                    @Override
-//                    public void windowClosing(java.awt.event.WindowEvent e) {
-//                        System.exit(0);
-//                    }
-//                });
-//                dialog.setVisible(true);
-//            }
-//        });
     }
     
     private javax.swing.JButton jButton1;

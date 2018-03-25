@@ -50,7 +50,7 @@ public class Utilities{
 	public static int maxQuerySet= 100;
 	public static String streamLocation = "";
 	public static String searchCol= "Path";
-	public static String userName= "Abhi768";
+	public static String userName= "";
 	public static boolean debugMode= true;
 	public static boolean singleMode= false;
 	public static boolean defaultMode= true;
@@ -411,7 +411,8 @@ public class Utilities{
     public static void streamOnCommandLine(String ip, int stream, String fileid, String filename){
     	
     	try {
-			Runtime.getRuntime().exec(new String[] {streamLocation, "http://"+ip+":8000/?f="+fileid+"&NAME= "+ filename});
+    		String streamUrl = "http://"+ip+":8000/?f="+fileid+"&NAME= "+ filename;
+			Runtime.getRuntime().exec(new String[] {streamLocation, streamUrl});
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

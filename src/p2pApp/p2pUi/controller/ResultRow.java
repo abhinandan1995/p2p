@@ -13,6 +13,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import p2pApp.SearchResults;
 
+import static p2pApp.p2pUi.AppUi.FXML_PATH;
+import static p2pApp.p2pUi.AppUi.IMG_PATH;
+
 public class ResultRow {
 
 	@FXML private VBox vBox;
@@ -31,13 +34,13 @@ public class ResultRow {
 	public ResultRow(UIController controller){
 		this.controller= controller;
 		
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/results_row.fxml"));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "results_row.fxml"));
 		fxmlLoader.setController(this);
 		
 		try{
 			fxmlLoader.load();
-			fileImage= new Image(getClass().getClassLoader().getResourceAsStream("img/file_r.png"));
-			dirImage= new Image(getClass().getClassLoader().getResourceAsStream("img/folder.png"));
+			fileImage= new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "file_r.png"));
+			dirImage= new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "folder.png"));
 		}
 		catch(Exception e){
 			System.out.println("Failed to load the list row: "+e.getMessage());

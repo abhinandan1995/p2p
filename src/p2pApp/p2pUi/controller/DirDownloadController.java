@@ -31,6 +31,9 @@ import p2pApp.p2pDownloader.DownloadEngine;
 import p2pApp.p2pDownloader.DownloadNodes;
 import p2pApp.p2pQueries.GetDirQuery;
 
+import static p2pApp.p2pUi.AppUi.FXML_PATH;
+import static p2pApp.p2pUi.AppUi.IMG_PATH;
+
 public class DirDownloadController implements Initializable {
 
 	@FXML private Label speedLabel, titleLabel, minLabel, closeLabel;
@@ -121,7 +124,7 @@ public class DirDownloadController implements Initializable {
 
 	@Override 
 	public void initialize(URL fxmlFileLocation, ResourceBundle resources) {
-		image.setImage(new Image(getClass().getClassLoader().getResourceAsStream("img/img_dir.png")));
+		image.setImage(new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "img_dir.png")));
 		listView.setItems(files);
 		listView.setCellFactory(new Callback<ListView<DownloadNodes>, ListCell<DownloadNodes>>()
 		{
@@ -132,9 +135,9 @@ public class DirDownloadController implements Initializable {
 			}
 		});
 
-		runImage= new Image(getClass().getClassLoader().getResourceAsStream("img/image_pl.png"));
-		pauseImage= new Image(getClass().getClassLoader().getResourceAsStream("img/images_ps.png"));
-		cancelImage= new Image(getClass().getClassLoader().getResourceAsStream("img/images_cn.png"));
+		runImage= new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "image_pl.png"));
+		pauseImage= new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "images_ps.png"));
+		cancelImage= new Image(getClass().getClassLoader().getResourceAsStream(IMG_PATH + "images_cn.png"));
 	}
 
 	public void setupStage(Stage stage){
@@ -247,7 +250,7 @@ public class DirDownloadController implements Initializable {
 			Stage dialog = new Stage();
 			dialog.initOwner(stage);
 			
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/alert.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FXML_PATH + "alert.fxml"));
 			Parent root = (Parent)loader.load();
 			AlertController controller = (AlertController)loader.getController();
 			controller.setupDetails(dialog,

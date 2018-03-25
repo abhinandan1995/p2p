@@ -18,21 +18,23 @@ public class BaseNetworkEngine {
 		peersTable= PeersTable.getInstance();
 	}
 
+	// Ensures a single instance of this class.
 	public static BaseNetworkEngine getInstance(){
-		if(baseEngineInstance==null)
-			baseEngineInstance= new BaseNetworkEngine();
+		if(baseEngineInstance == null)
+			baseEngineInstance = new BaseNetworkEngine();
 		return baseEngineInstance;
 	}
 	
-	public void manageNeighboursList(){
-		
+	public void manageNeighboursList() {
 		PeersTable pt= peersTable;
-		List<PeersEntries> pe= pt.getConnected();
+		List<PeersEntries> pe = pt.getConnected();
 			
 		for(int i=0;i< pe.size() && pt.getNeighbourPeers().size()<=utility.Utilities.neighbourPeersCount; i++){
 			if(!pt.isNeighbourPresentByIp(pe.get(i).ip)){
 				pt.addNeighbourPeers(pe.get(i).ip, pe.get(i).systemId, "unknown", false);
-				BaseController.getInstance().sendRequest(new PingQuery("ping",null,null), "tcp-server", "PingQuery", true, "", pe.get(i).ip);
+				BaseController.getInstance().sendRequest(
+						new PingQuery("ping",null,null), "tcp-server",
+						"PingQuery", true, "", pe.get(i).ip);
 			}
 		}
 	}
